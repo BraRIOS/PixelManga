@@ -25,10 +25,6 @@ class CustomUserDetails(user: User) : UserDetails {
         return user.username
     }
 
-    fun bornYear(): Int {
-        return user.bornYear?.toInt() ?: 0
-    }
-
     override fun isAccountNonExpired(): Boolean {
         return true
     }

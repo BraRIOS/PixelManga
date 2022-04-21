@@ -32,7 +32,7 @@ CREATE TABLE sample
 (
     id               BIGINT       NOT NULL,
     name             VARCHAR(255) NOT NULL,
-    synposis         VARCHAR(255) NOT NULL,
+    synopsis         VARCHAR(255) NOT NULL,
     publication_date date NULL,
     cover            VARCHAR(255) NULL,
     CONSTRAINT pk_sample PRIMARY KEY (id)

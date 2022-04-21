@@ -16,8 +16,6 @@ import javax.sql.DataSource
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
-    @Autowired
-    private val dataSource: DataSource? = null
     @Bean
     override fun userDetailsService(): UserDetailsService {
         return CustomUserDetailsService()
@@ -48,7 +46,6 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .anyRequest().permitAll()
             .and()
             .formLogin()
-            .usernameParameter("email")
             .defaultSuccessUrl("/users")
             .permitAll()
             .and()

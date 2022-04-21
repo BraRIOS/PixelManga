@@ -1,5 +1,6 @@
 package com.example.pixelmanga.entities
 
+import java.sql.Date
 import java.time.LocalDate
 import javax.persistence.*
 import javax.validation.constraints.FutureOrPresent
@@ -8,19 +9,19 @@ import javax.validation.constraints.FutureOrPresent
 @Table(name = "sample")
 open class Sample {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 
     @Column(name = "name", nullable = false, unique = true)
     open var name: String? = null
 
-    @Column(name = "synposis", nullable = false)
-    open var synposis: String? = null
+    @Column(name = "synopsis", nullable = false)
+    open var synopsis: String? = null
 
     @FutureOrPresent
     @Column(name = "publication_date")
-    open var publication_date: LocalDate? = null
+    open var publicationDate: Date? = null
 
     @OneToMany(mappedBy = "sample", cascade = [CascadeType.ALL], orphanRemoval = true)
     open var types: MutableList<Type> = mutableListOf()

@@ -1,6 +1,8 @@
 package com.example.pixelmanga.controllers
 
+import com.example.pixelmanga.entities.Sample
 import com.example.pixelmanga.entities.User
+import com.example.pixelmanga.repositories.SampleRepository
 import com.example.pixelmanga.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -15,6 +17,9 @@ class AppController {
 
     @Autowired
     private lateinit var userRepo: UserRepository
+
+    @Autowired
+    private lateinit var sampleRepo: SampleRepository
 
     @GetMapping("")
     fun viewHomePage(): String {
@@ -33,6 +38,11 @@ class AppController {
         return "login"
     }
 
+    @GetMapping("/home")
+    fun showHomePage(model: Model): String {
+        return "home"
+    }
+
     @GetMapping("/users")
     fun listUsers(model: Model): String? {
         val listUsers = userRepo.findAll()
@@ -40,9 +50,24 @@ class AppController {
         return "users"
     }
 
-    @GetMapping("/logout")
-    fun logout(): String {
-        return "redirect:/"
+    @GetMapping("/samples")
+    fun listSamples(model: Model): String? {
+        val listSamples = sampleRepo.findAll()
+        model.addAttribute("listSamples", listSamples)
+
+        return "samples"
+    }
+
+    @GetMapping("/register_sample")
+    fun showSampleRegistrationForm(model: Model): String {
+        model.addAttribute("sample", Sample())
+        return "sample_form"
+    }
+
+    @PostMapping("/register_sample")
+    fun registerSample(sample: Sample): String {
+        sampleRepo.save(sample)
+        return "samples"
     }
 
     @PostMapping("/process_register")

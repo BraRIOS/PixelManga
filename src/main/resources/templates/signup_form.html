@@ -29,7 +29,7 @@
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h5 class="card-title text-center">Registro</h5>
-                    <form class="form-signing" th:action="@{/process_register}" th:object="${user}"
+                    <form class="form-signing" action="/process_register" th:object="${user}"
                           method="post" style="max-width: 300px; margin: 0 auto;">
                         <div class="form-floating">
                             <input type="email" th:field="*{email}" class="form-control" required id="email"
