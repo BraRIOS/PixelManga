@@ -12,24 +12,14 @@
     <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
 </head>
 <body class="text-center">
-<!--
-<div>
-    <h1>User Registration - Sign Up</h1>
-</div>
 
-<form th:action="@{/process_register}" th:object="${user}"
-      method="post" style="max-width: 300px; margin: 0 auto;">
-
-
-</form>
--->
 <div class="container">
     <div class="row">
         <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
             <div class="card card-signin my-5">
                 <div class="card-body">
                     <h5 class="card-title text-center">Registro</h5>
-                    <form class="form-signing" action="/process_register" th:object="${user}"
+                    <form class="form-signing" th:action="@{/process_register}" th:object="${user}"
                           method="post" style="max-width: 300px; margin: 0 auto;">
                         <div class="form-floating">
                             <input type="email" th:field="*{email}" class="form-control" required id="email"
@@ -48,11 +38,6 @@
                                    required minlength="2" maxlength="20" placeholder="Nombre de usuario"/>
                             <label for="username">Nombre de usuario</label>
                         </div>
-
-                        <!--div class="form-floating">
-                            <input type="text" th:field="*{born_year}" class="form-control" id="year" placeholder="Año de nacimiento"/>
-                            <label for="year"> Año de nacimiento</label>
-                        </div-->
 
 
                         <div>

@@ -30,7 +30,7 @@ CREATE TABLE chapter
 
 CREATE TABLE sample
 (
-    id               BIGINT       NOT NULL,
+    id               BIGINT AUTO_INCREMENT NOT NULL,
     name             VARCHAR(255) NOT NULL,
     synopsis         VARCHAR(255) NOT NULL,
     publication_date date NULL,
