@@ -24,7 +24,7 @@ class UserRepositoryTests {
         user.email = "ravikumar@gmail.com"
         user.password = "ravi2020"
         user.username = "Ravi"
-        user.bornYear = "1999"
+        user.bornYear = 1999
         val savedUser = repo!!.save(user)
         val existUser = entityManager!!.find(
             User::class.java, savedUser.id

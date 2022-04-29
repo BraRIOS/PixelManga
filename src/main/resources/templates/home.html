@@ -58,14 +58,14 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span></button>
                     <h3>Login</h3>
-                    <form id="loginform" name="loginform" method="post" class="loginform">
+                    <form id="loginform" name="loginform" method="post" class="loginform" action="/login">
                         <p>
                             <label for="user_login">Username or Email Address *<br />
-                                <input type="text" name="log" id="user_login" class="input user_login" value="" size="20" /></label>
+                                <input type="text" name="username" id="user_login" class="input user_login" required size="20" /></label>
                         </p>
                         <p>
                             <label for="user_pass">Password *<br />
-                                <input type="password" name="pwd" id="user_pass" class="input user_pass" autocomplete="" value="" size="20" /></label>
+                                <input type="password" name="password" id="user_pass" class="input user_pass" required autocomplete="" size="20" /></label>
                         </p>
                         <p class="forgetmenot">
                             <label for="rememberme">
@@ -73,8 +73,6 @@
                         </p>
                         <p class="submit">
                             <input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary btn-large wp-submit" value="Log In" />
-                            <input type="hidden" name="redirect_to" value="http://localhost/wordpress/wp-admin/" />
-                            <input type="hidden" name="testcookie" value="1" />
                         </p>
                     </form>
                 </div>

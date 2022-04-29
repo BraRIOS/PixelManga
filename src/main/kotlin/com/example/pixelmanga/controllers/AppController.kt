@@ -5,6 +5,9 @@ import com.example.pixelmanga.entities.User
 import com.example.pixelmanga.repositories.SampleRepository
 import com.example.pixelmanga.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -22,8 +25,8 @@ class AppController {
     private lateinit var sampleRepo: SampleRepository
 
     @GetMapping("")
-    fun viewHomePage(): String {
-        return "index"
+    fun root(): String {
+        return "redirect:/home"
     }
 
     @GetMapping("/register")
@@ -32,15 +35,17 @@ class AppController {
         return "signup_form"
     }
 
-    @GetMapping("/login")
-    fun showLoginForm(model: Model): String {
-        model.addAttribute("user", User())
-        return "login"
-    }
-
     @GetMapping("/home")
     fun showHomePage(model: Model): String {
         return "home"
+    }
+
+    @GetMapping("/user_login")
+    fun showLoginForm(model: Model): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        return if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            "user_login"
+        } else "redirect:/"
     }
 
     @GetMapping("/users")
@@ -64,10 +69,10 @@ class AppController {
         return "sample_form"
     }
 
-    @PostMapping("/register_sample")
+    @PostMapping("/process_register_sample")
     fun registerSample(sample: Sample): String {
         sampleRepo.save(sample)
-        return "samples"
+        return "redirect:/samples"
     }
 
     @PostMapping("/process_register")
@@ -77,6 +82,11 @@ class AppController {
         user.password = encodedPassword
 
         userRepo.save(user)
-        return "register_success"
+        return "redirect:/user_login"
+    }
+
+    @GetMapping("/index")
+    fun showIndexPage(model: Model): String {
+        return "index"
     }
 }

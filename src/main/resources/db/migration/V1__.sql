@@ -70,7 +70,7 @@ CREATE TABLE user
     email     VARCHAR(255) NOT NULL,
     user_name VARCHAR(255) NOT NULL,
     password  VARCHAR(255) NOT NULL,
-    born_year VARCHAR(255) NOT NULL,
+    born_year INT          NOT NULL,
     icon      VARCHAR(255) NULL,
     CONSTRAINT pk_user PRIMARY KEY (id)
 );

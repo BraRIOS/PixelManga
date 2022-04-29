@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import javax.sql.DataSource
 
 
@@ -42,11 +43,10 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/users").authenticated()
-            .anyRequest().permitAll()
+            .antMatchers("/users").authenticated().anyRequest().permitAll()
             .and()
             .formLogin()
-            .defaultSuccessUrl("/users")
+            .loginPage("/user_login")
             .permitAll()
             .and()
             .logout().logoutSuccessUrl("/").permitAll()

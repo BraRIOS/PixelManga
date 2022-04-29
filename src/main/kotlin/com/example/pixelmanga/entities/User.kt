@@ -1,5 +1,6 @@
 package com.example.pixelmanga.entities
 
+import org.springframework.context.support.BeanDefinitionDsl
 import javax.persistence.*
 import javax.validation.constraints.Email
 
@@ -22,7 +23,7 @@ open class User {
     open var password: String? = null
 
     @Column(name = "born_year", nullable = false)
-    open var bornYear: String? = null
+    open var bornYear: Int? = null
 
     @Column(name = "icon")
     open var icon: String? = null
