@@ -1,9 +1,9 @@
-package com.example.pixelmanga.controllers
+package pixelmanga.controllers
 
-import com.example.pixelmanga.entities.Sample
-import com.example.pixelmanga.entities.User
-import com.example.pixelmanga.repositories.SampleRepository
-import com.example.pixelmanga.repositories.UserRepository
+import pixelmanga.entities.Sample
+import pixelmanga.entities.User
+import pixelmanga.repositories.SampleRepository
+import pixelmanga.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -36,15 +36,15 @@ class AppController {
     }
 
     @GetMapping("/home")
-    fun showHomePage(model: Model): String {
+    fun showHomePage(): String {
         return "home"
     }
 
-    @GetMapping("/user_login")
-    fun showLoginForm(model: Model): String {
+    @GetMapping("/login")
+    fun showLoginForm(): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         return if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            "user_login"
+            "login"
         } else "redirect:/"
     }
 
@@ -57,9 +57,7 @@ class AppController {
 
     @GetMapping("/samples")
     fun listSamples(model: Model): String? {
-        val listSamples = sampleRepo.findAll()
-        model.addAttribute("listSamples", listSamples)
-
+        model.addAttribute("listSamples", sampleRepo.findAll())
         return "samples"
     }
 
@@ -86,7 +84,7 @@ class AppController {
     }
 
     @GetMapping("/index")
-    fun showIndexPage(model: Model): String {
+    fun showIndexPage(): String {
         return "index"
     }
 }

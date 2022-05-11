@@ -1,6 +1,6 @@
-package com.example.pixelmanga.repositories
+package pixelmanga.repositories
 
-import com.example.pixelmanga.entities.User
+import pixelmanga.entities.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

@@ -1,4 +1,4 @@
-package com.example.pixelmanga.entities
+package pixelmanga.entities
 
 import org.springframework.context.support.BeanDefinitionDsl
 import javax.persistence.*

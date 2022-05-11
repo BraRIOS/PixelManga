@@ -1,7 +1,7 @@
-package com.example.pixelmanga.security
+package pixelmanga.security
 
-import com.example.pixelmanga.entities.User
-import com.example.pixelmanga.repositories.UserRepository
+import pixelmanga.entities.User
+import pixelmanga.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService

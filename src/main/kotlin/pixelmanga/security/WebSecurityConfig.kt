@@ -1,4 +1,4 @@
-package com.example.pixelmanga.security
+package pixelmanga.security
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -45,8 +45,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
         http.authorizeRequests()
             .antMatchers("/users").authenticated().anyRequest().permitAll()
             .and()
-            .formLogin()
-            .loginPage("/user_login")
+            .formLogin().loginPage("/login")
+            .loginProcessingUrl("/login")
             .permitAll()
             .and()
             .logout().logoutSuccessUrl("/").permitAll()

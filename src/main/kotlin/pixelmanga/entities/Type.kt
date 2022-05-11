@@ -1,4 +1,4 @@
-package com.example.pixelmanga.entities
+package pixelmanga.entities
 
 import javax.persistence.*
 

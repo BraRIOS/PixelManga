@@ -1,4 +1,4 @@
-package com.example.pixelmanga.entities
+package pixelmanga.entities
 
 import java.sql.Date
 import java.time.LocalDate
