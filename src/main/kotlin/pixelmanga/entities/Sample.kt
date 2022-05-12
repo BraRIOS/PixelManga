@@ -1,12 +1,11 @@
 package pixelmanga.entities
 
 import java.sql.Date
-import java.time.LocalDate
 import javax.persistence.*
 import javax.validation.constraints.FutureOrPresent
 
 @Entity
-@Table(name = "sample")
+@Table(name = "samples")
 open class Sample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

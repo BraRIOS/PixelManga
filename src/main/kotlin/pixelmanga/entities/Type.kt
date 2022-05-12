@@ -3,7 +3,7 @@ package pixelmanga.entities
 import javax.persistence.*
 
 @Entity
-@Table(name = "type")
+@Table(name = "types")
 open class Type {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

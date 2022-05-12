@@ -1,41 +1,24 @@
-CREATE TABLE `admin`
-(
-    id      BIGINT NOT NULL,
-    user_id BIGINT NULL,
-    CONSTRAINT pk_admin PRIMARY KEY (id)
-);
-
-CREATE TABLE attribute
+CREATE TABLE attributes
 (
     id      BIGINT       NOT NULL,
     name    VARCHAR(255) NOT NULL,
     type_id BIGINT       NOT NULL,
-    CONSTRAINT pk_attribute PRIMARY KEY (id)
+    CONSTRAINT pk_attributes PRIMARY KEY (id)
 );
 
-CREATE TABLE author
+CREATE TABLE chapters
 (
-    id      BIGINT NOT NULL,
-    user_id BIGINT NULL,
-    CONSTRAINT pk_author PRIMARY KEY (id)
-);
-
-CREATE TABLE chapter
-(
-    id        BIGINT NOT NULL,
-    sample_id BIGINT NOT NULL,
+    id        BIGINT       NOT NULL,
+    sample_id BIGINT       NOT NULL,
     image     VARCHAR(255) NULL,
-    CONSTRAINT pk_chapter PRIMARY KEY (id)
+    CONSTRAINT pk_chapters PRIMARY KEY (id)
 );
 
-CREATE TABLE sample
+CREATE TABLE roles
 (
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    name             VARCHAR(255) NOT NULL,
-    synopsis         VARCHAR(255) NOT NULL,
-    publication_date date NULL,
-    cover            VARCHAR(255) NULL,
-    CONSTRAINT pk_sample PRIMARY KEY (id)
+    id   BIGINT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(255)          NULL,
+    CONSTRAINT pk_roles PRIMARY KEY (id)
 );
 
 CREATE TABLE sample_attributes
@@ -45,80 +28,74 @@ CREATE TABLE sample_attributes
     CONSTRAINT pk_sample_attributes PRIMARY KEY (attributes_id, sample_id)
 );
 
-CREATE TABLE sample_revision
+CREATE TABLE samples
 (
-    id          BIGINT NOT NULL,
-    is_approved BIT(1) NULL,
-    message     VARCHAR(255) NULL,
-    admin_id    BIGINT NULL,
-    author_id   BIGINT NULL,
-    sample_id   BIGINT NULL,
-    CONSTRAINT pk_sample_revision PRIMARY KEY (id)
+    id               BIGINT AUTO_INCREMENT NOT NULL,
+    name             VARCHAR(255)          NOT NULL,
+    synopsis         VARCHAR(255)          NOT NULL,
+    publication_date date                  NULL,
+    cover            VARCHAR(255)          NULL,
+    CONSTRAINT pk_samples PRIMARY KEY (id)
 );
 
-CREATE TABLE type
+CREATE TABLE types
 (
     id        BIGINT       NOT NULL,
     name      VARCHAR(255) NOT NULL,
-    sample_id BIGINT NULL,
-    CONSTRAINT pk_type PRIMARY KEY (id)
+    sample_id BIGINT       NULL,
+    CONSTRAINT pk_types PRIMARY KEY (id)
 );
 
-CREATE TABLE user
+CREATE TABLE users
 (
     id        BIGINT AUTO_INCREMENT NOT NULL,
-    email     VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
-    password  VARCHAR(255) NOT NULL,
-    born_year INT          NOT NULL,
-    icon      VARCHAR(255) NULL,
-    CONSTRAINT pk_user PRIMARY KEY (id)
+    email     VARCHAR(255)          NOT NULL,
+    user_name VARCHAR(255)          NOT NULL,
+    password  VARCHAR(255)          NOT NULL,
+    born_year INT                   NOT NULL,
+    icon      VARCHAR(255)          NULL,
+    CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
-ALTER TABLE `admin`
-    ADD CONSTRAINT uc_admin_user UNIQUE (user_id);
+CREATE TABLE users_roles
+(
+    role_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    CONSTRAINT pk_users_roles PRIMARY KEY (role_id, user_id)
+);
 
-ALTER TABLE attribute
-    ADD CONSTRAINT uc_attribute_name UNIQUE (name);
+ALTER TABLE attributes
+    ADD CONSTRAINT uc_attributes_name UNIQUE (name);
 
-ALTER TABLE author
-    ADD CONSTRAINT uc_author_user UNIQUE (user_id);
+ALTER TABLE roles
+    ADD CONSTRAINT uc_roles_name UNIQUE (name);
 
-ALTER TABLE sample
-    ADD CONSTRAINT uc_sample_name UNIQUE (name);
+ALTER TABLE samples
+    ADD CONSTRAINT uc_samples_name UNIQUE (name);
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_email UNIQUE (email);
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_email UNIQUE (email);
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_user_name UNIQUE (user_name);
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_user_name UNIQUE (user_name);
 
-ALTER TABLE `admin`
-    ADD CONSTRAINT FK_ADMIN_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
+ALTER TABLE attributes
+    ADD CONSTRAINT FK_ATTRIBUTES_ON_TYPE FOREIGN KEY (type_id) REFERENCES types (id);
 
-ALTER TABLE attribute
-    ADD CONSTRAINT FK_ATTRIBUTE_ON_TYPE FOREIGN KEY (type_id) REFERENCES type (id);
+ALTER TABLE chapters
+    ADD CONSTRAINT FK_CHAPTERS_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
 
-ALTER TABLE author
-    ADD CONSTRAINT FK_AUTHOR_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
-
-ALTER TABLE chapter
-    ADD CONSTRAINT FK_CHAPTER_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES sample (id);
-
-ALTER TABLE sample_revision
-    ADD CONSTRAINT FK_SAMPLE_REVISION_ON_ADMIN FOREIGN KEY (admin_id) REFERENCES `admin` (id);
-
-ALTER TABLE sample_revision
-    ADD CONSTRAINT FK_SAMPLE_REVISION_ON_AUTHOR FOREIGN KEY (author_id) REFERENCES author (id);
-
-ALTER TABLE sample_revision
-    ADD CONSTRAINT FK_SAMPLE_REVISION_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES sample (id);
-
-ALTER TABLE type
-    ADD CONSTRAINT FK_TYPE_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES sample (id);
+ALTER TABLE types
+    ADD CONSTRAINT FK_TYPES_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
 
 ALTER TABLE sample_attributes
-    ADD CONSTRAINT fk_samatt_on_attribute FOREIGN KEY (attributes_id) REFERENCES attribute (id);
+    ADD CONSTRAINT fk_samatt_on_attribute FOREIGN KEY (attributes_id) REFERENCES attributes (id);
 
 ALTER TABLE sample_attributes
-    ADD CONSTRAINT fk_samatt_on_sample FOREIGN KEY (sample_id) REFERENCES sample (id);
+    ADD CONSTRAINT fk_samatt_on_sample FOREIGN KEY (sample_id) REFERENCES samples (id);
+
+ALTER TABLE users_roles
+    ADD CONSTRAINT fk_userol_on_role FOREIGN KEY (role_id) REFERENCES roles (id);
+
+ALTER TABLE users_roles
+    ADD CONSTRAINT fk_userol_on_user FOREIGN KEY (user_id) REFERENCES users (id);

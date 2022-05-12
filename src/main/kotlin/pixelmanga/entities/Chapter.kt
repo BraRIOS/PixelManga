@@ -3,7 +3,7 @@ package pixelmanga.entities
 import javax.persistence.*
 
 @Entity
-@Table(name = "chapter")
+@Table(name = "chapters")
 open class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

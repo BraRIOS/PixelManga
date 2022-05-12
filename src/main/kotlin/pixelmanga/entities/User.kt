@@ -1,11 +1,10 @@
 package pixelmanga.entities
 
-import org.springframework.context.support.BeanDefinitionDsl
 import javax.persistence.*
 import javax.validation.constraints.Email
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 open class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +26,13 @@ open class User {
 
     @Column(name = "icon")
     open var icon: String? = null
+
+
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "users_roles",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "role_id")]
+    )
+    open var roles: MutableSet<Role> = mutableSetOf()
 }

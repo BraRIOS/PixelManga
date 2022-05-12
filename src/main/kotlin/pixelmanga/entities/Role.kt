@@ -4,24 +4,20 @@ import org.hibernate.Hibernate
 import javax.persistence.*
 
 @Entity
-@Table(name = "attributes")
-open class Attribute {
+@Table(name = "roles")
+open class Role() {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", unique = true)
     open var name: String? = null
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "type_id", nullable = false)
-    open var type: Type? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Attribute
+        other as Role
 
         return id != null && id == other.id
     }

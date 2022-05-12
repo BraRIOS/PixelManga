@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import pixelmanga.entities.Role
+import pixelmanga.repositories.RoleRepository
 
 
 @Controller
@@ -24,6 +26,10 @@ class AppController {
     @Autowired
     private lateinit var sampleRepo: SampleRepository
 
+    @Autowired
+    private lateinit var roleRepo: RoleRepository
+
+
     @GetMapping("")
     fun root(): String {
         return "redirect:/home"
@@ -32,6 +38,10 @@ class AppController {
     @GetMapping("/register")
     fun showRegistrationForm(model: Model): String {
         model.addAttribute("user", User())
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (!(authentication == null || authentication is AnonymousAuthenticationToken))
+            return "redirect:/home"
+
         return "signup_form"
     }
 
@@ -78,9 +88,10 @@ class AppController {
         val passwordEncoder = BCryptPasswordEncoder()
         val encodedPassword = passwordEncoder.encode(user.password)
         user.password = encodedPassword
-
+        user.roles.add(roleRepo.findByName("USER"))
         userRepo.save(user)
-        return "redirect:/user_login"
+
+        return "redirect:/login"
     }
 
     @GetMapping("/index")
