@@ -1,7 +1,10 @@
 package pixelmanga.repositories
 
-import pixelmanga.entities.Sample
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.transaction.annotation.Transactional
+import pixelmanga.entities.Sample
 
 interface SampleRepository : JpaRepository<Sample, Long> {
 }

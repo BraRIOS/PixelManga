@@ -7,7 +7,7 @@ import javax.persistence.*
 @Table(name = "attributes")
 open class Attribute {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 

@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "roles")
-open class Role() {
+open class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

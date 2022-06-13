@@ -51,31 +51,5 @@
     </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" id="form-login">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div id="login" class="login">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span></button>
-                    <h3>Login</h3>
-                    <form id="loginform" method="post" class="loginform" th:action="@{/login}">
-                        <p>
-                            <label for="user_login">Username or Email Address *<br />
-                                <input type="text" name="username" id="user_login" class="input user_login" required size="20" /></label>
-                        </p>
-                        <p>
-                            <label for="user_pass">Password *<br />
-                                <input type="password" name="password" id="user_pass" class="input user_pass" required autocomplete="" size="20" /></label>
-                        </p>
-                        <p class="submit">
-                            <input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary btn-large wp-submit" value="Log In" />
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>

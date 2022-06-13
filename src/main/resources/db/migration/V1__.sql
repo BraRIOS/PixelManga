@@ -1,6 +1,6 @@
 CREATE TABLE attributes
 (
-    id      BIGINT       NOT NULL,
+    id      BIGINT AUTO_INCREMENT NOT NULL,
     name    VARCHAR(255) NOT NULL,
     type_id BIGINT       NOT NULL,
     CONSTRAINT pk_attributes PRIMARY KEY (id)
@@ -8,8 +8,8 @@ CREATE TABLE attributes
 
 CREATE TABLE chapters
 (
-    id        BIGINT       NOT NULL,
-    sample_id BIGINT       NOT NULL,
+    id        BIGINT AUTO_INCREMENT NOT NULL,
+    sample_id BIGINT NOT NULL,
     image     VARCHAR(255) NULL,
     CONSTRAINT pk_chapters PRIMARY KEY (id)
 );
@@ -17,7 +17,7 @@ CREATE TABLE chapters
 CREATE TABLE roles
 (
     id   BIGINT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255)          NULL,
+    name VARCHAR(255) NULL,
     CONSTRAINT pk_roles PRIMARY KEY (id)
 );
 
@@ -31,29 +31,28 @@ CREATE TABLE sample_attributes
 CREATE TABLE samples
 (
     id               BIGINT AUTO_INCREMENT NOT NULL,
-    name             VARCHAR(255)          NOT NULL,
-    synopsis         VARCHAR(255)          NOT NULL,
-    publication_date date                  NULL,
-    cover            VARCHAR(255)          NULL,
+    name             VARCHAR(255) NOT NULL,
+    synopsis         VARCHAR(255) NOT NULL,
+    publication_date date NULL,
+    cover            VARCHAR(255) NULL,
     CONSTRAINT pk_samples PRIMARY KEY (id)
 );
 
 CREATE TABLE types
 (
-    id        BIGINT       NOT NULL,
+    id        BIGINT AUTO_INCREMENT NOT NULL,
     name      VARCHAR(255) NOT NULL,
-    sample_id BIGINT       NULL,
     CONSTRAINT pk_types PRIMARY KEY (id)
 );
 
 CREATE TABLE users
 (
     id        BIGINT AUTO_INCREMENT NOT NULL,
-    email     VARCHAR(255)          NOT NULL,
-    user_name VARCHAR(255)          NOT NULL,
-    password  VARCHAR(255)          NOT NULL,
-    born_year INT                   NOT NULL,
-    icon      VARCHAR(255)          NULL,
+    email     VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255) NOT NULL,
+    password  VARCHAR(255) NOT NULL,
+    born_year INT          NOT NULL,
+    icon      VARCHAR(255) NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -84,9 +83,6 @@ ALTER TABLE attributes
 
 ALTER TABLE chapters
     ADD CONSTRAINT FK_CHAPTERS_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
-
-ALTER TABLE types
-    ADD CONSTRAINT FK_TYPES_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
 
 ALTER TABLE sample_attributes
     ADD CONSTRAINT fk_samatt_on_attribute FOREIGN KEY (attributes_id) REFERENCES attributes (id);

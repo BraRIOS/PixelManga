@@ -22,10 +22,7 @@ open class Sample {
     @Column(name = "publication_date")
     open var publicationDate: Date? = null
 
-    @OneToMany(mappedBy = "sample", cascade = [CascadeType.ALL], orphanRemoval = true)
-    open var types: MutableList<Type> = mutableListOf()
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sample_attributes",
         joinColumns = [JoinColumn(name = "sample_id")],

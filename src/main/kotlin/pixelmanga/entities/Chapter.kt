@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "chapters")
 open class Chapter {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 
