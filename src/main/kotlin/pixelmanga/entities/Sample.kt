@@ -23,6 +23,7 @@ open class Sample {
     open var publicationDate: Date? = null
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @OrderBy("name")
     @JoinTable(
         name = "sample_attributes",
         joinColumns = [JoinColumn(name = "sample_id")],

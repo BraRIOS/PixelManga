@@ -15,6 +15,7 @@ open class Attribute {
     open var name: String? = null
 
     @ManyToOne(optional = false)
+    @OrderBy("name")
     @JoinColumn(name = "type_id", nullable = false)
     open var type: Type? = null
 

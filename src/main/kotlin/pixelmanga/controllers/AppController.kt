@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.multipart.MultipartFile
 import pixelmanga.entities.Sample
 import pixelmanga.entities.User
 import pixelmanga.repositories.RoleRepository
@@ -82,7 +84,14 @@ class AppController {
     }
 
     @PostMapping("/process_register_sample")
-    fun registerSample(sample: Sample): String {
+    fun saveSample(sample: Sample, @RequestParam("image") image: MultipartFile): String {
+        val id = sample.id
+        val type = sample.attributes.first { atribute -> atribute.type?.name == "tipo de libro" }.name
+        val name = sample.name + "-cover"
+        val extension = "jpg"
+
+        sample.cover = "/static/images/${type}/${id}/${name}.${extension}"
+
         sampleRepo.save(sample)
         return "redirect:/samples"
     }
