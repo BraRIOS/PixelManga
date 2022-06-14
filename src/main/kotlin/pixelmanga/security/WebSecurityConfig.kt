@@ -40,7 +40,9 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/users").authenticated().anyRequest().permitAll()
+            .antMatchers("/users").authenticated()
+            .antMatchers("/make_author").authenticated()
+            .anyRequest().permitAll()
             .and()
             .formLogin().loginPage("/login")
             .loginProcessingUrl("/login")

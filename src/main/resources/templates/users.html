@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5 ">
+
 <head>
   <meta charset="UTF-8">
   <title>List Users</title>
@@ -12,10 +13,15 @@
   <div>
     <form th:action="@{/logout}" method="post">
       <p>
-        Welcome <b>[[${#request.userPrincipal.principal.username}]]</b>
+        Welcome <b><span sec:authentication="name">Username</span></b>
+        &nbsp;
+        <i><span sec:authentication="principal.authorities">Roles</span></i>
       </p>
       <input type="submit" value="Sign Out" />
     </form>
+  </div>
+  <div>
+    <a href="/make_author" type="submit">Quiero ser autor</a>
   </div>
   <div>
     <h1>List of Users</h1>
@@ -29,6 +35,7 @@
         <th>E-mail</th>
         <th>Usuario</th>
         <th>Año de nacimiento</th>
+        <th>Roles</th>
       </tr>
       </thead>
       <tbody>
@@ -37,6 +44,7 @@
         <td th:text="${user.email}">E-mail</td>
         <td th:text="${user.username}">Usuario</td>
         <td th:text="${user.bornYear}">Año de nacimiento</td>
+        <td th:each="role : ${user.roles}"> <a th:text="${role.name}">Roles </a></td>
       </tr>
       </tbody>
     </table>

@@ -1,20 +1,24 @@
 package pixelmanga.controllers
 
-import pixelmanga.entities.Sample
-import pixelmanga.entities.User
-import pixelmanga.repositories.SampleRepository
-import pixelmanga.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import pixelmanga.entities.Role
+import pixelmanga.entities.Sample
+import pixelmanga.entities.User
 import pixelmanga.repositories.RoleRepository
+import pixelmanga.repositories.SampleRepository
+import pixelmanga.repositories.UserRepository
+import pixelmanga.security.CustomUserDetails
+import java.util.stream.Collectors
 
 
 @Controller
@@ -68,13 +72,13 @@ class AppController {
     @GetMapping("/samples")
     fun listSamples(model: Model): String? {
         model.addAttribute("listSamples", sampleRepo.findAll())
-        return "sample"
+        return "samples"
     }
 
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
-        return "sample_form"
+        return "sample"
     }
 
     @PostMapping("/process_register_sample")
@@ -97,5 +101,20 @@ class AppController {
     @GetMapping("/index")
     fun showIndexPage(): String {
         return "index"
+    }
+
+    @PostMapping("/make_author")
+    fun makeAuthor(authentication: Authentication): String {
+        val user = userRepo.findByUsername(authentication.name)
+        user.roles.add(roleRepo.findByName("AUTHOR"))
+
+        val actualAuthorities : MutableSet<GrantedAuthority>? =
+            user.roles.stream().map { role ->  SimpleGrantedAuthority(role.name) }.collect(Collectors.toSet())
+        val newAuth: Authentication = UsernamePasswordAuthenticationToken(CustomUserDetails(user), user.password, actualAuthorities)
+        SecurityContextHolder.getContext().authentication = newAuth
+
+        userRepo.save(user)
+
+        return "redirect:/register_sample"
     }
 }

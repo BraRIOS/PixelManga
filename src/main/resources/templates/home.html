@@ -31,6 +31,30 @@
         <div class="loader"></div>
     </div>
 
+    <!-- Modal -->
+    <div id="myModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">¿Quieres convertirte en un autor?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Aún no eres un autor.¿Quieres convertirte en uno?</p>
+                </div>
+                <div class="modal-footer">
+                    <form th:action="@{/make_author}" method="post">
+                        <button type="submit" class="btn btn-primary">Si quiero</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No quiero</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
     <!-- Header Section Begin -->
     <header class="header">
         <div class="container">
@@ -55,10 +79,13 @@
                 </div>
                 <div class="col-lg-2">
                     <div class="header__right">
-                        <a href="#" sec:authorize="hasAnyAuthority('AUTHOR')"><span class="icon_pencil"></span></a>
+                        <div sec:authorize="isAuthenticated()">
+                            <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR')"><span class="icon_pencil"></span></a>
+                            <a sec:authorize="!hasAnyAuthority('AUTHOR')" data-toggle="modal" data-target="#myModal"><span class="icon_pencil"></span></a>
+                        </div>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
                         <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
-                        <a href="/logout" sec:authorize="isAuthenticated()">Salir</a>
+                        <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                     </div>
                 </div>
