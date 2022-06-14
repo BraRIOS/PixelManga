@@ -368,6 +368,28 @@ ol {
 	background: transparent;
 }
 
+.header__right a ul li:hover .dropdown {
+	top: 62px;
+	opacity: 1;
+	visibility: visible;
+}
+
+.header__right a ul li .dropdown {
+	position: absolute;
+	left: 0;
+	top: 82px;
+	width: 150px;
+	background: #ffffff;
+	text-align: left;
+	padding: 5px 0;
+	z-index: 9;
+	opacity: 0;
+	visibility: hidden;
+	-webkit-transition: all, 0.3s;
+	-o-transition: all, 0.3s;
+	transition: all, 0.3s;
+}
+
 .header__menu ul li:last-child {
 	margin-right: 0;
 }
@@ -1746,6 +1768,12 @@ ol {
 .login__form form .input__item {
 	position: relative;
 	width: 370px;
+	margin-bottom: 20px;
+}
+
+.login__form form .input__select {
+	position: relative;
+	width: 120px;
 	margin-bottom: 20px;
 }
 

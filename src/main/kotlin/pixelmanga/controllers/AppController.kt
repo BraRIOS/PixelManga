@@ -54,7 +54,7 @@ class AppController {
     fun showLoginForm(): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         return if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            "login"
+            "login_form"
         } else "redirect:/"
     }
 
@@ -68,7 +68,7 @@ class AppController {
     @GetMapping("/samples")
     fun listSamples(model: Model): String? {
         model.addAttribute("listSamples", sampleRepo.findAll())
-        return "samples"
+        return "sample"
     }
 
     @GetMapping("/register_sample")

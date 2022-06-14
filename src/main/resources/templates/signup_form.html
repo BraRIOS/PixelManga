@@ -37,7 +37,7 @@
         <div class="row">
             <div class="col-lg-2">
                 <div class="header__logo">
-                    <a href="./index.html">
+                    <a href="/home">
                         <img src="/static/images/logo.png" alt="">
                     </a>
                 </div>
@@ -56,7 +56,7 @@
             <div class="col-lg-2">
                 <div class="header__right">
                     <a href="#" class="search-switch"><span class="icon_search"></span></a>
-                    <a href="./login.html"><span class="icon_profile"></span></a>
+                    <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                 </div>
             </div>
         </div>
@@ -87,19 +87,28 @@
             <div class="col-lg-6">
                 <div class="login__form">
                     <h3>Regístrese</h3>
-                    <form action="#">
+                    <form th:action="@{/process_register}" th:object="${user}"
+                          method="post">
                         <div class="input__item">
-                            <input type="email" placeholder="Correo electrónico">
+                            <input type="email" th:field="*{email}" id="email" placeholder="Correo electrónico" required>
                             <span class="icon_mail"></span>
                         </div>
                         <div class="input__item">
-                            <input type="text" placeholder="Nombre de usuario">
+                            <input type="password" th:field="*{password}" placeholder="Contraseña"
+                                   id="password" minlength="6" maxlength="10" required>
+                            <span class="icon_lock"></span>
+                        </div>
+                        <div class="input__item">
+                            <input type="text" th:field="*{username}" placeholder="Nombre de usuario" id="username"
+                                   required minlength="2" maxlength="20">
                             <span class="icon_profile"></span>
                         </div>
                         <div class="input__item">
-                            <input type="password" placeholder="Contraseña">
-                            <span class="icon_lock"></span>
+                            <input type="number" th:field="*{bornYear}" placeholder="Año de nacimiento" id="bornYear"
+                                   required min="1965" max=2022>
+                            <span class="icon_clock"></span>
                         </div>
+
                         <button type="submit" class="site-btn">Registrarse</button>
                     </form>
                 </div>
@@ -107,7 +116,7 @@
             <div class="col-lg-6">
                 <div class="login__register">
                     <h3>¿Ya tienes una cuenta?</h3>
-                    <a href="login.html" class="primary-btn">Inicia Sesión</a>
+                    <a href="/login" class="primary-btn">Inicia Sesión</a>
                 </div>
             </div>
         </div>
@@ -125,7 +134,7 @@
             <div class="col-lg-12">
                 <div class="footer__nav">
                     <ul>
-                        <li class="active"><a href="./index.html">Home</a></li>
+                        <li class="active"><a href="/home">Home</a></li>
                         <li><a href="./categories.html">Géneros</a></li>
                         <li><a href="./blog.html">Siguiendo</a></li>
                         <li><a href="#">Listas</a></li>
