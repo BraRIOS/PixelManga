@@ -19,7 +19,7 @@
         $("#preloder").delay(200).fadeOut("slow");
 
         /*------------------
-            Filter
+            FIlter
         --------------------*/
         $('.filter__controls li').on('click', function () {
             $('.filter__controls li').removeClass('active');
