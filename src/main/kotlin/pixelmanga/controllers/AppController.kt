@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import pixelmanga.entities.Chapter
 import pixelmanga.entities.Sample
 import pixelmanga.entities.User
 import pixelmanga.repositories.*
@@ -136,7 +137,8 @@ class AppController {
 
     @GetMapping("/upload_chapter/{id}")
     fun showUploadChapterForm(model: Model, @PathVariable id: Long): String {
-        model.addAttribute("chapter", chapterRepo.findById(id).get())
+        model.addAttribute("chapter", Chapter())
+        model.addAttribute("sample", sampleRepo.findById(id).get())
         return "upload_chapter"
     }
 
