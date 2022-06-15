@@ -43,6 +43,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .antMatchers("/users").authenticated()
             .antMatchers("/make_author").authenticated()
             .antMatchers("/perform_sample_register").hasAnyRole("ADMIN", "AUTHOR")
+            .antMatchers("/perform_chapter_upload").hasAnyRole("ADMIN", "AUTHOR")
             .anyRequest().permitAll()
             .and()
             .formLogin().loginPage("/login")
