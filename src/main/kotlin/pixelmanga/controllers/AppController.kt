@@ -142,6 +142,33 @@ class AppController {
         return "upload_chapter"
     }
 
+    @PostMapping("/perform_chapter_upload")
+    fun saveChapter(chapter: Chapter, @RequestParam("fileImage") image: MultipartFile,
+                    @RequestParam("sampleName") sampleName: String, ra: RedirectAttributes): String {
+        val sample = sampleRepo.findByName(sampleName)
+        chapter.sample = sample
+
+        val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
+        val name = "${sample.name?.replace(" ","-")}.${image.contentType?.split("/")?.last()}"
+
+        val savedChapter = chapterRepo.save(chapter)
+        val id = savedChapter.id as Long
+
+        val uploadDir = "./src/main/resources/static/images/samples/$type/${sample.id}/chapter/$id"
+        chapterRepo.updateImagePathById("/static/images/samples/$type/${sample.id}/chapter/$id/$name", id)
+
+        val uploadPath = Paths.get(uploadDir)
+        if (!uploadPath.exists()) {
+            uploadPath.toFile().mkdirs()
+        }
+        val imagePath = uploadPath.resolve(name)
+        image.transferTo(imagePath)
+
+        ra.addAttribute("message", "El capítulo $id se ha registrado correctamente")
+        return "redirect:/library/$type/$id/${sample.name}"
+
+    }
+
     @PostMapping("/process_register")
     fun registerUser(user: User): String {
         val passwordEncoder = BCryptPasswordEncoder()

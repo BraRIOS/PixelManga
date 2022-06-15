@@ -11,4 +11,9 @@ interface SampleRepository : JpaRepository<Sample, Long> {
     @Modifying
     @Query("update Sample s set s.cover = ?1 where s.id = ?2")
     fun updateCoverPathById(cover: String, id: Long): Int
+
+
+    @Query("select s from Sample s where s.name = ?1")
+    fun findByName(name: String): Sample
+
 }
