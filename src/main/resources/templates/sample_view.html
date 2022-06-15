@@ -104,10 +104,17 @@
                                 <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Seguir</a>
                                 <a href="#" class="watch-btn"><span>Leer ahora</span> <i
                                     class="fa fa-angle-right"></i></a>
+                                <a th:href="@{'/upload_chapter/'+*{id}}" class="watch-btn" sec:authorize="hasAuthority('AUTHOR')"><span>Subir capítulo</span></a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                <div class="anime__details__episodes">
+                    <div class="section-title">
+                        <h5>Capítulos</h5>
+                    </div>
+                    <a th:each="chapter : ${chapters}" th:href="'/view/'+${chapter.id}" th:text="'Ep '+${chapter.id}"></a>
+                </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-8 col-md-8">

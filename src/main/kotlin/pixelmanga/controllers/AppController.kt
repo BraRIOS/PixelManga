@@ -140,7 +140,7 @@ class AppController {
     fun showUploadChapterForm(model: Model, @PathVariable id: Long): String {
         model.addAttribute("chapter", Chapter())
         model.addAttribute("sample", sampleRepo.findById(id).get())
-        return "upload_chapter"
+        return "chapter_form"
     }
 
     @GetMapping("/view/{id}")

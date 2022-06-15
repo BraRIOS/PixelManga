@@ -13,7 +13,7 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+          rel="stylesheet">
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
@@ -73,60 +73,32 @@
             <div class="anime__details__content">
                 <div class="row">
                     <div class="col-lg-3">
-                        <img class="anime__details__pic set-bg" src="/static/images/img.png" id="thumbnail"
-                             onclick="open_explorer();">
                     </div>
                     <div class="col-lg-9">
                         <div class="login__form">
-                            <h3>Nuevo ejemplar</h3>
-                            <form th:action="@{/perform_sample_register}" th:object="${sample}" method="post" enctype="multipart/form-data">
+                            <h3>Nuevo capítulo</h3>
+                            <form th:action="@{/perform_chapter_upload}" th:object="${chapter}" method="post" enctype="multipart/form-data">
+
                                 <div class="input__item">
-                                    <input type="text" id="name" name="name" placeholder="Nombre de ejemplar">
+                                    <input type="text" id="sampleName" name="sampleName" th:value="${sample.name}">
                                     <span class="icon_pencil"></span>
                                 </div>
+
                                 <div class="input__item">
-                                    <input type="text" id="synopsis" name="synopsis" placeholder="Synopsis">
-                                    <span class="icon_pencil"></span>
+                                    <input type="file" id="fileImage" name="fileImage" placeholder="Capítulo">
+                                    <span class="icon_image"></span>
                                 </div>
-                                <div class="input__item">
-                                    <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}" placeholder="Fecha de publicacion">
-                                    <span class="icon_calendar"></span>
-                                </div>
-
-                                <select class="type-select" required id="type" name="type">
-                                    <option></option>
-                                    <option th:each="type : ${sample_types}"
-                                            th:value="${type.name}"
-                                            th:text="${type.name}"></option>
-                                </select>
-
-                                <select class="demographic-select" required id="demographic" name="demographic">
-                                    <option></option>
-                                    <option th:each="demographic : ${sample_demographics}"
-                                            th:value="${demographic.name}"
-                                            th:text="${demographic.name}"></option>
-                                </select>
-
-                                <select style="width: 30%" class="select-multiple" multiple="multiple" name="genres[]"
-                                        id="genres[]">
-                                    <option th:each="genre : ${sample_genres}"
-                                            th:value="${genre.name}"
-                                            th:text="${genre.name}"></option>
-                                </select>
-
-                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
-                                       style="display: none;">
                                 <button type="submit" class="site-btn">Subir</button>
                             </form>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-        <!-- Anime Section End -->
+        </div>
+    </section>
+    <!-- Anime Section End -->
 
-        <!-- Footer Section Begin -->
+    <!-- Footer Section Begin -->
     <footer class="footer">
         <div class="page-up">
             <a href="#" id="scrollToTopButton"><span class="arrow_carrot-up"></span></a>
@@ -147,20 +119,20 @@
         </div>
         </div>
     </footer>
-          <!-- Footer Section End -->
+    <!-- Footer Section End -->
 
-          <!-- Search model Begin -->
-          <div class="search-model">
-            <div class="h-100 d-flex align-items-center justify-content-center">
-                <div class="search-close-switch"><i class="icon_close"></i></div>
-                <form class="search-model-form">
-                    <input type="text" id="search-input" placeholder="Search here.....">
-                </form>
-            </div>
+    <!-- Search model Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch"><i class="icon_close"></i></div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
         </div>
-        <!-- Search model end -->
+    </div>
+    <!-- Search model end -->
 
-        <!-- Js Plugins -->
+    <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/player.js"></script>
