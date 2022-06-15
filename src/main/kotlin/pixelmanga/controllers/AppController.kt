@@ -112,7 +112,7 @@ class AppController {
         val id = savedSample.id as Long
 
         val uploadDir = "./src/main/resources/static/images/samples/$type/$id"
-        sampleRepo.updateCoverPathById("$uploadDir/$name", id)
+        sampleRepo.updateCoverPathById("/static/images/samples/$type/$id/$name", id)
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
