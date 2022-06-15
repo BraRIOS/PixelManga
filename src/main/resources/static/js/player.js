@@ -6173,7 +6173,7 @@ typeof navigator === "object" && (function (global, factory) {
       }).then(function (src) {
         // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
         if (!src.includes('maxres')) {
-          player.elements.poster.style.backgroundSize = 'cover';
+          player.elements.poster.style.backgroundSize = 'fileImage';
         }
       }).catch(function () {});
       var config = player.config.youtube; // Setup instance

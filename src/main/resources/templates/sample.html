@@ -74,12 +74,12 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <img class="anime__details__pic set-bg" src="/static/images/img.png" id="thumbnail"
-                             onclick="javascript:open_explorer();">
+                             onclick="open_explorer();">
                     </div>
                     <div class="col-lg-9">
                         <div class="login__form">
                             <h3>Nuevo ejemplar</h3>
-                            <form th:object="${sample}">
+                            <form th:action="@{/perform_sample_register}" th:object="${sample}" method="post" enctype="multipart/form-data">
                                 <div class="input__item">
                                     <input type="text" id="name" name="name" placeholder="Nombre de ejemplar">
                                     <span class="icon_pencil"></span>
@@ -89,31 +89,33 @@
                                     <span class="icon_pencil"></span>
                                 </div>
                                 <div class="input__item">
-                                    <input type="date" id="publication_date" name="publication_date" placeholder="Fecha de publicacion">
+                                    <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}" placeholder="Fecha de publicacion">
                                     <span class="icon_calendar"></span>
                                 </div>
 
-                                <select class="form-select" required id="type" name="type">
-                                    <option value="" selected>Seleccione el tipo</option>
+                                <select class="type-select" required id="type" name="type">
+                                    <option></option>
                                     <option th:each="type : ${sample_types}"
                                             th:value="${type.name}"
                                             th:text="${type.name}"></option>
                                 </select>
 
-                                <select class="form-select" required id="demographic" name="demographic">
-                                    <option value="" selected>Seleccione la demografia</option>
+                                <select class="demographic-select" required id="demographic" name="demographic">
+                                    <option></option>
                                     <option th:each="demographic : ${sample_demographics}"
                                             th:value="${demographic.name}"
                                             th:text="${demographic.name}"></option>
                                 </select>
 
-                                <select style="width: 30%" class="js-example-basic-multiple" multiple="multiple" name="genre[]" id="genre[]">
+                                <select style="width: 30%" class="select-multiple" multiple="multiple" name="genres[]"
+                                        id="genres[]">
                                     <option th:each="genre : ${sample_genres}"
                                             th:value="${genre.name}"
                                             th:text="${genre.name}"></option>
                                 </select>
 
-                                    <input type="file" accept="image/png, image/jpeg" id="cover" name="cover" placeholder="Subir portada" style="display: none;">
+                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
+                                       style="display: none;">
                                 <button type="submit" class="site-btn">Subir</button>
                             </form>
                             </div>
@@ -166,7 +168,6 @@
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/player.js"></script>
-    <script src="/static/js/jquery.nice-select.min.js"></script>
     <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/owl.carousel.min.js"></script>
@@ -175,12 +176,23 @@
 
     <script type="text/javascript">
         $(document).ready(function (){
-            $('#cover').change(function (){
+            $('#fileImage').change(function (){
                 showImageThumbnail(this);
             })
 
-            $('.js-example-basic-multiple').select2({
-                placeholder: "Seleccione los generos",
+            $('.select-multiple').select2({
+                placeholder: "Seleccione los géneros",
+                allowClear: true,
+                width:'resolve'
+            });
+            $('.type-select').select2({
+                placeholder: "Seleccione el tipo",
+                allowClear: true,
+                width:'resolve'
+            });
+            $('.demographic-select').select2({
+                placeholder: "Seleccione la demografía",
+                allowClear: true,
                 width:'resolve'
             });
         });
@@ -197,7 +209,7 @@
         }
 
         function open_explorer(){
-            document.getElementById('cover').click();
+            document.getElementById('fileImage').click();
         }
     </script>
 

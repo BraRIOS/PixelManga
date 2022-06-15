@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
@@ -26,9 +27,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.stream.Collectors
-import kotlin.io.path.Path
 import kotlin.io.path.exists
-import kotlin.io.path.pathString
 
 
 @Controller
@@ -62,7 +61,8 @@ class AppController {
     }
 
     @GetMapping("/home")
-    fun showHomePage(): String {
+    fun showHomePage(model: Model): String {
+        model.addAttribute("samples", sampleRepo.findAll())
         return "home"
     }
 
@@ -97,27 +97,37 @@ class AppController {
         return "sample"
     }
 
-    @PostMapping("/process_sample_register")
-    fun saveSample(sample: Sample, @RequestParam("fileImage") image: MultipartFile, ra: RedirectAttributes): String {
-        val type = sample.attributes.first { atribute -> atribute.type?.name == "tipo de libro" }.name
-        val name = sample.name?.replace(" ","-") + "-cover"
-        val extension = image.contentType
+    @PostMapping("/perform_sample_register")
+    fun saveSample(sample: Sample, @RequestParam("type") type: String,
+                   @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
+                   @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
+        sample.attributes.addAll(genres.map { attributeRepository.findByName(it) })
+        sample.attributes.add(attributeRepository.findByName(type))
+        sample.attributes.add(attributeRepository.findByName(demographic))
+
+        val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
+        val name = "${sample.name?.replace(" ","-")}-cover.${image.contentType?.split("/")?.last()}"
+
         val savedSample = sampleRepo.save(sample)
         val id = savedSample.id as Long
 
-        val uploadDir = "./static/images/samples/${type}/${id}"
+        val uploadDir = "./src/main/resources/static/images/samples/$type/$id"
+        sampleRepo.updateCoverPathById("$uploadDir/$name", id)
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
             uploadPath.toFile().mkdirs()
         }
-        val filePath = uploadPath.resolve("${name}.${extension}")
-        Files.copy(image.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
-
-        sampleRepo.updateCoverPathById(filePath.pathString, id)
+        val imagePath = uploadPath.resolve(name)
+        Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
 
         ra.addAttribute("message", "${sample.name} registrado correctamente")
-        return "redirect:/samples"
+        return "redirect:/library/$type/$id/${sample.name}"
+    }
+    @GetMapping("/library/{type}/{id}/{name}")
+    fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
+        model.addAttribute("sample", sampleRepo.findById(id))
+        return "sample_view"
     }
 
     @PostMapping("/process_register")
@@ -129,6 +139,17 @@ class AppController {
         userRepo.save(user)
 
         return "redirect:/login"
+    }
+
+    @GetMapping("/profile")
+    fun showProfile(model: Model): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name)
+        model.addAttribute("user", user)
+        return "profile"
     }
 
     @GetMapping("/index")

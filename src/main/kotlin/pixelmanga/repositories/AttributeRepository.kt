@@ -10,4 +10,8 @@ interface AttributeRepository : JpaRepository<Attribute, Long> {
     @Query("select a from Attribute a where a.type.name = ?1")
     fun findByType_Name(name: String): List<Attribute>
 
+
+    @Query("select a from Attribute a where a.name = ?1")
+    fun findByName(name: String): Attribute
+
 }

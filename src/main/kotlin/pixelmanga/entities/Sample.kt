@@ -2,7 +2,6 @@ package pixelmanga.entities
 
 import java.sql.Date
 import javax.persistence.*
-import javax.validation.constraints.FutureOrPresent
 
 @Entity
 @Table(name = "samples")
@@ -18,7 +17,6 @@ open class Sample {
     @Column(name = "synopsis", nullable = false)
     open var synopsis: String? = null
 
-    @FutureOrPresent
     @Column(name = "publication_date")
     open var publicationDate: Date? = null
 
