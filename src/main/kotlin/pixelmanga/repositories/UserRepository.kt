@@ -9,4 +9,9 @@ import org.springframework.transaction.annotation.Transactional
 interface UserRepository : JpaRepository<User, Long> {
     @Query("select u from User u where u.username = ?1")
     fun findByUsername(username: String): User
+
+    @Transactional
+    @Modifying
+    @Query("update User u set u.icon = ?1 where u.id = ?2")
+    fun updateIconById(icon: String, id: Long): Int
 }

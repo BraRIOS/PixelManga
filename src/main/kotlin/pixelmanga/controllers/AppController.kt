@@ -14,13 +14,21 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pixelmanga.entities.Sample
 import pixelmanga.entities.User
+import pixelmanga.repositories.AttributeRepository
 import pixelmanga.repositories.RoleRepository
 import pixelmanga.repositories.SampleRepository
 import pixelmanga.repositories.UserRepository
 import pixelmanga.security.CustomUserDetails
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.stream.Collectors
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+import kotlin.io.path.pathString
 
 
 @Controller
@@ -35,6 +43,8 @@ class AppController {
     @Autowired
     private lateinit var roleRepo: RoleRepository
 
+    @Autowired
+    private lateinit var attributeRepository: AttributeRepository
 
     @GetMapping("")
     fun root(): String {
@@ -80,19 +90,33 @@ class AppController {
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
+        model.addAttribute("sample_types", attributeRepository.findByType_Name("tipo de libro").sortedBy { it.name })
+        model.addAttribute("sample_genres", attributeRepository.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("sample_demographics", attributeRepository.findByType_Name("demografía").sortedBy { it.name })
+
         return "sample"
     }
 
-    @PostMapping("/process_register_sample")
-    fun saveSample(sample: Sample, @RequestParam("image") image: MultipartFile): String {
-        val id = sample.id
+    @PostMapping("/process_sample_register")
+    fun saveSample(sample: Sample, @RequestParam("fileImage") image: MultipartFile, ra: RedirectAttributes): String {
         val type = sample.attributes.first { atribute -> atribute.type?.name == "tipo de libro" }.name
-        val name = sample.name + "-cover"
-        val extension = "jpg"
+        val name = sample.name?.replace(" ","-") + "-cover"
+        val extension = image.contentType
+        val savedSample = sampleRepo.save(sample)
+        val id = savedSample.id as Long
 
-        sample.cover = "/static/images/${type}/${id}/${name}.${extension}"
+        val uploadDir = "./static/images/samples/${type}/${id}"
 
-        sampleRepo.save(sample)
+        val uploadPath = Paths.get(uploadDir)
+        if (!uploadPath.exists()) {
+            uploadPath.toFile().mkdirs()
+        }
+        val filePath = uploadPath.resolve("${name}.${extension}")
+        Files.copy(image.inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
+
+        sampleRepo.updateCoverPathById(filePath.pathString, id)
+
+        ra.addAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/samples"
     }
 

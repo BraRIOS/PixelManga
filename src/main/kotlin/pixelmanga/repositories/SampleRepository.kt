@@ -7,4 +7,8 @@ import org.springframework.transaction.annotation.Transactional
 import pixelmanga.entities.Sample
 
 interface SampleRepository : JpaRepository<Sample, Long> {
+    @Transactional
+    @Modifying
+    @Query("update Sample s set s.cover = ?1 where s.id = ?2")
+    fun updateCoverPathById(cover: String, id: Long): Int
 }
