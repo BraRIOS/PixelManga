@@ -143,6 +143,13 @@ class AppController {
         return "upload_chapter"
     }
 
+    @GetMapping("/view/{id}")
+    fun showChapter(model: Model, @PathVariable id: Long): String {
+        val chapter = chapterRepo.findById(id).get()
+        model.addAttribute("chapter", chapter)
+        return "chapter_view"
+    }
+
     @PostMapping("/perform_chapter_upload")
     fun saveChapter(chapter: Chapter, @RequestParam("fileImage") image: MultipartFile,
                     @RequestParam("sampleName") sampleName: String, ra: RedirectAttributes): String {
