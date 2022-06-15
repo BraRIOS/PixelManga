@@ -173,7 +173,7 @@ class AppController {
         image.transferTo(imagePath)
 
         ra.addAttribute("message", "El capítulo $id se ha registrado correctamente")
-        return "redirect:/library/$type/$id/${sample.name}"
+        return "redirect:/library/$type/${sample.id}/${sample.name}"
 
     }
 
