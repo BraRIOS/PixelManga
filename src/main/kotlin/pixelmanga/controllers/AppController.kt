@@ -18,10 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pixelmanga.entities.Sample
 import pixelmanga.entities.User
-import pixelmanga.repositories.AttributeRepository
-import pixelmanga.repositories.RoleRepository
-import pixelmanga.repositories.SampleRepository
-import pixelmanga.repositories.UserRepository
+import pixelmanga.repositories.*
 import pixelmanga.security.CustomUserDetails
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -43,7 +40,10 @@ class AppController {
     private lateinit var roleRepo: RoleRepository
 
     @Autowired
-    private lateinit var attributeRepository: AttributeRepository
+    private lateinit var attributeRepo: AttributeRepository
+
+    @Autowired
+    private lateinit var chapterRepo: ChapterRepository
 
     @GetMapping("")
     fun root(): String {
@@ -90,9 +90,9 @@ class AppController {
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
-        model.addAttribute("sample_types", attributeRepository.findByType_Name("tipo de libro").sortedBy { it.name })
-        model.addAttribute("sample_genres", attributeRepository.findByType_Name("género").sortedBy { it.name })
-        model.addAttribute("sample_demographics", attributeRepository.findByType_Name("demografía").sortedBy { it.name })
+        model.addAttribute("sample_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
+        model.addAttribute("sample_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("sample_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
 
         return "sample"
     }
@@ -101,9 +101,9 @@ class AppController {
     fun saveSample(sample: Sample, @RequestParam("type") type: String,
                    @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
                    @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
-        sample.attributes.addAll(genres.map { attributeRepository.findByName(it) })
-        sample.attributes.add(attributeRepository.findByName(type))
-        sample.attributes.add(attributeRepository.findByName(demographic))
+        sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
+        sample.attributes.add(attributeRepo.findByName(type))
+        sample.attributes.add(attributeRepo.findByName(demographic))
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
         val name = "${sample.name?.replace(" ","-")}-cover.${image.contentType?.split("/")?.last()}"
@@ -126,8 +126,14 @@ class AppController {
     }
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
-        model.addAttribute("sample", sampleRepo.findById(id))
+        model.addAttribute("sample", sampleRepo.findById(id).get())
         return "sample_view"
+    }
+
+    @GetMapping("/upload_chapter/{id}")
+    fun showUploadChapterForm(model: Model, @PathVariable id: Long): String {
+        model.addAttribute("chapter", chapterRepo.findById(id).get())
+        return "upload_chapter"
     }
 
     @PostMapping("/process_register")
