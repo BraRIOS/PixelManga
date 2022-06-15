@@ -128,10 +128,11 @@ class AppController {
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
+        val chapters = chapterRepo.findBySample_Id(id)
         model.addAttribute("sample", sample)
         model.addAttribute("type",sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name)
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
-
+        model.addAttribute("chapters", chapters)
         return "sample_view"
     }
 

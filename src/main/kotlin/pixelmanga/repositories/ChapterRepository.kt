@@ -13,4 +13,8 @@ interface ChapterRepository : JpaRepository<Chapter, Long> {
     @Query("update Chapter c set c.image = ?1 where c.id = ?2")
     fun updateImagePathById(image: String, id: Long): Int
 
+
+    @Query("select c from Chapter c where c.sample.id = ?1")
+    fun findBySample_Id(id: Long): List<Chapter>
+
 }
