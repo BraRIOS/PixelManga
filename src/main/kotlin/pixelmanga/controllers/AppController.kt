@@ -146,7 +146,9 @@ class AppController {
     @GetMapping("/view/{id}")
     fun showChapter(model: Model, @PathVariable id: Long): String {
         val chapter = chapterRepo.findById(id).get()
+        val chapters = chapterRepo.findBySample_Id(chapter.sample?.id as Long)
         model.addAttribute("chapter", chapter)
+        model.addAttribute("chapters", chapters)
         return "chapter_view"
     }
 
