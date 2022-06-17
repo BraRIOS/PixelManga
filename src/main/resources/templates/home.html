@@ -165,7 +165,8 @@
                                     <div class="product__item__text">
                                             <ul th:each="attribute: ${sample.attributes.?[type.name == 'tipo de libro']}">
                                                 <li id="type" th:text="${attribute.name}"></li>
-                                        <h5><a th:href="@{'/library/'+${attribute.name}+'/'+${sample.id}+'/'+${sample.name}}" th:text="${sample.name}"></a></h5>
+                                        <h5><a th:href="@{'/library/'+${attribute.name}+'/'+${sample.id}+'/'+
+                                        ${sample.name.replace('/','-')}}" th:text="${sample.name}"></a></h5>
                                             </ul>
                                     </div>
                                 </div>

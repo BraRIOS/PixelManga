@@ -107,7 +107,9 @@ class AppController {
         sample.attributes.add(attributeRepo.findByName(demographic))
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
-        val name = "${sample.name?.replace(" ","-")}-cover.${image.contentType?.split("/")?.last()}"
+        val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
+        val name = "${regex.replace(sample.name as String,"_")}-cover.${image.contentType?.split("/")?.last()}"
+
 
         val savedSample = sampleRepo.save(sample)
         val id = savedSample.id as Long
@@ -123,7 +125,7 @@ class AppController {
         Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
 
         ra.addAttribute("message", "${sample.name} registrado correctamente")
-        return "redirect:/library/$type/$id/${sample.name}"
+        return "redirect:/home"
     }
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
@@ -138,15 +140,16 @@ class AppController {
 
     @GetMapping("/upload_chapter/{id}")
     fun showUploadChapterForm(model: Model, @PathVariable id: Long): String {
-        model.addAttribute("chapter", Chapter())
-        model.addAttribute("sample", sampleRepo.findById(id).get())
+        val sample = sampleRepo.findById(id).get()
+        model.addAttribute("chapter",Chapter())
+        model.addAttribute("sample", sample)
         return "chapter_form"
     }
 
-    @GetMapping("/view/{id}")
-    fun showChapter(model: Model, @PathVariable id: Long): String {
-        val chapter = chapterRepo.findById(id).get()
-        val chapters = chapterRepo.findBySample_Id(chapter.sample?.id as Long)
+    @GetMapping("/view/{sampleName}/{number}")
+    fun showChapter(model: Model, @PathVariable sampleName: String, @PathVariable number:Long): String {
+        val chapter = chapterRepo.findByNumber(number)
+        val chapters = chapterRepo.findBySample_Name(sampleName)
         model.addAttribute("chapter", chapter)
         model.addAttribute("chapters", chapters)
         return "chapter_view"
@@ -156,10 +159,13 @@ class AppController {
     fun saveChapter(chapter: Chapter, @RequestParam("fileImage") image: MultipartFile,
                     @RequestParam("sampleName") sampleName: String, ra: RedirectAttributes): String {
         val sample = sampleRepo.findByName(sampleName)
+
+        chapter.number = chapterRepo.countBySample_Id(sample.id as Long) + 1
         chapter.sample = sample
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
-        val name = "${sample.name?.replace(" ","-")}.${image.contentType?.split("/")?.last()}"
+        val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
+        val name = "${regex.replace(sample.name as String,"_")}.${image.contentType?.split("/")?.last()}"
 
         val savedChapter = chapterRepo.save(chapter)
         val id = savedChapter.id as Long

@@ -17,4 +17,16 @@ interface ChapterRepository : JpaRepository<Chapter, Long> {
     @Query("select c from Chapter c where c.sample.id = ?1")
     fun findBySample_Id(id: Long): List<Chapter>
 
+
+    @Query("select count(c) from Chapter c where c.sample.id = ?1")
+    fun countBySample_Id(id: Long): Long
+
+
+    @Query("select c from Chapter c where c.sample.name = ?1")
+    fun findBySample_Name(name: String): Chapter
+
+
+    @Query("select c from Chapter c where c.number = ?1")
+    fun findByNumber(number: Long): Chapter
+
 }

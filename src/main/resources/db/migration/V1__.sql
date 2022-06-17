@@ -1,23 +1,24 @@
 CREATE TABLE attributes
 (
     id      BIGINT AUTO_INCREMENT NOT NULL,
-    name    VARCHAR(255) NOT NULL,
-    type_id BIGINT       NOT NULL,
+    name    VARCHAR(255)          NOT NULL,
+    type_id BIGINT                NOT NULL,
     CONSTRAINT pk_attributes PRIMARY KEY (id)
 );
 
 CREATE TABLE chapters
 (
     id        BIGINT AUTO_INCREMENT NOT NULL,
-    sample_id BIGINT NOT NULL,
-    image     VARCHAR(255) NULL,
+    sample_id BIGINT                NOT NULL,
+    image     VARCHAR(255)          NULL,
+    number    BIGINT                NOT NULL,
     CONSTRAINT pk_chapters PRIMARY KEY (id)
 );
 
 CREATE TABLE roles
 (
     id   BIGINT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255) NULL,
+    name VARCHAR(255)          NULL,
     CONSTRAINT pk_roles PRIMARY KEY (id)
 );
 
@@ -31,28 +32,28 @@ CREATE TABLE sample_attributes
 CREATE TABLE samples
 (
     id               BIGINT AUTO_INCREMENT NOT NULL,
-    name             VARCHAR(255) NOT NULL,
-    synopsis         VARCHAR(255) NOT NULL,
-    publication_date date NULL,
-    cover            VARCHAR(255) NULL,
+    name             VARCHAR(255)          NOT NULL,
+    synopsis         VARCHAR(255)          NOT NULL,
+    publication_date date                  NULL,
+    cover            VARCHAR(255)          NULL,
     CONSTRAINT pk_samples PRIMARY KEY (id)
 );
 
 CREATE TABLE types
 (
-    id        BIGINT AUTO_INCREMENT NOT NULL,
-    name      VARCHAR(255) NOT NULL,
+    id   BIGINT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_types PRIMARY KEY (id)
 );
 
 CREATE TABLE users
 (
     id        BIGINT AUTO_INCREMENT NOT NULL,
-    email     VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
-    password  VARCHAR(255) NOT NULL,
-    born_year INT          NOT NULL,
-    icon      VARCHAR(255) NULL,
+    email     VARCHAR(255)          NOT NULL,
+    user_name VARCHAR(255)          NOT NULL,
+    password  VARCHAR(255)          NOT NULL,
+    born_year INT                   NOT NULL,
+    icon      VARCHAR(255)          NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -65,6 +66,9 @@ CREATE TABLE users_roles
 
 ALTER TABLE attributes
     ADD CONSTRAINT uc_attributes_name UNIQUE (name);
+
+ALTER TABLE chapters
+    ADD CONSTRAINT uc_chapters_number UNIQUE (number);
 
 ALTER TABLE roles
     ADD CONSTRAINT uc_roles_name UNIQUE (name);

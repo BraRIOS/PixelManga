@@ -16,4 +16,7 @@ open class Chapter {
 
     @Column(name = "image")
     open var image: String? = null
+
+    @Column(name = "number", nullable = false, unique = true)
+    open var number: Long? = null
 }
