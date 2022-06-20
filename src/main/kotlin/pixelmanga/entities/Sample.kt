@@ -6,6 +6,8 @@ import javax.persistence.*
 @Entity
 @Table(name = "samples")
 open class Sample {
+    lateinit var coverPath: String
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

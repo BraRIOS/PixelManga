@@ -95,7 +95,7 @@ class AppController {
         model.addAttribute("sample_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
         model.addAttribute("sample_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
 
-        return "sample"
+        return "sample_form"
     }
 
     @PostMapping("/perform_sample_register")
@@ -110,12 +110,13 @@ class AppController {
         val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
         val name = "${regex.replace(sample.name as String,"_")}-cover.${image.contentType?.split("/")?.last()}"
 
+        sample.cover = name
 
         val savedSample = sampleRepo.save(sample)
         val id = savedSample.id as Long
 
-        val uploadDir = "./src/main/resources/static/images/samples/$type/$id"
-        sampleRepo.updateCoverPathById("/static/images/samples/$type/$id/$name", id)
+        val uploadDir = "./resources/images/samples/$type/$id"
+        savedSample.coverPath = "uploadDir/$name"
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
@@ -158,6 +159,11 @@ class AppController {
     @PostMapping("/perform_chapter_upload")
     fun saveChapter(chapter: Chapter, @RequestParam("fileImage") image: MultipartFile,
                     @RequestParam("sampleName") sampleName: String, ra: RedirectAttributes): String {
+        if (image.isEmpty) {
+            ra.addAttribute("message", "No se ha seleccionado una imagen")
+            return "redirect:/upload_chapter/${chapter.sample?.id}"
+        }
+
         val sample = sampleRepo.findByName(sampleName)
 
         chapter.number = chapterRepo.countBySample_Id(sample.id as Long) + 1
@@ -167,11 +173,11 @@ class AppController {
         val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
         val name = "${regex.replace(sample.name as String,"_")}.${image.contentType?.split("/")?.last()}"
 
-        val savedChapter = chapterRepo.save(chapter)
-        val id = savedChapter.id as Long
+        chapter.image= name
 
-        val uploadDir = "./src/main/resources/static/images/samples/$type/${sample.id}/chapter/$id"
-        chapterRepo.updateImagePathById("/static/images/samples/$type/${sample.id}/chapter/$id/$name", id)
+        val uploadDir = "./resources/images/samples/$type/${sample.id}/chapters/${chapter.number}"
+        chapter.imagePath = "uploadDir/$name"
+        chapterRepo.save(chapter)
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
@@ -180,7 +186,7 @@ class AppController {
         val imagePath = uploadPath.resolve(name)
         image.transferTo(imagePath)
 
-        ra.addAttribute("message", "El capítulo $id se ha registrado correctamente")
+        ra.addAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
         return "redirect:/library/$type/${sample.id}/${sample.name}"
 
     }
