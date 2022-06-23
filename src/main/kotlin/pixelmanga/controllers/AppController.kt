@@ -52,6 +52,12 @@ class AppController {
         return "redirect:/home"
     }
 
+    @GetMapping("/home")
+    fun showHomePage(model: Model): String {
+        model.addAttribute("samples", sampleRepo.findAll())
+        return "home"
+    }
+
     @GetMapping("/register")
     fun showRegistrationForm(model: Model): String {
         model.addAttribute("user", User())
@@ -62,10 +68,29 @@ class AppController {
         return "signup_form"
     }
 
-    @GetMapping("/home")
-    fun showHomePage(model: Model): String {
-        model.addAttribute("samples", sampleRepo.findAll())
-        return "home"
+    @GetMapping("/check_username")
+    fun checkUsername(@RequestParam username: String): ResponseEntity<String> {
+        if (userRepo.findByUsername(username) != null)
+            return ResponseEntity.ok("Username already exists")
+        return ResponseEntity.ok("Username available")
+    }
+
+    @GetMapping("/check_email")
+    fun checkEmail(@RequestParam email: String): ResponseEntity<String> {
+        if (userRepo.findByEmail(email) != null)
+            return ResponseEntity.ok("Email already exists")
+        return ResponseEntity.ok("Email available")
+    }
+
+    @PostMapping("/process_register")
+    fun registerUser(user: User, redirectAttributes: RedirectAttributes): String {
+        val passwordEncoder = BCryptPasswordEncoder()
+        val encodedPassword = passwordEncoder.encode(user.password)
+        user.password = encodedPassword
+        user.roles.add(roleRepo.findByName("USER"))
+        userRepo.save(user)
+
+        return "redirect:/login"
     }
 
     @GetMapping("/login")
@@ -98,7 +123,6 @@ class AppController {
 
         return "sample_form"
     }
-
     @PostMapping("/perform_sample_register")
     fun saveSample(sample: Sample, @RequestParam("type") type: String,
                    @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
@@ -135,6 +159,7 @@ class AppController {
         ra.addAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/home"
     }
+
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
@@ -195,17 +220,6 @@ class AppController {
         model.addAttribute("chapter", chapter)
         model.addAttribute("chapters", chapters)
         return "chapter_view"
-    }
-
-    @PostMapping("/process_register")
-    fun registerUser(user: User): String {
-        val passwordEncoder = BCryptPasswordEncoder()
-        val encodedPassword = passwordEncoder.encode(user.password)
-        user.password = encodedPassword
-        user.roles.add(roleRepo.findByName("USER"))
-        userRepo.save(user)
-
-        return "redirect:/login"
     }
 
     @GetMapping("/profile")
