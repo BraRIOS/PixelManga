@@ -5,7 +5,6 @@ import javax.persistence.*
 @Entity
 @Table(name = "chapters")
 open class Chapter {
-    lateinit var imagePath: String
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,4 +20,13 @@ open class Chapter {
 
     @Column(name = "number", nullable = false, unique = true)
     open var number: Long? = null
+
+    @Transient
+    open fun imagePath(): String? {
+        return if (image != null) {
+            "${sample?.samplePath()}/chapters/$number/$image"
+        } else {
+            null
+        }
+    }
 }

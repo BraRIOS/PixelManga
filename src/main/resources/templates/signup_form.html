@@ -38,7 +38,7 @@
             <div class="col-lg-2">
                 <div class="header__logo">
                     <a href="/home">
-                        <img src="/images/logo.png" alt="">
+                        <img src="/static/images/logo.png" alt="">
                     </a>
                 </div>
             </div>
@@ -90,7 +90,12 @@
                     <form th:action="@{/process_register}" th:object="${user}"
                           method="post">
                         <div class="input__item">
-                            <input type="email" th:field="*{email}" id="email" placeholder="Correo electrónico" required>
+                            <input type="text" th:field="*{username}" autocomplete="username" id="username"
+                                   required minlength="2" maxlength="20">
+                            <span class="icon_profile"></span>
+                        </div>
+                        <div class="input__item">
+                            <input type="email" th:field="*{email}" autocomplete="email" id="email" placeholder="Correo electrónico" required>
                             <span class="icon_mail"></span>
                         </div>
                         <div class="input__item">
@@ -99,13 +104,8 @@
                             <span class="icon_lock"></span>
                         </div>
                         <div class="input__item">
-                            <input type="text" th:field="*{username}" placeholder="Nombre de usuario" id="username"
-                                   required minlength="2" maxlength="20">
-                            <span class="icon_profile"></span>
-                        </div>
-                        <div class="input__item">
                             <input type="number" th:field="*{bornYear}" placeholder="Año de nacimiento" id="bornYear"
-                                   required min="1965" max=2022>
+                                   required min="1940" max=2022>
                             <span class="icon_clock"></span>
                         </div>
 

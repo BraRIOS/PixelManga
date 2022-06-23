@@ -41,7 +41,7 @@
                 <div class="col-lg-2">
                     <div class="header__logo">
                         <a href="/home">
-                            <img src="/images/logo.png" alt="">
+                            <img src="/static/images/logo.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -74,13 +74,15 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="anime__video__player" style="text-align: center">
-                        <img th:src="${chapter.image}">
+                        <img th:src="@{'/images/samples/'+${chapter.sample.id}+'/chapters/'+${number}}">
                     </div>
                     <div class="anime__details__episodes">
                         <div class="section-title">
                             <h5>Capítulos</h5>
                         </div>
-                        <a th:each="chapter : ${chapters}" th:href="'/view/'+${chapter.id}" th:text="'Ep '+${chapter.id}"></a>
+                        <a th:each="chapter : ${chapters}"
+                           th:href="@{/view/${chapter.sample.attributes.?[type.name == 'tipo de libro'].get(0).name}/${chapter.sample.id}/${chapter.sample.name}/chapters/${chapter.number}}"
+                           th:text="'Ep '+${chapter.number}"></a>
                     </div>
                 </div>
             </div>

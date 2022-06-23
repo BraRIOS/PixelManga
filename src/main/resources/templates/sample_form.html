@@ -40,7 +40,7 @@
                 <div class="col-lg-2">
                     <div class="header__logo">
                         <a href="/home">
-                            <img src="/images/logo.png" alt="">
+                            <img src="/static/images/logo.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -72,51 +72,52 @@
         <div class="container">
             <div class="anime__details__content">
                 <div class="row">
-                    <div class="col-lg-3">
-                        <img class="anime__details__pic set-bg" src="/images/img.png" id="thumbnail"
+                    <div class="col-lg-3 col-md-3 text-center">
+                        <img class="anime__details__pic" src="/static/images/img.png" id="thumbnail"
                              onclick="open_explorer();">
                     </div>
-                    <div class="col-lg-9">
-                        <div class="login__form">
+                    <div class="col-lg-9 col-md-9">
+                        <div class="login__form" style="padding-left: 0">
                             <h3>Nuevo ejemplar</h3>
-                            <form th:action="@{/perform_sample_register}" th:object="${sample}" method="post" enctype="multipart/form-data">
-                                <div class="input__item">
-                                    <input type="text" id="name" name="name" placeholder="Nombre de ejemplar">
+                            <form th:action="@{/perform_sample_register}" autocomplete="off" th:object="${sample}" method="post" enctype="multipart/form-data">
+                                <div class="input__item" style="width: auto">
+                                    <input type="text" name="name" required placeholder="Nombre de ejemplar">
                                     <span class="icon_pencil"></span>
                                 </div>
-                                <div class="input__item">
-                                    <input type="text" id="synopsis" name="synopsis" placeholder="Synopsis">
-                                    <span class="icon_pencil"></span>
-                                </div>
-                                <div class="input__item">
+                                    <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required></textarea>
+                                <div class="input__item" style="width: auto">
                                     <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}" placeholder="Fecha de publicacion">
                                     <span class="icon_calendar"></span>
                                 </div>
 
-                                <select class="type-select" required id="type" name="type">
-                                    <option></option>
-                                    <option th:each="type : ${sample_types}"
-                                            th:value="${type.name}"
-                                            th:text="${type.name}"></option>
-                                </select>
+                                <div class="input__select">
+                                    <select class="type-select" required id="type" name="type">
+                                        <option></option>
+                                        <option th:each="type : ${sample_types}"
+                                                th:value="${type.name}"
+                                                th:text="${type.name}"></option>
+                                    </select>
+                                </div>
 
-                                <select class="demographic-select" required id="demographic" name="demographic">
-                                    <option></option>
-                                    <option th:each="demographic : ${sample_demographics}"
-                                            th:value="${demographic.name}"
-                                            th:text="${demographic.name}"></option>
-                                </select>
-
-                                <select style="width: 30%" class="select-multiple" multiple="multiple" name="genres[]"
-                                        id="genres[]">
-                                    <option th:each="genre : ${sample_genres}"
-                                            th:value="${genre.name}"
-                                            th:text="${genre.name}"></option>
-                                </select>
-
+                                <div class="input__select">
+                                    <select class="demographic-select" id="demographic" name="demographic">
+                                        <option></option>
+                                        <option th:each="demographic : ${sample_demographics}"
+                                                th:value="${demographic.name}"
+                                                th:text="${demographic.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="input__select">
+                                    <select class="select-multiple" multiple="multiple" name="genres[]"
+                                            id="genres[]">
+                                        <option th:each="genre : ${sample_genres}"
+                                                th:value="${genre.name}"
+                                                th:text="${genre.name}"></option>
+                                    </select>
+                                </div>
                                 <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
                                        style="display: none;">
-                                <button type="submit" class="site-btn">Subir</button>
+                                <button type="submit" class="site-btn text-center">Subir</button>
                             </form>
                             </div>
                         </div>
@@ -179,17 +180,17 @@
             $('.select-multiple').select2({
                 placeholder: "Seleccione los géneros",
                 allowClear: true,
-                width:'resolve'
+                width:'style'
             });
             $('.type-select').select2({
                 placeholder: "Seleccione el tipo",
                 allowClear: true,
-                width:'resolve'
+                width: 'style'
             });
             $('.demographic-select').select2({
                 placeholder: "Seleccione la demografía",
                 allowClear: true,
-                width:'resolve'
+                width: 'style'
             });
         });
 

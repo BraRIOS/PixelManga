@@ -1,6 +1,7 @@
 package pixelmanga.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -102,28 +103,34 @@ class AppController {
     fun saveSample(sample: Sample, @RequestParam("type") type: String,
                    @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
                    @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
+
         sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
         sample.attributes.add(attributeRepo.findByName(type))
         sample.attributes.add(attributeRepo.findByName(demographic))
 
-        val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
-        val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
-        val name = "${regex.replace(sample.name as String,"_")}-cover.${image.contentType?.split("/")?.last()}"
+        if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
+            ra.addFlashAttribute("message", "El nombre del libro ya existe")
+            return "redirect:/register_sample"
+        }
+        sampleRepo.save(sample)
 
-        sample.cover = name
+        val id = sample.id as Long
 
-        val savedSample = sampleRepo.save(sample)
-        val id = savedSample.id as Long
-
-        val uploadDir = "./resources/images/samples/$type/$id"
-        savedSample.coverPath = "uploadDir/$name"
+        val uploadDir = "/resources/images/samples/$type/$id"
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
             uploadPath.toFile().mkdirs()
         }
-        val imagePath = uploadPath.resolve(name)
-        Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
+
+        if (!image.isEmpty) {
+            val regex = """\\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
+            val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
+            sampleRepo.updateCoverById(name, id)
+
+            val imagePath = uploadPath.resolve(name)
+            Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
+        }
 
         ra.addAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/home"
@@ -131,42 +138,33 @@ class AppController {
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
-        val chapters = chapterRepo.findBySample_Id(id)
+        val chapters = chapterRepo.findAllBySampleId(id)
         model.addAttribute("sample", sample)
-        model.addAttribute("type",sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name)
+        model.addAttribute("type", type)
+        model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía" })
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("chapters", chapters)
         return "sample_view"
     }
 
-    @GetMapping("/upload_chapter/{id}")
-    fun showUploadChapterForm(model: Model, @PathVariable id: Long): String {
-        val sample = sampleRepo.findById(id).get()
-        model.addAttribute("chapter",Chapter())
+    @GetMapping("/upload_chapter/{sampleId}")
+    fun showUploadChapterForm(model: Model, @PathVariable sampleId: Long): String {
+        val sample = sampleRepo.findById(sampleId).get()
         model.addAttribute("sample", sample)
         return "chapter_form"
     }
 
-    @GetMapping("/view/{sampleName}/{number}")
-    fun showChapter(model: Model, @PathVariable sampleName: String, @PathVariable number:Long): String {
-        val chapter = chapterRepo.findByNumber(number)
-        val chapters = chapterRepo.findBySample_Name(sampleName)
-        model.addAttribute("chapter", chapter)
-        model.addAttribute("chapters", chapters)
-        return "chapter_view"
-    }
-
     @PostMapping("/perform_chapter_upload")
-    fun saveChapter(chapter: Chapter, @RequestParam("fileImage") image: MultipartFile,
-                    @RequestParam("sampleName") sampleName: String, ra: RedirectAttributes): String {
+    fun saveChapter(@RequestParam("fileImage") image: MultipartFile,
+                    @RequestParam("sample_id") sampleId: Long, ra: RedirectAttributes): String {
         if (image.isEmpty) {
             ra.addAttribute("message", "No se ha seleccionado una imagen")
-            return "redirect:/upload_chapter/${chapter.sample?.id}"
+            return "redirect:/upload_chapter/${sampleId}"
         }
+        val chapter = Chapter()
+        val sample = sampleRepo.findById(sampleId).get()
 
-        val sample = sampleRepo.findByName(sampleName)
-
-        chapter.number = chapterRepo.countBySample_Id(sample.id as Long) + 1
+        chapter.number = chapterRepo.countBySampleId(sample.id as Long) + 1
         chapter.sample = sample
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
@@ -176,7 +174,6 @@ class AppController {
         chapter.image= name
 
         val uploadDir = "./resources/images/samples/$type/${sample.id}/chapters/${chapter.number}"
-        chapter.imagePath = "uploadDir/$name"
         chapterRepo.save(chapter)
 
         val uploadPath = Paths.get(uploadDir)
@@ -189,6 +186,15 @@ class AppController {
         ra.addAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
         return "redirect:/library/$type/${sample.id}/${sample.name}"
 
+    }
+
+    @GetMapping("/view/{type}/{sampleId}/{sampleName}/chapters/{number}")
+    fun showChapter(model: Model, @PathVariable sampleId: Long, @PathVariable number:Long): String {
+        val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
+        val chapters = chapterRepo.findAllBySampleId(sampleId)
+        model.addAttribute("chapter", chapter)
+        model.addAttribute("chapters", chapters)
+        return "chapter_view"
     }
 
     @PostMapping("/process_register")
@@ -208,7 +214,7 @@ class AppController {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             return "redirect:/login"
         }
-        val user = userRepo.findByUsername(authentication.name)
+        val user = userRepo.findByUsername(authentication.name) as User
         model.addAttribute("user", user)
         return "profile"
     }
@@ -220,7 +226,7 @@ class AppController {
 
     @PostMapping("/make_author")
     fun makeAuthor(authentication: Authentication): String {
-        val user = userRepo.findByUsername(authentication.name)
+        val user = userRepo.findByUsername(authentication.name) as User
         user.roles.add(roleRepo.findByName("AUTHOR"))
 
         val actualAuthorities : MutableSet<GrantedAuthority>? =
@@ -231,5 +237,21 @@ class AppController {
         userRepo.save(user)
 
         return "redirect:/register_sample"
+    }
+
+    @GetMapping("/images/samples/{id}")
+    fun getImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
+        val sample = sampleRepo.findById(id).get()
+        val imagePath = Paths.get(sample.coverPath() as String)
+        val image = Files.readAllBytes(imagePath)
+        return ResponseEntity.ok().body(image)
+    }
+
+    @GetMapping("/images/samples/{id}/chapters/{number}")
+    fun getChapterImage(@PathVariable id: Long, @PathVariable number: Long): ResponseEntity<ByteArray> {
+        val chapter = chapterRepo.findBySampleIdAndNumber(id, number)
+        val imagePath = Paths.get(chapter.imagePath() as String)
+        val image = Files.readAllBytes(imagePath)
+        return ResponseEntity.ok().body(image)
     }
 }

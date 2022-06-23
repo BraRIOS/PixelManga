@@ -40,7 +40,7 @@
                 <div class="col-lg-2">
                     <div class="header__logo">
                         <a href="/home">
-                            <img src="/images/logo.png" alt="">
+                            <img src="/static/images/logo.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -77,15 +77,18 @@
                     <div class="col-lg-9">
                         <div class="login__form">
                             <h3>Nuevo capítulo</h3>
-                            <form th:action="@{/perform_chapter_upload}" th:object="${chapter}" method="post" enctype="multipart/form-data">
-
+                            <form th:action="@{/perform_chapter_upload}" method="post" enctype="multipart/form-data">
                                 <div class="input__item">
-                                    <input type="text" id="sampleName" name="sampleName" th:value="${sample.name}">
+                                    <input type="hidden" name="sample_id" th:value="${sample.id}">
+                                    <span class="select2-selection__rendered" role="textbox" aria-readonly="true" th:title="${sample.name}">
+                                        <span class="badge badge-info" th:text="${sample.attributes.?[type.name == 'tipo de libro'].get(0).name.toUpperCase()}"></span>
+                                        <b th:text="${sample.name}"></b>
+                                    </span>
                                     <span class="icon_pencil"></span>
                                 </div>
 
                                 <div class="input__item">
-                                    <input type="file" id="fileImage" name="fileImage" placeholder="Capítulo">
+                                    <input type="file" id="fileImage" name="fileImage" placeholder="Subir imagen del capítulo" required>
                                     <span class="icon_image"></span>
                                 </div>
                                 <button type="submit" class="site-btn">Subir</button>

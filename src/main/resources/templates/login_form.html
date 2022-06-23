@@ -38,7 +38,7 @@
                 <div class="col-lg-2">
                     <div class="header__logo">
                         <a href="/home">
-                            <img src="/images/logo.png" alt="">
+                            <img src="/static/images/logo.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -89,11 +89,11 @@
                         <h3>Inicio de Sesión</h3>
                         <form th:action="@{/login}" method="post">
                             <div class="input__item">
-                                <input type="text" id="username" name="username" placeholder="Nombre de usuario">
+                                <input type="text" id="username" name="username" autocomplete="username" required placeholder="Nombre de usuario">
                                 <span class="icon_profile"></span>
                             </div>
                             <div class="input__item">
-                                <input type="password" id="password" name="password" placeholder="Contraseña">
+                                <input type="password" id="password" name="password" required placeholder="Contraseña">
                                 <span class="icon_lock"></span>
                             </div>
                             <button type="submit" class="site-btn">Acceder</button>
