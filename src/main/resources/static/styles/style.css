@@ -2376,7 +2376,6 @@ textarea {
 	height: 110px;
 	border: none;
 	border-radius: 5px;
-	resize: none;
 	margin-bottom: 24px;
 }
 textarea::placeholder{

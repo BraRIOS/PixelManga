@@ -109,14 +109,14 @@ class AppController {
         sample.attributes.add(attributeRepo.findByName(demographic))
 
         if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
-            ra.addFlashAttribute("message", "El nombre del libro ya existe")
+            ra.addFlashAttribute("message", "${sample.name} ya existe")
             return "redirect:/register_sample"
         }
         sampleRepo.save(sample)
 
         val id = sample.id as Long
 
-        val uploadDir = "/resources/images/samples/$type/$id"
+        val uploadDir = "./resources/images/samples/$type/$id"
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
@@ -124,7 +124,7 @@ class AppController {
         }
 
         if (!image.isEmpty) {
-            val regex = """\\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
+            val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
             val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
             sampleRepo.updateCoverById(name, id)
 
@@ -168,7 +168,7 @@ class AppController {
         chapter.sample = sample
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
-        val regex = """\*|\"|\?|\\|\>|/|<|:|\|""".toRegex()
+        val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
         val name = "${regex.replace(sample.name as String,"_")}.${image.contentType?.split("/")?.last()}"
 
         chapter.image= name
@@ -252,6 +252,9 @@ class AppController {
         val chapter = chapterRepo.findBySampleIdAndNumber(id, number)
         val imagePath = Paths.get(chapter.imagePath() as String)
         val image = Files.readAllBytes(imagePath)
+        if (image.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        }
         return ResponseEntity.ok().body(image)
     }
 }

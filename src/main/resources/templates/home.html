@@ -161,12 +161,12 @@
                         <div class="row">
                             <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${samples}">
                                 <div class="product__item">
-                                    <img class="product__item__pic" th:src="'/images/samples/'+${sample.id}">
+                                    <img class="product__item__pic" th:src="'/images/samples/'+${sample.id}" alt="/static/images/img.png">
                                     <div class="product__item__text">
                                             <ul th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}">
                                                 <li id="type" th:text="${type.toUpperCase()}"></li>
                                                 <h5><a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
-                                                    ${sample.name.replace('/','-')}}" th:text="${sample.name}"></a></h5>
+                                                    ${sample.name.replaceAll('\\|\/','-').replace('?','')}}" th:text="${sample.name}"></a></h5>
                                             </ul>
                                     </div>
                                 </div>
