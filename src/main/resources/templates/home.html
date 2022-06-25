@@ -166,7 +166,7 @@
                                             <ul th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}">
                                                 <li id="type" th:text="${type.toUpperCase()}"></li>
                                                 <h5><a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
-                                                    ${sample.name.replaceAll('\\|\/','-').replace('?','')}}" th:text="${sample.name}"></a></h5>
+                                                    ${sample.name.replaceAll('\s|\\|\/','-').replace('?','')}}" th:text="${sample.name}"></a></h5>
                                             </ul>
                                     </div>
                                 </div>

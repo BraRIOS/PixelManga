@@ -117,6 +117,8 @@ class AppController {
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
+        model.addAttribute("is_edition", false)
+        model.addAttribute("is_register", true)
         model.addAttribute("sample_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
         model.addAttribute("sample_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
         model.addAttribute("sample_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
@@ -140,21 +142,7 @@ class AppController {
 
         val id = sample.id as Long
 
-        val uploadDir = "./resources/images/samples/$type/$id"
-
-        val uploadPath = Paths.get(uploadDir)
-        if (!uploadPath.exists()) {
-            uploadPath.toFile().mkdirs()
-        }
-
-        if (!image.isEmpty) {
-            val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
-            val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
-            sampleRepo.updateCoverById(name, id)
-
-            val imagePath = uploadPath.resolve(name)
-            Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
-        }
+        saveSampleCover(type, id, image, sample)
 
         ra.addAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/home"
@@ -170,6 +158,61 @@ class AppController {
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("chapters", chapters)
         return "sample_view"
+    }
+
+    @GetMapping("/library/{type}/{id}/{name}/edit")
+    fun showSampleEditForm(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
+        val sample = sampleRepo.findById(id).get()
+        model.addAttribute("sample", sample)
+        model.addAttribute("is_edition", true)
+        model.addAttribute("is_register", false)
+        model.addAttribute("sample_demography", sample.attributes.find { it.type?.name == "demografía" })
+        model.addAttribute("sample_genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
+        model.addAttribute("all_genres",attributeRepo.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("all_demographics",attributeRepo.findByType_Name("demografía").sortedBy { it.name })
+        return "sample_form"
+    }
+
+    @PostMapping("/perform_sample_edit")
+    fun saveSampleEdit(sample: Sample, @RequestParam("type") type: String,
+                   @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
+                   @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
+
+        sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
+        sample.attributes.add(attributeRepo.findByName(type))
+        sample.attributes.add(attributeRepo.findByName(demographic))
+
+        sampleRepo.save(sample)
+
+        val id = sample.id as Long
+
+        saveSampleCover(type, id, image, sample)
+
+        ra.addAttribute("message", "Se han guardado los cambios de ${sample.name}")
+        return "redirect:/library/$type/$id/${sample.name}"
+    }
+
+    private fun saveSampleCover(
+        type: String,
+        id: Long,
+        image: MultipartFile,
+        sample: Sample
+    ) {
+        val uploadDir = "./resources/images/samples/$type/$id"
+
+        val uploadPath = Paths.get(uploadDir)
+        if (!uploadPath.exists()) {
+            uploadPath.toFile().mkdirs()
+        }
+
+        if (!image.isEmpty) {
+            val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
+            val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
+            sampleRepo.updateCoverById(name, id)
+
+            val imagePath = uploadPath.resolve(name)
+            Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
+        }
     }
 
     @GetMapping("/upload_chapter/{sampleId}")
@@ -254,7 +297,7 @@ class AppController {
     }
 
     @GetMapping("/images/samples/{id}")
-    fun getImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
+    fun getSampleImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val sample = sampleRepo.findById(id).get()
         val imagePath = Paths.get(sample.coverPath() as String)
         val image = Files.readAllBytes(imagePath)
