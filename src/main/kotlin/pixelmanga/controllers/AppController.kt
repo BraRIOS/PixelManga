@@ -69,10 +69,10 @@ class AppController {
     }
 
     @GetMapping("/check_username")
-    fun checkUsername(@RequestParam username: String): ResponseEntity<String> {
+    fun checkUsername(@RequestParam username: String): ResponseEntity<Boolean> {
         if (userRepo.findByUsername(username) != null)
-            return ResponseEntity.ok("Username already exists")
-        return ResponseEntity.ok("Username available")
+            return ResponseEntity.ok(false)
+        return ResponseEntity.ok(true)
     }
 
     @GetMapping("/check_email")
@@ -213,6 +213,20 @@ class AppController {
             val imagePath = uploadPath.resolve(name)
             Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
         }
+    }
+
+    @GetMapping("/library/{type}/{id}/{name}/delete")
+    fun deleteSample(@PathVariable type: String, @PathVariable id: Long, @PathVariable name: String, ra: RedirectAttributes): String {
+        val sample = sampleRepo.findById(id).get()
+        sampleRepo.delete(sample)
+        val uploadDir = sample.samplePath() as String
+        val uploadPath = Paths.get(uploadDir)
+        if (uploadPath.exists()) {
+            uploadPath.toFile().deleteRecursively()
+        }
+
+        ra.addAttribute("message", "Se ha eliminado ${sample.name}")
+        return "redirect:/home"
     }
 
     @GetMapping("/upload_chapter/{sampleId}")
