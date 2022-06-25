@@ -78,13 +78,9 @@
                             <div class="anime__details__title">
                                 <h3 th:text="*{name}"></h3>
                             </div>
-                            <div class="anime__details__rating">
-                                <div class="rating">
-                                    <a href="#"><i class="fa fa-star"></i></a>
-                                    <a href="#"><i class="fa fa-star"></i></a>
-                                    <a href="#"><i class="fa fa-star"></i></a>
-                                    <a href="#"><i class="fa fa-star"></i></a>
-                                    <a href="#"><i class="fa fa-star-half-o"></i></a>
+                            <div class="anime__details__rating" sec:authorize="hasAuthority('AUTHOR')">
+                                <div class="anime__details__btn">
+                                <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name}+'/edit'}"><i class="fa fa-pencil"></i> Editar</a>
                                 </div>
                             </div>
                             <p th:text="*{synopsis}"></p>
