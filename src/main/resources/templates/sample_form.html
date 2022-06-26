@@ -73,44 +73,48 @@
             <div class="anime__details__content">
                 <div class="row">
                     <div class="col-lg-3 col-md-3 text-center">
-                        <img class="anime__details__pic" src="/static/images/img.png" id="thumbnail"
+                        <img class="anime__details__pic" th:src="${sample.id != null}? '/images/samples/'+${sample.id} : '/static/images/img.png'" id="thumbnail"
                              onclick="open_explorer();">
                     </div>
                     <div class="col-lg-9 col-md-9">
                         <div class="login__form" style="padding-left: 0">
-                            <h3>Nuevo ejemplar</h3>
+                            <h3 th:if="is_register">Nuevo ejemplar</h3>
+                            <h3 th:if="!is_register">Editar ejemplar</h3>
+
                             <form th:action="@{/perform_sample_register}" autocomplete="off" th:object="${sample}" method="post" enctype="multipart/form-data">
                                 <div class="input__item" style="width: auto">
-                                    <input type="text" name="name" required placeholder="Nombre de ejemplar">
+                                    <input type="text" name="name" required placeholder="Nombre de ejemplar" th:value="${sample.name}">
                                     <span class="icon_pencil"></span>
                                 </div>
-                                    <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required></textarea>
+                                    <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required th:text="${sample.synopsis}"></textarea>
                                 <div class="input__item" style="width: auto">
-                                    <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}" placeholder="Fecha de publicacion">
+                                    <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}"
+                                           placeholder="Fecha de publicacion" th:value="${sample.publicationDate}">
                                     <span class="icon_calendar"></span>
                                 </div>
 
-                                <div class="input__select">
+                                <div class="input__select" id="type_div">
                                     <select class="type-select" required id="type" name="type">
                                         <option></option>
-                                        <option th:each="type : ${sample_types}"
+                                        <option th:each="type : ${all_types}"
                                                 th:value="${type.name}"
                                                 th:text="${type.name}"></option>
                                     </select>
                                 </div>
+                                <!--input type="hidden" name="type" id="edition_type" th:value="${sample_type}"-->
 
                                 <div class="input__select">
                                     <select class="demographic-select" id="demographic" name="demographic">
                                         <option></option>
-                                        <option th:each="demographic : ${sample_demographics}"
+                                        <option th:each="demographic : ${all_demographics}"
                                                 th:value="${demographic.name}"
                                                 th:text="${demographic.name}"></option>
                                     </select>
                                 </div>
                                 <div class="input__select">
-                                    <select class="select-multiple" multiple="multiple" name="genres[]"
+                                    <select class="select-genres" multiple="multiple" name="genres[]"
                                             id="genres[]">
-                                        <option th:each="genre : ${sample_genres}"
+                                        <option th:each="genre : ${all_genres}"
                                                 th:value="${genre.name}"
                                                 th:text="${genre.name}"></option>
                                     </select>
@@ -125,65 +129,7 @@
                 </div>
             </div>
         </section>
-
-    <section class="anime-details spad">
-        <div class="container">
-            <div class="anime__details__content">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 text-center">
-                        <img class="anime__details__pic" th:src="@{/images/samples/${sample.id}}" id="thumbnail"
-                             onclick="open_explorer();">
-                    </div>
-                    <div class="col-lg-9 col-md-9">
-                        <div class="login__form" style="padding-left: 0">
-                            <h3>Nuevo ejemplar</h3>
-                            <form th:action="@{/perform_sample_register}" autocomplete="off" th:object="${sample}" method="post" enctype="multipart/form-data">
-                                <div class="input__item" style="width: auto">
-                                    <input type="text" name="name" required placeholder="Nombre de ejemplar">
-                                    <span class="icon_pencil"></span>
-                                </div>
-                                <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required></textarea>
-                                <div class="input__item" style="width: auto">
-                                    <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}" placeholder="Fecha de publicacion">
-                                    <span class="icon_calendar"></span>
-                                </div>
-
-                                <div class="input__select">
-                                    <select class="type-select" required id="type" name="type">
-                                        <option></option>
-                                        <option th:each="type : ${sample_types}"
-                                                th:value="${type.name}"
-                                                th:text="${type.name}"></option>
-                                    </select>
-                                </div>
-
-                                <div class="input__select">
-                                    <select class="demographic-select" id="demographic" name="demographic">
-                                        <option></option>
-                                        <option th:each="demographic : ${sample_demographics}"
-                                                th:value="${demographic.name}"
-                                                th:text="${demographic.name}"></option>
-                                    </select>
-                                </div>
-                                <div class="input__select">
-                                    <select class="select-multiple" multiple="multiple" name="genres[]"
-                                            id="genres[]">
-                                        <option th:each="genre : ${sample_genres}"
-                                                th:value="${genre.name}"
-                                                th:text="${genre.name}"></option>
-                                    </select>
-                                </div>
-                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
-                                       style="display: none;">
-                                <button type="submit" class="site-btn text-center">Subir</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-        <!-- Anime Section End -->
+    <!-- Anime Section End -->
 
         <!-- Footer Section Begin -->
     <footer class="footer">
@@ -231,25 +177,39 @@
 
     <script type="text/javascript">
         $(document).ready(function (){
+            let isRegister = [[${is_register}]]
+            let typeDiv = document.getElementById("type_div")
+
+            if (isRegister) {
+                $('.type-select').select2({
+                    placeholder: "Seleccione el tipo",
+                    allowClear: true,
+                    width:'style'
+                });
+            }
+            else {
+                typeDiv.parentNode.removeChild(typeDiv)
+            }
+
             $('#fileImage').change(function (){
                 showImageThumbnail(this);
-            })
+            });
 
-            $('.select-multiple').select2({
+            let sampleGenres = [[${sample.genres}]]
+            for (let i = 0; i < sampleGenres.length-1 ; i++) {
+                sampleGenres[i] = ""+sampleGenres[i]
+            }
+            $('.select-genres').select2({
                 placeholder: "Seleccione los géneros",
                 allowClear: true,
                 width:'style'
-            });
-            $('.type-select').select2({
-                placeholder: "Seleccione el tipo",
-                allowClear: true,
-                width:'style'
-            });
+            }).val(sampleGenres).trigger('change');
+
             $('.demographic-select').select2({
                 placeholder: "Seleccione la demografía",
                 allowClear: true,
                 width:'style'
-            });
+            }).val("[[${sample_demography}]]").trigger('change');
         });
 
         function showImageThumbnail(fileInput){

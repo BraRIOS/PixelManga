@@ -117,11 +117,10 @@ class AppController {
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
-        model.addAttribute("is_edition", false)
         model.addAttribute("is_register", true)
-        model.addAttribute("sample_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
-        model.addAttribute("sample_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
-        model.addAttribute("sample_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
+        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
+        model.addAttribute("all_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
 
         return "sample_form"
     }
@@ -164,9 +163,9 @@ class AppController {
     fun showSampleEditForm(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
         model.addAttribute("sample", sample)
-        model.addAttribute("is_edition", true)
         model.addAttribute("is_register", false)
-        model.addAttribute("sample_demography", sample.attributes.find { it.type?.name == "demografía" })
+        model.addAttribute("sample_type", type)
+        model.addAttribute("sample_demography", sample.attributes.find { it.type?.name == "demografía" }?.name)
         model.addAttribute("sample_genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("all_genres",attributeRepo.findByType_Name("género").sortedBy { it.name })
         model.addAttribute("all_demographics",attributeRepo.findByType_Name("demografía").sortedBy { it.name })
