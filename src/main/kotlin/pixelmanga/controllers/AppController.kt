@@ -173,17 +173,16 @@ class AppController {
     }
 
     @PostMapping("/perform_sample_edit")
-    fun saveSampleEdit(sample: Sample, @RequestParam("type") type: String,
-                   @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
-                   @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
-
+    fun saveSampleEdit(sample: Sample, @RequestParam("id") id: Long,
+                       @RequestParam("type") type: String,
+                       @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
+                       @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
+        sample.id = id
         sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
         sample.attributes.add(attributeRepo.findByName(type))
         sample.attributes.add(attributeRepo.findByName(demographic))
 
         sampleRepo.save(sample)
-
-        val id = sample.id as Long
 
         saveSampleCover(type, id, image, sample)
 
@@ -250,7 +249,7 @@ class AppController {
 
         val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
         val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
-        val name = "${regex.replace(sample.name as String,"_")}.${image.contentType?.split("/")?.last()}"
+        val name = "${regex.replace(sample.name as String,"_")}_capítulo_${chapter.number}.${image.contentType?.split("/")?.last()}"
 
         chapter.image= name
 
@@ -312,19 +311,26 @@ class AppController {
     @GetMapping("/images/samples/{id}")
     fun getSampleImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val sample = sampleRepo.findById(id).get()
-        val imagePath = Paths.get(sample.coverPath() as String)
-        val image = Files.readAllBytes(imagePath)
-        return ResponseEntity.ok().body(image)
+        return if (sample.coverPath() != null) {
+            val imagePath = Paths.get(sample.coverPath() as String)
+            val image = Files.readAllBytes(imagePath)
+            ResponseEntity.ok().body(image)
+        } else{
+            val image = Files.readAllBytes(Paths.get("./resources/images/samples/default.png"))
+            ResponseEntity.ok().body(image)
+        }
     }
 
     @GetMapping("/images/samples/{id}/chapters/{number}")
     fun getChapterImage(@PathVariable id: Long, @PathVariable number: Long): ResponseEntity<ByteArray> {
         val chapter = chapterRepo.findBySampleIdAndNumber(id, number)
-        val imagePath = Paths.get(chapter.imagePath() as String)
-        val image = Files.readAllBytes(imagePath)
-        if (image.isEmpty()) {
-            return ResponseEntity.notFound().build()
+        return if (chapter.imagePath() != null) {
+            val imagePath = Paths.get(chapter.imagePath() as String)
+            val image = Files.readAllBytes(imagePath)
+            ResponseEntity.ok().body(image)
+        } else{
+            val image = Files.readAllBytes(Paths.get("./resources/images/samples/default.png"))
+            ResponseEntity.ok().body(image)
         }
-        return ResponseEntity.ok().body(image)
     }
 }
