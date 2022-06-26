@@ -195,15 +195,14 @@
                 showImageThumbnail(this);
             });
 
-            let sampleGenres = [[${sample.genres}]]
-            for (let i = 0; i < sampleGenres.length-1 ; i++) {
-                sampleGenres[i] = ""+sampleGenres[i]
-            }
+            let genres = "[[${sample_genres}]]".replace(/\[|\]/g,'').split(",").map(item => item.trim())
+            console.log(genres)
+
             $('.select-genres').select2({
                 placeholder: "Seleccione los géneros",
                 allowClear: true,
                 width:'style'
-            }).val(sampleGenres).trigger('change');
+            }).val(genres).trigger('change');
 
             $('.demographic-select').select2({
                 placeholder: "Seleccione la demografía",
