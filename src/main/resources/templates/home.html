@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/plyr.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/nice-select.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
@@ -32,7 +31,7 @@
     </div>
 
     <!-- Modal -->
-    <div id="myModal" class="modal" tabindex="-1" role="dialog">
+    <div id="askAuthorModal" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -80,7 +79,7 @@
                 <div class="col-lg-2">
                     <div class="header__right">
                         <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
-                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#myModal"><span class="icon_pencil"></span></a>
+                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
                         <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
                         <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
@@ -214,7 +213,6 @@
 <!-- Js Plugins -->
 <script src="/static/js/jquery-3.3.1.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/player.js"></script>
 <script src="/static/js/jquery.nice-select.min.js"></script>
 <script src="/static/js/mixitup.min.js"></script>
 <script src="/static/js/jquery.slicknav.js"></script>

@@ -1,6 +1,7 @@
 package pixelmanga.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,7 +28,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.stream.Collectors
+import java.util.stream.IntStream
 import kotlin.io.path.exists
+import kotlin.streams.toList
 
 
 @Controller
@@ -76,17 +79,17 @@ class AppController {
     }
 
     @GetMapping("/check_username")
-    fun checkUsername(@RequestParam username: String): ResponseEntity<Boolean> {
+    fun checkUsername(@RequestParam username: String): Boolean {
         if (userRepo.findByUsername(username) != null)
-            return ResponseEntity.ok(false)
-        return ResponseEntity.ok(true)
+            return false
+        return true
     }
 
     @GetMapping("/check_email")
-    fun checkEmail(@RequestParam email: String): ResponseEntity<Boolean> {
+    fun checkEmail(@RequestParam email: String): Boolean {
         if (userRepo.findByEmail(email) != null)
-            return ResponseEntity.ok(false)
-        return ResponseEntity.ok(true)
+            return false
+        return true
     }
 
     @PostMapping("/process_register")
@@ -180,16 +183,20 @@ class AppController {
         return "redirect:/home"
     }
 
-    //paginado de libros totales
     @GetMapping("/library")
-    fun showLibrary(model: Model, @RequestParam("page", required = false) page: Int, @RequestParam("type", required = false) type: String): String{
-        val samples = sampleRepo.findAll().sortedBy { it.name }
-        model.addAttribute("samples", samples.slice(page * 10 until (page + 1) * 10))
-        model.addAttribute("page", page)
-        model.addAttribute("total_pages", (samples.size / 10) + 1)
+    fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("type", required = false) type: String): String{
+        val page = pageNumber ?: 0
+
+        val samplePage = sampleRepo.findAll(PageRequest.of(page, 20))
+        val totalPage = samplePage.totalPages
+        if (totalPage > 0){
+            val pages = IntStream.rangeClosed(1, totalPage).toList()
+            model.addAttribute("pages", pages)
+        }
+        model.addAttribute("list_samples", samplePage.content)
+
         return "library"
     }
-
 
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
@@ -244,11 +251,17 @@ class AppController {
             return "redirect:/login"
         }
         val user = userRepo.findByUsername(SecurityContextHolder.getContext().authentication.name) as User
-        val rate = Rate()
-        rate.user = user
-        rate.sample = sample
-        rate.rate = rating
-        rateRepo.save(rate)
+        val ratingSample = rateRepo.findByUser_IdAndSample_Id(user.id as Long, sampleId)
+        if (ratingSample != null) {
+            ratingSample.rating = rating
+            rateRepo.save(ratingSample)
+        } else {
+            val newRate = Rate()
+            newRate.user = user
+            newRate.sample = sample
+            newRate.rating = rating
+            rateRepo.save(newRate)
+        }
         ra.addFlashAttribute("message", "Valoración añadida")
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
         return "redirect:/library/$type/${sample.id}/${sample.name}"
@@ -259,7 +272,7 @@ class AppController {
         return try {
             val sample = sampleRepo.findById(sampleId).get()
             val rates = rateRepo.findAllBySample_Id(sample.id as Long)
-            val average = (rates.map { it.rate as Int } as Iterable<Int>).average()
+            val average = (rates.map { it.rating as Int } as Iterable<Int>).average()
             average.toString()
         } catch (e: Exception) {
             "0"
