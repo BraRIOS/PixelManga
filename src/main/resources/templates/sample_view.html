@@ -101,9 +101,7 @@
                             </div>
                             <div class="anime__details__btn">
                                 <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Seguir</a>
-                                <a href="#" class="watch-btn"><span>Leer ahora</span> <i
-                                    class="fa fa-angle-right"></i></a>
-                                <a th:href="@{'/upload_chapter/'+*{id}}" class="watch-btn" sec:authorize="hasAuthority('AUTHOR')"><span>Subir capítulo</span></a>
+                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')">Subir capítulo</a>
                                 </div>
                             </div>
                         </div>

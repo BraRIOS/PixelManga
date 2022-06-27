@@ -75,11 +75,17 @@
                     <div class="col-lg-3 col-md-3 text-center">
                         <img class="anime__details__pic" th:src="${sample.id != null}? '/images/samples/'+${sample.id} : '/static/images/img.png'" id="thumbnail"
                              onclick="open_explorer();">
+                        <div class="view" style="color: white" th:if="${!is_register}">Editar portada</div>
                     </div>
                     <div class="col-lg-9 col-md-9">
                         <div class="login__form" style="padding-left: 0">
                             <h3 th:if="${is_register}">Nuevo ejemplar</h3>
                             <h3 th:if="${!is_register}">Editar ejemplar</h3>
+                            <div class="anime__details__rating" th:if="${!is_register}">
+                                <div class="anime__details__btn">
+                                    <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name}+'/delete'}"><i class="fa fa-exclamation-circle"></i> Eliminar</a>
+                                </div>
+                            </div>
 
                             <form th:action="${is_register == true}? '/perform_sample_register' : '/perform_sample_edit'" autocomplete="off" th:object="${sample}" method="post" enctype="multipart/form-data">
                                 <div class="input__item" style="width: auto">
