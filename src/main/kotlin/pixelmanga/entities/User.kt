@@ -35,4 +35,12 @@ open class User {
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     open var roles: MutableSet<Role> = mutableSetOf()
+
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "users_favorite_samples",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "samples_id")]
+    )
+    open var favoriteSamples: MutableSet<Sample> = mutableSetOf()
 }

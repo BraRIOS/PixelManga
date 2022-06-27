@@ -101,19 +101,31 @@ class AppController {
         } else "redirect:/"
     }
 
-    @GetMapping("/users")
-    fun listUsers(model: Model): String? {
-        val listUsers = userRepo.findAll()
-        model.addAttribute("listUsers", listUsers)
-        return "users"
+    @GetMapping("/profile")
+    fun showProfile(model: Model): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name)
+        model.addAttribute("user", user)
+        return "profile"
     }
 
-    @GetMapping("/samples")
-    fun listSamples(model: Model): String? {
-        model.addAttribute("listSamples", sampleRepo.findAll())
-        return "samples"
-    }
+    @PostMapping("/make_author")
+    fun makeAuthor(authentication: Authentication): String {
+        val user = userRepo.findByUsername(authentication.name) as User
+        user.roles.add(roleRepo.findByName("AUTHOR"))
 
+        val actualAuthorities : MutableSet<GrantedAuthority>? =
+            user.roles.stream().map { role ->  SimpleGrantedAuthority(role.name) }.collect(Collectors.toSet())
+        val newAuth: Authentication = UsernamePasswordAuthenticationToken(CustomUserDetails(user), user.password, actualAuthorities)
+        SecurityContextHolder.getContext().authentication = newAuth
+
+        userRepo.save(user)
+
+        return "redirect:/register_sample"
+    }
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
@@ -124,6 +136,7 @@ class AppController {
 
         return "sample_form"
     }
+
     @PostMapping("/perform_sample_register")
     fun saveSample(sample: Sample, @RequestParam("type") type: String,
                    @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
@@ -216,6 +229,7 @@ class AppController {
     @GetMapping("/library/{type}/{id}/{name}/delete")
     fun deleteSample(@PathVariable type: String, @PathVariable id: Long, @PathVariable name: String, ra: RedirectAttributes): String {
         val sample = sampleRepo.findById(id).get()
+        chapterRepo.deleteAll(chapterRepo.findAllBySampleId(id))
         sampleRepo.delete(sample)
         val uploadDir = sample.samplePath() as String
         val uploadPath = Paths.get(uploadDir)
@@ -277,35 +291,9 @@ class AppController {
         return "chapter_view"
     }
 
-    @GetMapping("/profile")
-    fun showProfile(model: Model): String {
-        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-        if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            return "redirect:/login"
-        }
-        val user = userRepo.findByUsername(authentication.name) as User
-        model.addAttribute("user", user)
-        return "profile"
-    }
-
     @GetMapping("/index")
     fun showIndexPage(): String {
         return "index"
-    }
-
-    @PostMapping("/make_author")
-    fun makeAuthor(authentication: Authentication): String {
-        val user = userRepo.findByUsername(authentication.name) as User
-        user.roles.add(roleRepo.findByName("AUTHOR"))
-
-        val actualAuthorities : MutableSet<GrantedAuthority>? =
-            user.roles.stream().map { role ->  SimpleGrantedAuthority(role.name) }.collect(Collectors.toSet())
-        val newAuth: Authentication = UsernamePasswordAuthenticationToken(CustomUserDetails(user), user.password, actualAuthorities)
-        SecurityContextHolder.getContext().authentication = newAuth
-
-        userRepo.save(user)
-
-        return "redirect:/register_sample"
     }
 
     @GetMapping("/images/samples/{id}")
