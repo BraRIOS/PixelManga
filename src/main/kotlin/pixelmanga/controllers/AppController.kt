@@ -244,7 +244,10 @@ class AppController {
             return "redirect:/login"
         }
         val user = userRepo.findByUsername(SecurityContextHolder.getContext().authentication.name) as User
-        val rate = Rate(user, sample, rating)
+        val rate = Rate()
+        rate.user = user
+        rate.sample = sample
+        rate.rate = rating
         rateRepo.save(rate)
         ra.addFlashAttribute("message", "Valoración añadida")
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name

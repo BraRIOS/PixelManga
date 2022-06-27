@@ -157,7 +157,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${samples}">
+                            <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${randomSamples}">
                                 <div class="product__item">
                                     <img class="product__item__pic" th:src="'/images/samples/'+${sample.id}" alt="/static/images/img.png">
                                     <div class="product__item__text">

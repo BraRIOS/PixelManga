@@ -6,7 +6,7 @@ import pixelmanga.entities.Rate
 
 interface RateRepository : JpaRepository<Rate, Long> {
 
-    @Query("select r from Rate r inner join r.samples samples where samples.id = ?1")
-    fun findAllBySample_Id(id: Long): Iterable<Rate>
+    @Query("select r from Rate r where r.sample.id = ?1")
+    fun findAllBySample_Id(id: Long): List<Rate>
 
 }
