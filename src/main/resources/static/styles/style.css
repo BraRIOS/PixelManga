@@ -1042,6 +1042,17 @@ ol {
 	display: inline-block;
 }
 
+.anime__details__rating2 {
+	text-align: center;
+	margin-top: 10px;
+}
+
+.anime__details__rating2 .rating i {
+	font-size: 24px;
+	color: #e89f12;
+	display: inline-block;
+}
+
 .anime__details__rating span {
 	display: block;
 	font-size: 18px;
@@ -2259,6 +2270,10 @@ ol {
 		text-align: left;
 		position: relative;
 		margin-bottom: 20px;
+	}
+
+	.anime__details__rating2 {
+		text-align: center;
 	}
 	.blog__details__social {
 		overflow: hidden;

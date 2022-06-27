@@ -72,6 +72,19 @@
                 <div class="row" style="margin-bottom: 12px">
                     <div class="col-lg-3" >
                         <img class="anime__details__pic" th:src="'/images/samples/'+${sample.id}">
+                        <div class="anime__details__rating2">
+                            <form th:action="@{/user_rating_sample}" method="post">
+                            <div class="rating">
+                                <i class="fa fa-star-o" onclick=a1(this) id="1"><input id="0" name="rating" hidden value="1"></i>
+                                <i class="fa fa-star-o" onclick=a2(this) id="2"><input name="rating" hidden></i>
+                                <i class="fa fa-star-o" onclick=a3(this) id="3"><input name="rating" hidden></i>
+                                <i class="fa fa-star-o" onclick=a4(this) id="4"><input name="rating" hidden></i>
+                                <i class="fa fa-star-o" onclick=a5(this) id="5"><input name="rating" hidden></i>
+                            </div>
+                            <input type="hidden" name="sample_id" th:value="${sample.id}">
+                                <button id="acceder" hidden type="submit">Acceder</button>
+                            </form>
+                        </div>
                     </div>
                     <div class="col-lg-9">
                         <div class="anime__details__text">
@@ -187,6 +200,45 @@
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
+
+    <script>
+        $(".fa-star-o").hover(
+            function () {
+                $(this).removeClass("fa-star-o").addClass("fa-star");
+                $(this).prevAll().removeClass("fa fa-star-o").addClass("fa fa-star");
+            },
+            function () {
+                $(this).prevAll().removeClass("fa fa-star").addClass("fa fa-star-o");
+                $(this).removeClass("fa fa-star").addClass("fa fa-star-o");
+            }
+        );
+    </script>
+
+    <script>
+        function a1( ){
+            document.getElementById("0").value="0"
+            document.getElementById("acceder").click()
+        }
+        function a2( ){
+            document.getElementById("0").value='2'
+            document.getElementById("acceder").click()
+        }
+        function a3( ){
+            document.getElementById("0").value='3'
+            document.getElementById("acceder").click()
+        }
+        function a4( ){
+            document.getElementById("0").value='4'
+            document.getElementById("acceder").click()
+        }
+        function a5( ){
+            document.getElementById("0").value='5'
+            document.getElementById("acceder").click()
+        }
+
+
+    </script>
+
 
 
 </body>

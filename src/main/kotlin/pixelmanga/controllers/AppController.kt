@@ -262,8 +262,8 @@ class AppController {
             newRate.rating = rating
             rateRepo.save(newRate)
         }
-        ra.addFlashAttribute("message", "Valoración añadida")
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
+        ra.addFlashAttribute("message", "Valoración añadida")
         return "redirect:/library/$type/${sample.id}/${sample.name}"
     }
 
