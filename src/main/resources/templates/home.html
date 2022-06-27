@@ -79,10 +79,8 @@
                 </div>
                 <div class="col-lg-2">
                     <div class="header__right">
-                        <div sec:authorize="isAuthenticated()">
-                            <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR')"><span class="icon_pencil"></span></a>
-                            <a sec:authorize="!hasAnyAuthority('AUTHOR')" data-toggle="modal" data-target="#myModal"><span class="icon_pencil"></span></a>
-                        </div>
+                        <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
+                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#myModal"><span class="icon_pencil"></span></a>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
                         <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
                         <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
