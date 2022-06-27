@@ -112,6 +112,17 @@ class AppController {
         return "profile"
     }
 
+    @GetMapping("/profile/edit")
+    fun showProfileEdit(model: Model): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name)
+        model.addAttribute("user", user)
+        return "profile_edit"
+    }
+
     @PostMapping("/make_author")
     fun makeAuthor(authentication: Authentication): String {
         val user = userRepo.findByUsername(authentication.name) as User
