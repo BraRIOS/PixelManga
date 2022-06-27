@@ -13,9 +13,15 @@ interface SampleRepository : JpaRepository<Sample, Long> {
     fun findByName(name: String): Sample?
 
 
+
+
     @Transactional
     @Modifying
     @Query("update Sample s set s.cover = ?1 where s.id = ?2")
     fun updateCoverById(cover: String, id: Long): Int
+
+
+    @Query("select s from Sample s inner join s.attributes attributes where attributes.name = ?1")
+    fun findAllByAttributes_Name(name: String): List<Sample>
 
 }

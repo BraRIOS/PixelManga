@@ -54,7 +54,10 @@ class AppController {
 
     @GetMapping("/home")
     fun showHomePage(model: Model): String {
-        model.addAttribute("samples", sampleRepo.findAll())
+        val randomSamples = sampleRepo.findAll().sortedBy { it.name }.shuffled().take(10)
+        val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(10)
+        model.addAttribute("randomSamples", randomSamples)
+        model.addAttribute("latest_samples", latestSamples)
         return "home"
     }
 
@@ -76,10 +79,10 @@ class AppController {
     }
 
     @GetMapping("/check_email")
-    fun checkEmail(@RequestParam email: String): ResponseEntity<String> {
+    fun checkEmail(@RequestParam email: String): ResponseEntity<Boolean> {
         if (userRepo.findByEmail(email) != null)
-            return ResponseEntity.ok("Email already exists")
-        return ResponseEntity.ok("Email available")
+            return ResponseEntity.ok(false)
+        return ResponseEntity.ok(true)
     }
 
     @PostMapping("/process_register")
@@ -102,9 +105,10 @@ class AppController {
     }
 
     @GetMapping("/profile")
-    fun showProfile(model: Model): String {
+    fun showProfile(model: Model, ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tu perfil")
             return "redirect:/login"
         }
         val user = userRepo.findByUsername(authentication.name)
@@ -113,9 +117,10 @@ class AppController {
     }
 
     @GetMapping("/profile/edit")
-    fun showProfileEdit(model: Model): String {
+    fun showProfileEdit(model: Model, ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
             return "redirect:/login"
         }
         val user = userRepo.findByUsername(authentication.name)
@@ -170,6 +175,17 @@ class AppController {
         ra.addAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/home"
     }
+
+    //paginado de libros totales
+    @GetMapping("/library")
+    fun showLibrary(model: Model, @RequestParam("page", required = false) page: Int, @RequestParam("type", required = false) type: String): String{
+        val samples = sampleRepo.findAll().sortedBy { it.name }
+        model.addAttribute("samples", samples.slice(page * 10 until (page + 1) * 10))
+        model.addAttribute("page", page)
+        model.addAttribute("total_pages", (samples.size / 10) + 1)
+        return "library"
+    }
+
 
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
