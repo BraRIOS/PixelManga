@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pixelmanga.entities.Chapter
+import pixelmanga.entities.Rate
 import pixelmanga.entities.Sample
 import pixelmanga.entities.User
 import pixelmanga.repositories.*
@@ -46,6 +47,9 @@ class AppController {
 
     @Autowired
     private lateinit var chapterRepo: ChapterRepository
+
+    @Autowired
+    private lateinit var rateRepo: RateRepository
 
     @GetMapping("")
     fun root(): String {
@@ -228,6 +232,35 @@ class AppController {
 
         ra.addAttribute("message", "Se han guardado los cambios de ${sample.name}")
         return "redirect:/library/$type/$id/${sample.name}"
+    }
+
+    @PostMapping("/user_rating_sample")
+    fun rateSample(@RequestParam("sample_id") sampleId: Long, @RequestParam("rating") rating: Int,
+                   ra: RedirectAttributes): String {
+        val sample = sampleRepo.findById(sampleId).get()
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder valorar: ${sample.name}")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(SecurityContextHolder.getContext().authentication.name) as User
+        val rate = Rate(user, sample, rating)
+        rateRepo.save(rate)
+        ra.addFlashAttribute("message", "Valoración añadida")
+        val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
+        return "redirect:/library/$type/${sample.id}/${sample.name}"
+    }
+
+    @GetMapping("/sample_average_rate")
+    fun getSampleAverageRate(@RequestParam("sample_id") sampleId: Long): String {
+        return try {
+            val sample = sampleRepo.findById(sampleId).get()
+            val rates = rateRepo.findAllBySample_Id(sample.id as Long)
+            val average = (rates.map { it.rate as Int } as Iterable<Int>).average()
+            average.toString()
+        } catch (e: Exception) {
+            "0"
+        }
     }
 
     private fun saveSampleCover(
