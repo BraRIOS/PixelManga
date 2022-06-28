@@ -126,12 +126,9 @@
                         </div>
                     </div>
                     <div class="product__pagination text-center">
-                        <a th:each="page :${pages}" th:href="@{|/?page=${page}|}" th:text="${page}" th:classappend="${document}">1</a>
-                        <a href="#">2</a>
-                        <a href="#">3</a>
-                        <a href="#">4</a>
-                        <a href="#">5</a>
-                        <a href="#"><i class="fa fa-angle-double-right"></i></a>
+                        <a th:classappend="${prev == 0? 'hidden' : ''}" th:href="@{|/?page=${prev}|}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
+                        <a th:classappend="${page == current? 'current-page' : ''}" class="current-page" th:each="page :${pages}" th:id="'page '+${page}" th:href="@{|/?page=${page}|}" th:text="${page}"></a>
+                        <a th:classappend="${current == last? 'hidden' : ''}" th:href="@{|/?page=${next}|}"><i th:classappend="${current==last? '' : 'fa fa-angle-double-left'}"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-8">
@@ -295,7 +292,18 @@
 <script src="/static/js/jquery.slicknav.js"></script>
 <script src="/static/js/owl.carousel.min.js"></script>
 <script src="/static/js/main.js"></script>
-
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function() {
+        let samples = [[${list_samples}]];
+        for (let i = 0; i < samples.length; i++) {
+            $.get("sample_average_rate", {sampleId: samples[i].id}, function (data) {
+                console.log(data);
+                $("#" + samples[i].id).append(data);
+            });
+        }
+    })
+    /*]]>*/
+</script>
 </body>
-
 </html>

@@ -186,7 +186,7 @@ class AppController {
     }
 
     @GetMapping("/library")
-    fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("type", required = false) type: String): String{
+    fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("type", required = false) type: String?): String{
         val page = pageNumber ?: 0
 
         val samplePage = sampleRepo.findAll(PageRequest.of(page, 20))
@@ -194,6 +194,10 @@ class AppController {
         if (totalPage > 0){
             val pages = IntStream.rangeClosed(1, totalPage).toList()
             model.addAttribute("pages", pages)
+            model.addAttribute("current", page+1)
+            model.addAttribute("next", page+2)
+            model.addAttribute("prev", page)
+            model.addAttribute("last", totalPage)
         }
         model.addAttribute("list_samples", samplePage.content)
 
