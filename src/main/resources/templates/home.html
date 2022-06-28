@@ -162,7 +162,7 @@
                                         <span class="score" th:id="${sample.id}">
                                             <i class="fa fa-star"></i>
                                         </span>
-                                        <span class="book-type badge badge-manga" th:text="${type.toUpperCase()}"></span>
+                                        <span class="book-type badge badge-manga" th:classappend="badge-+${type}" th:text="${type.toUpperCase()}"></span>
                                         <span class="demography" th:classappend="${demography}" th:text="${ demography.substring(0, 1).toUpperCase() + demography.substring(1)}"></span>
                                     </div>
                                     <div class="product__item__text">
