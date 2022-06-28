@@ -90,7 +90,7 @@
                     <form th:action="@{/process_register}" th:object="${user}"
                           method="post">
                         <div class="input__item">
-                            <input type="text" th:field="*{username}" autocomplete="username" id="username"
+                            <input type="text" th:field="*{username}" autocomplete="username" id="username" placeholder="Nombre de usuario"
                                    required minlength="2" maxlength="20">
                             <span class="icon_profile"></span>
                         </div>

@@ -2,6 +2,7 @@ package pixelmanga.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -270,18 +271,19 @@ class AppController {
     }
 
     @GetMapping("/sample_average_rate")
-    fun getSampleAverageRate(@RequestParam("sample_id") sampleId: Long): String {
+    fun getSampleAverageRate(sampleId: Long): ResponseEntity<String> {
         return try {
             val sample = sampleRepo.findById(sampleId).get()
             val rates = rateRepo.findAllBySample_Id(sample.id as Long)
-            val average = (rates.map { it.rating as Int } as Iterable<Int>).average()
-            if (average.isNaN()){
-                "0"
+            if (rates.isEmpty()) {
+                ResponseEntity.ok("0.00")
             } else {
-                String.format("%.2f", average)
+                val sum = rates.sumOf { it.rating }
+                val average = sum / rates.size.toDouble()
+                ResponseEntity.ok(String.format("%.2f", average))
             }
         } catch (e: Exception) {
-            "0"
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error")
         }
     }
 

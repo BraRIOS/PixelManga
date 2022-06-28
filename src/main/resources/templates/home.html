@@ -157,14 +157,17 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${randomSamples}">
-                                <div class="product__item">
-                                    <img class="product__item__pic" th:src="'/images/samples/'+${sample.id}" alt="/static/images/img.png">
+                                <div class="product__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}, demography= ${sample.attributes.?[type.name == 'demografía'].get(0).name}">
+                                    <div class="product__item__pic set-bg" th:data-setbg="'/images/samples/'+${sample.id}">
+                                        <span class="score" th:id="${sample.id}">
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                        <span class="book-type badge badge-manga" th:text="${type.toUpperCase()}">MANGA</span>
+                                        <span class="demography shounen" th:text="${ demography.substring(0, 1).toUpperCase() + demography.substring(1)}">Shounen</span>
+                                    </div>
                                     <div class="product__item__text">
-                                            <ul th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}">
-                                                <li id="type" th:text="${type.toUpperCase()}"></li>
-                                                <h5><a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
+                                        <h5><a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
                                                     ${sample.name.replaceAll('\s|\\|\/','-').replace('?','')}}" th:text="${sample.name}"></a></h5>
-                                            </ul>
                                     </div>
                                 </div>
                             </div>
@@ -219,6 +222,19 @@
 <script src="/static/js/owl.carousel.min.js"></script>
 <script src="/static/js/main.js"></script>
 
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function() {
+        let randomSamples = [[${randomSamples}]];
+        for (let i = 0; i < randomSamples.length; i++) {
+            $.get("sample_average_rate", {sampleId: randomSamples[i].id}, function (data) {
+                console.log(data);
+                $("#" + randomSamples[i].id).append(data);
+            });
+        }
+    })
+    /*]]>*/
+</script>
 
 </body>
 
