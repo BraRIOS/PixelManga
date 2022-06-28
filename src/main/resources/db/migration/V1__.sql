@@ -13,7 +13,7 @@ CREATE TABLE chapters
     image_path VARCHAR(255) NULL,
     sample_id  BIGINT       NOT NULL,
     image      VARCHAR(255) NOT NULL,
-    number     BIGINT       NOT NULL,
+    number     BIGINT       NULL,
     CONSTRAINT pk_chapters PRIMARY KEY (id)
 );
 
@@ -69,9 +69,6 @@ CREATE TABLE users_roles
 
 ALTER TABLE attributes
     ADD CONSTRAINT uc_attributes_name UNIQUE (name);
-
-ALTER TABLE chapters
-    ADD CONSTRAINT uc_chapters_number UNIQUE (number);
 
 ALTER TABLE roles
     ADD CONSTRAINT uc_roles_name UNIQUE (name);
