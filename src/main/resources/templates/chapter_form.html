@@ -78,12 +78,10 @@
                         <div class="login__form">
                             <h3>Nuevo capítulo</h3>
                             <form th:action="@{/perform_chapter_upload}" method="post" enctype="multipart/form-data">
-                                <div class="input__item">
+                                <div class="input__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}">
                                     <input type="hidden" name="sample_id" th:value="${sample.id}">
-                                    <span class="select2-selection__rendered" role="textbox" aria-readonly="true" th:title="${sample.name}">
-                                        <span class="badge badge-info" th:text="${sample.attributes.?[type.name == 'tipo de libro'].get(0).name.toUpperCase()}"></span>
-                                        <b th:text="${sample.name}"></b>
-                                    </span>
+                                    <div class="item-text" th:text="${sample.name}"></div>
+                                    <div class="badge" th:classappend="'badge-'+${type}" th:text="${type.toUpperCase()}"></div>
                                     <span class="icon_pencil"></span>
                                 </div>
 
@@ -91,7 +89,7 @@
                                     <input type="file" id="fileImage" name="fileImage" placeholder="Subir imagen del capítulo" required>
                                     <span class="icon_image"></span>
                                 </div>
-                                <button type="submit" class="site-btn">Subir</button>
+                                <button type="submit" class="site-btn text-center">Subir</button>
                             </form>
                         </div>
                     </div>

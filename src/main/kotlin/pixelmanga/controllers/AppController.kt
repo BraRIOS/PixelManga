@@ -207,7 +207,7 @@ class AppController {
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
-        model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía" })
+        model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía"}?.name)
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("chapters", chapters)
         return "sample_view"

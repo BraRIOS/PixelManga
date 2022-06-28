@@ -83,7 +83,7 @@
                             <h3 th:if="${!is_register}">Editar ejemplar</h3>
                             <div class="anime__details__rating" th:if="${!is_register}">
                                 <div class="anime__details__btn">
-                                    <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name}+'/delete'}"><i class="fa fa-exclamation-circle"></i> Eliminar</a>
+                                    <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name.replaceAll('\s|\\|\/','-').replace('?','')}+'/delete'}"><i class="fa fa-exclamation-circle"></i> Eliminar</a>
                                 </div>
                             </div>
 

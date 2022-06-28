@@ -665,6 +665,37 @@ ol {
 	margin-bottom: 4px;
 }
 
+.book__details__thumbnail {
+	position: relative;
+}
+
+.book__details__thumbnail .book-thumbnail{
+	width: 100%;
+	height: auto;
+}
+.book__details__thumbnail .score {
+	z-index: 1;
+	color: #e89f12;
+	text-shadow: 1px 1px 0 #222!important;
+	position: absolute;
+	right: 5px;
+	top: 15px;
+	background: rgba(0,0,0,.6);
+	padding: 2px 5px;
+	font-weight: 700;
+}
+
+.book__details__thumbnail .demography {
+	z-index: 1;
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	color: #fff;
+	background-color: hsla(0,0%,53%,.75);
+	font-size: 1.25rem;
+	line-height: 2.3rem;
+}
+
 .product__item__pic {
 	display: block;
 	height: 15.5rem;
@@ -679,9 +710,10 @@ ol {
 	color: #e89f12;
 	position: absolute;
 	right: 0;
+	font-weight: 700;
 }
 
-.product__item__pic .book-type {
+.product__item__pic .book-type, .book__details__thumbnail .book-type {
 	color: #fff;
 	position: absolute;
 	margin-top: 3px;
@@ -701,8 +733,20 @@ ol {
 	line-height: 2rem;
 }
 
-.product__item__pic .demography.shounen{
+.product__item__pic .demography.shounen, .book__details__thumbnail	.demography.shounen {
 	background-color: rgba(255,165,0,.75);
+}
+
+.product__item__pic .demography.seinen, .book__details__thumbnail	.demography.seinen {
+	background-color: rgba(255, 0, 0, 0.75);
+}
+
+.product__item__pic .demography.shoujo, .book__details__thumbnail	.demography.shoujo {
+	background-color: rgba(221,148,161,.75);
+}
+
+.product__item__pic .demography.josei, .book__details__thumbnail	.demography.josei {
+	background-color: rgba(128,0,128,.75);
 }
 
 .product__item__pic .ep {
@@ -742,7 +786,7 @@ ol {
 }
 
 .product__item__text {
-	padding-top: 20px;
+	padding-top: 8px;
 }
 
 .product__item__text ul {
@@ -760,7 +804,7 @@ ol {
 	display: inline-block;
 }
 
-.product__item__text h5 a {
+.product__item__text h5 {
 	color: #ffffff;
 	font-weight: 700;
 	line-height: 26px;
@@ -999,6 +1043,14 @@ ol {
 
 .anime__details__content {
 	margin-bottom: 65px;
+}
+
+.anime__details__content .book-type{
+	color: #fff;
+	border-radius: 2px;
+	font-size: 1.25rem;
+	font-weight: lighter;
+	letter-spacing: 1px;
 }
 
 .anime__details__text {
@@ -1831,6 +1883,7 @@ ol {
 	background: #ffffff;
 	border: none;
 	padding-left: 76px;
+	align-items: center;
 }
 
 .login__form form .input__item input::-webkit-input-placeholder {
@@ -1859,6 +1912,25 @@ ol {
 	position: absolute;
 	left: 15px;
 	top: 13px;
+}
+.login__form form .input__item .badge {
+	font-size: 15px;
+	position: absolute;
+	left: 78%;
+	top: 25%;
+}
+
+.login__form form .input__item .item-text {
+	display: flex;
+	height: 50px;
+	width: 100%;
+	font-size: 15px;
+	color: #535353;
+	background: #ffffff;
+	border: none;
+	padding-left: 76px;
+	align-items: center;
+	font-weight: bold;
 }
 
 .login__form form button {
@@ -2424,8 +2496,20 @@ textarea::placeholder{
 	color: #b7b7b7;
 }
 
-.badge.badge-manga{
+.badge.badge-manga, .bg-manga{
 	background-color: #7986cb;
+}
+
+.badge.badge-manwha, .bg-manwha{
+	background-color: #70c473;;
+}
+
+.badge.badge-manhua, .bg-manhua{
+	background-color: #7c6868;
+}
+
+.badge.badge-novela, .bg-novela{
+	background-color: #e57373;
 }
 
 div.vote-input {
@@ -2440,7 +2524,7 @@ div.vote-input div.star-bar {
 }
 
 div.vote-input div.star-bar{
-	background: url(/static/images/star-select-2.webp) repeat-x 0 -46px;
+	background: url(/static/images/star-select-2.png) repeat-x 0 -46px;
 	background-size: 53px 235px;
 }
 
@@ -2507,7 +2591,7 @@ div.vote-input div.star-bar input[value="10"]+label {
 }
 
 div.vote-input div.star-bar input:hover+label:before, div.vote-input div.star-bar label.hover:before {
-	background: url(/static/images/star-select-2.webp) repeat-x 0 -95px;
+	background: url(/static/images/star-select-2.png) repeat-x 0 -95px;
 	background-size: 53px 238px;
 }
 
