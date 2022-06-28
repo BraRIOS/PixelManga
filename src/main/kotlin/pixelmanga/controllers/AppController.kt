@@ -267,7 +267,9 @@ class AppController {
         }
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
         ra.addFlashAttribute("message", "Valoración añadida")
-        return "redirect:/library/$type/${sample.id}/${sample.name}"
+        val regex = """\s|\\|/""".toRegex()
+        val urlName = regex.replace(sample.name as String, "-").replace("?", "")
+        return "redirect:/library/$type/${sample.id}/$urlName"
     }
 
     @GetMapping("/sample_average_rate")

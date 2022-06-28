@@ -2427,3 +2427,98 @@ textarea::placeholder{
 .badge.badge-manga{
 	background-color: #7986cb;
 }
+
+div.vote-input {
+	display: inline-flex;
+	align-items: center;
+	width: 100%;
+}
+div.vote-input div.star-bar {
+	position: relative;
+	height: 48px;
+	width: 100%;
+}
+
+div.vote-input div.star-bar{
+	background: url(/static/images/star-select-2.webp) repeat-x 0 -46px;
+	background-size: 53px 235px;
+}
+
+div.vote-input div.star-bar input{
+	display: none;
+}
+
+div.vote-input div.star-bar input+label {
+	text-indent: -9999px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+div.vote-input div.star-bar input[value="1"]+label {
+	z-index: 15;
+	width: 10%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="2"]+label {
+	z-index: 14;
+	width: 20%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="3"]+label {
+	z-index: 13;
+	width: 30%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="4"]+label {
+	z-index: 12;
+	width: 40%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="5"]+label {
+	z-index: 11;
+	width: 50%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="6"]+label {
+	z-index: 10;
+	width: 60%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="7"]+label {
+	z-index: 9;
+	width: 70%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="8"]+label {
+	z-index: 8;
+	width: 80%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="9"]+label {
+	z-index: 7;
+	width: 90%;
+	height: 48px;
+}
+div.vote-input div.star-bar input[value="10"]+label {
+	z-index: 6;
+	width: 100%;
+	height: 48px;
+}
+
+div.vote-input div.star-bar input:hover+label:before, div.vote-input div.star-bar label.hover:before {
+	background: url(/static/images/star-select-2.webp) repeat-x 0 -95px;
+	background-size: 53px 238px;
+}
+
+div.vote-input div.star-bar input+label:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+input[type="radio" i]{
+	margin: 3px 3px 0 5px;
+}

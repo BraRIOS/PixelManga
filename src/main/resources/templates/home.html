@@ -160,10 +160,10 @@
                                 <div class="product__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}, demography= ${sample.attributes.?[type.name == 'demografía'].get(0).name}">
                                     <div class="product__item__pic set-bg" th:data-setbg="'/images/samples/'+${sample.id}">
                                         <span class="score" th:id="${sample.id}">
-                                            <i class="fas fa-star"></i>
+                                            <i class="fa fa-star"></i>
                                         </span>
-                                        <span class="book-type badge badge-manga" th:text="${type.toUpperCase()}">MANGA</span>
-                                        <span class="demography shounen" th:text="${ demography.substring(0, 1).toUpperCase() + demography.substring(1)}">Shounen</span>
+                                        <span class="book-type badge badge-manga" th:text="${type.toUpperCase()}"></span>
+                                        <span class="demography" th:classappend="${demography}" th:text="${ demography.substring(0, 1).toUpperCase() + demography.substring(1)}"></span>
                                     </div>
                                     <div class="product__item__text">
                                         <h5><a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
