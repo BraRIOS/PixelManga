@@ -202,6 +202,8 @@ class AppController {
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
         val chapters = chapterRepo.findAllBySampleId(id)
+        val average = getSampleAverageRate(sample.id as Long)
+        model.addAttribute("average", average)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
         model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía" })
@@ -273,7 +275,11 @@ class AppController {
             val sample = sampleRepo.findById(sampleId).get()
             val rates = rateRepo.findAllBySample_Id(sample.id as Long)
             val average = (rates.map { it.rating as Int } as Iterable<Int>).average()
-            average.toString()
+            if (average.isNaN()){
+                "0"
+            } else {
+                String.format("%.2f", average)
+            }
         } catch (e: Exception) {
             "0"
         }

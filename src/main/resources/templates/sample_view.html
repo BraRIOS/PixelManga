@@ -104,6 +104,7 @@
                                             <li th:text="'Tipo: ' +${type}"></li>
                                             <li th:text="'Fecha de publicación: '+*{publicationDate}"></li>
                                             <li th:text="'Demografía: '+${demography.name}" th:title="${demography.name}+': '+${demography.description}"></li>
+                                            <li th:text="'Puntuación: '+${average}"></li>
                                         </ul>
                                         <h5 style="color: #FFFFFF">Géneros</h5>
                                         <h6 style="display: inline-block;" th:each="genre : ${genres}">
@@ -216,7 +217,7 @@
 
     <script>
         function a1( ){
-            document.getElementById("0").value="0"
+            document.getElementById("0").value="1"
             document.getElementById("acceder").click()
         }
         function a2( ){
@@ -235,11 +236,6 @@
             document.getElementById("0").value='5'
             document.getElementById("acceder").click()
         }
-
-
     </script>
-
-
-
 </body>
 </html>
