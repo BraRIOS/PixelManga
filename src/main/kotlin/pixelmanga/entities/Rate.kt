@@ -14,7 +14,7 @@ open class Rate {
     open var id: Long? = null
 
     @Column(name = "rate", nullable = false)
-    open var rating: Int? = null
+    open var rating: Int = 0
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
