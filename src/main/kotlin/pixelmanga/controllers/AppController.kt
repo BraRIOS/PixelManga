@@ -101,6 +101,7 @@ class AppController {
         user.roles.add(roleRepo.findByName("USER"))
         userRepo.save(user)
 
+        redirectAttributes.addFlashAttribute("message", "Te has registrado correctamente")
         return "redirect:/login"
     }
 
@@ -128,7 +129,7 @@ class AppController {
     fun showProfileEdit(model: Model, ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            ra.addAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
             return "redirect:/login"
         }
         val user = userRepo.findByUsername(authentication.name)
@@ -171,7 +172,7 @@ class AppController {
         sample.attributes.add(attributeRepo.findByName(demographic))
 
         if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
-            ra.addFlashAttribute("message", "${sample.name} ya existe")
+            ra.addFlashAttribute("error", "${sample.name} ya existe")
             return "redirect:/register_sample"
         }
         sampleRepo.save(sample)
@@ -180,7 +181,7 @@ class AppController {
 
         saveSampleCover(type, id, image, sample)
 
-        ra.addAttribute("message", "${sample.name} registrado correctamente")
+        ra.addFlashAttribute("message", "${sample.name} registrado correctamente")
         return "redirect:/home"
     }
 
@@ -240,7 +241,7 @@ class AppController {
 
         saveSampleCover(type, id, image, sample)
 
-        ra.addAttribute("message", "Se han guardado los cambios de ${sample.name}")
+        ra.addFlashAttribute("message", "Se han guardado los cambios de ${sample.name}")
         return "redirect:/library/$type/$id/${sample.name}"
     }
 
@@ -266,9 +267,9 @@ class AppController {
             rateRepo.save(newRate)
         }
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
-        ra.addFlashAttribute("message", "Valoración añadida")
-        val regex = """\s|\\|/""".toRegex()
+        val regex = """\s|\*|"|\\|>|/|<|:|\|""".toRegex()
         val urlName = regex.replace(sample.name as String, "-").replace("?", "")
+        ra.addFlashAttribute("message", "Valoración añadida correctamente")
         return "redirect:/library/$type/${sample.id}/$urlName"
     }
 
@@ -323,7 +324,7 @@ class AppController {
             uploadPath.toFile().deleteRecursively()
         }
 
-        ra.addAttribute("message", "Se ha eliminado ${sample.name}")
+        ra.addFlashAttribute("message", "Se ha eliminado ${sample.name} correctamente")
         return "redirect:/home"
     }
 
@@ -338,7 +339,7 @@ class AppController {
     fun saveChapter(@RequestParam("fileImage") image: MultipartFile,
                     @RequestParam("sample_id") sampleId: Long, ra: RedirectAttributes): String {
         if (image.isEmpty) {
-            ra.addAttribute("message", "No se ha seleccionado una imagen")
+            ra.addFlashAttribute("error", "No se ha seleccionado una imagen")
             return "redirect:/upload_chapter/${sampleId}"
         }
         val chapter = Chapter()
@@ -363,7 +364,7 @@ class AppController {
         val imagePath = uploadPath.resolve(name)
         image.transferTo(imagePath)
 
-        ra.addAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
+        ra.addFlashAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
         return "redirect:/library/$type/${sample.id}/${sample.name}"
 
     }
