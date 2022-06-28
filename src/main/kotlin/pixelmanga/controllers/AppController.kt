@@ -204,7 +204,7 @@ class AppController {
         val sample = sampleRepo.findById(id).get()
         val chapters = chapterRepo.findAllBySampleId(id)
         val average = getSampleAverageRate(sample.id as Long)
-        model.addAttribute("average", average)
+        model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
         model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía" })

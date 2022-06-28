@@ -80,8 +80,9 @@
                         <div class="section-title">
                             <h5>Capítulos</h5>
                         </div>
-                        <a th:each="chapter : ${chapters}"
-                           th:href="@{/view/${chapter.sample.attributes.?[type.name == 'tipo de libro'].get(0).name}/${chapter.sample.id}/${chapter.sample.name}/chapters/${chapter.number}}"
+                        <a th:with="type= ${chapter.sample.attributes.?[type.name == 'tipo de libro'].get(0).name}"
+                           th:each="chapter : ${chapters}"
+                           th:href="@{'/view/'+${type}+'/'+${chapter.sample.id}+'/'+*{chapter.sample.name}+'/chapters/'+${chapter.number}}"
                            th:text="'Ep '+${chapter.number}"></a>
                     </div>
 

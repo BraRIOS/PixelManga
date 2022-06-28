@@ -18,7 +18,7 @@ open class Chapter {
     @Column(name = "image", nullable = false)
     open var image: String? = null
 
-    @Column(name = "number", nullable = false, unique = true)
+    @Column(name = "number", nullable = false)
     open var number: Long? = null
 
     @Transient
