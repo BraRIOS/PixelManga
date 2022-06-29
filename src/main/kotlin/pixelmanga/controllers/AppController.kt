@@ -62,9 +62,9 @@ class AppController {
 
     @GetMapping("/home")
     fun showHomePage(model: Model): String {
-        val randomSamples = sampleRepo.findAll().sortedBy { it.name }.shuffled().take(10)
-        val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(10)
-        model.addAttribute("randomSamples", randomSamples)
+        val randomSamples = sampleRepo.findAll().sortedBy { it.name }.shuffled().take(12)
+        val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(12)
+        model.addAttribute("random_samples", randomSamples)
         model.addAttribute("latest_samples", latestSamples)
         return "home"
     }

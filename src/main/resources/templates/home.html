@@ -185,12 +185,12 @@
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12">
                                 <div class="btn__all">
-                                    <a href="#" class="primary-btn">Ver todos<span class="arrow_right"></span></a>
+                                    <a href="/library" class="primary-btn">Ver todos<span class="arrow_right"></span></a>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${randomSamples}">
+                            <div class="col-lg-2 col-md-4 col-sm-4" th:each="sample : ${latest_samples}">
                                 <div class="product__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}, demography= ${sample.attributes.?[type.name == 'demografía'].get(0).name}">
                                     <a th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+
                                                     ${sample.name.replaceAll('\s|\\|\/','-').replace('?','')}}">
@@ -261,11 +261,11 @@
 <script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     $(document).ready(function() {
-        let randomSamples = [[${randomSamples}]];
-        for (let i = 0; i < randomSamples.length; i++) {
-            $.get("sample_average_rate", {sampleId: randomSamples[i].id}, function (data) {
+        let latestSamples = [[${latest_samples}]];
+        for (let i = 0; i < latestSamples.length; i++) {
+            $.get("sample_average_rate", {sampleId: latestSamples[i].id}, function (data) {
                 console.log(data);
-                $("#" + randomSamples[i].id).append(data);
+                $("#" + latestSamples[i].id).append(data);
             });
         }
     })

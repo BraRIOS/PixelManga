@@ -126,15 +126,15 @@
                         </div>
                     </div>
                     <div>
-                        <ul class="product__pagination text-center">
-                            <li>
-                                <a th:classappend="${prev == 0? 'hidden disabled' : ''}" th:href="@{|/library?page=${prev}|}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
+                        <ul class="pagination product__pagination justify-content-center">
+                            <li th:classappend="${prev == 0? 'disabled' : 'page-item'}" th:style="${prev == 0? 'display: none' : ''}">
+                                <a th:href="@{|/library?page=${prev}|}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
                             </li>
-                            <li>
-                                <a class="current-page" th:each="page :${pages}" th:classappend="${current == page? 'current-page' : ''}" th:href="@{|/library?page=${page}|}" th:text="${page}"></a>
+                            <li class="page-item" th:each="page :${pages}">
+                                <a th:classappend="${current == page? 'current-page' : ''}" th:href="@{|/library?page=${page}|}" th:text="${page}"></a>
                             </li>
-                            <li>
-                                <a th:classappend="${current == last? 'hidden disabled' : ''}" th:href="@{|/library?page=${next}|}"><i th:classappend="${current==last? '' : 'fa fa-angle-double-rigth'}"></i></a>
+                            <li th:classappend="${current == last? 'hidden disabled' : 'page-item'}" th:style="${current == last? 'display: none' : ''}">
+                                <a th:href="@{|/library?page=${next}|}"><i th:classappend="${current==last? '' : 'fa fa-angle-double-right'}"></i></a>
                             </li>
                         </ul>
                     </div>
