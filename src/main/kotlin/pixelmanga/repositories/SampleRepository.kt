@@ -1,5 +1,7 @@
 package pixelmanga.repositories
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -14,7 +16,6 @@ interface SampleRepository : JpaRepository<Sample, Long> {
 
 
 
-
     @Transactional
     @Modifying
     @Query("update Sample s set s.cover = ?1 where s.id = ?2")
@@ -23,5 +24,12 @@ interface SampleRepository : JpaRepository<Sample, Long> {
 
     @Query("select s from Sample s inner join s.attributes attributes where attributes.name = ?1")
     fun findAllByAttributes_Name(name: String): List<Sample>
+
+
+    @Query("select s from Sample s where s.name like concat('%', ?1, '%') order by s.name")
+    fun findAllByNameContaining(
+        title: String,
+        pageable: Pageable
+    ): Page<Sample>
 
 }

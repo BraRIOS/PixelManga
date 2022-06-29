@@ -1,6 +1,7 @@
 package pixelmanga.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -164,12 +165,12 @@ class AppController {
 
     @PostMapping("/perform_sample_register")
     fun saveSample(sample: Sample, @RequestParam("type") type: String,
-                   @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
+                   @RequestParam("demography") demography:String, @RequestParam("fileImage") image: MultipartFile,
                    @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
 
         sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
         sample.attributes.add(attributeRepo.findByName(type))
-        sample.attributes.add(attributeRepo.findByName(demographic))
+        sample.attributes.add(attributeRepo.findByName(demography))
 
         if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
             ra.addFlashAttribute("error", "${sample.name} ya existe")
@@ -186,20 +187,31 @@ class AppController {
     }
 
     @GetMapping("/library")
-    fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("type", required = false) type: String?): String{
+    fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("title", required = false) title: String?,
+                    @RequestParam("type", required = false) type: String?, @RequestParam("demography", required = false) demography: String?,
+                    @RequestParam("genres[]", required = false) genre: Array<String>?): String {
         val page: Int = pageNumber?.minus(1) ?:  0
-
-        val samplePage = sampleRepo.findAll(PageRequest.of(page, 10))
-        val totalPage = samplePage.totalPages
+        val pageable = PageRequest.of(page, 10)
+        val samplePages: Page<Sample>
+        if (title!=null){
+            samplePages = sampleRepo.findAllByNameContaining(title,pageable)
+            model.addAttribute("title", title)
+        } else{
+            samplePages = sampleRepo.findAll(pageable)
+        }
+        val totalPage = samplePages.totalPages
         if (totalPage > 0){
             val pages = IntStream.rangeClosed(1, totalPage).toList()
             model.addAttribute("pages", pages)
         }
-        model.addAttribute("list_samples", samplePage.content)
+        model.addAttribute("list_samples", samplePages.content)
         model.addAttribute("current", page+1)
         model.addAttribute("next", page+2)
         model.addAttribute("prev", page)
         model.addAttribute("last", totalPage)
+        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
+        model.addAttribute("all_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
 
         return "library"
     }
@@ -237,7 +249,7 @@ class AppController {
     @PostMapping("/perform_sample_edit")
     fun saveSampleEdit(sample: Sample, @RequestParam("id") id: Long,
                        @RequestParam("type") type: String,
-                       @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
+                       @RequestParam("demography") demography:String, @RequestParam("fileImage") image: MultipartFile,
                        @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
         val sampleToUpdate = sampleRepo.findById(id).get()
         sampleToUpdate.name = sample.name
@@ -245,7 +257,7 @@ class AppController {
         sampleToUpdate.attributes.clear()
         sampleToUpdate.attributes.addAll(genres.map { attributeRepo.findByName(it) })
         sampleToUpdate.attributes.add(attributeRepo.findByName(type))
-        sampleToUpdate.attributes.add(attributeRepo.findByName(demographic))
+        sampleToUpdate.attributes.add(attributeRepo.findByName(demography))
         sampleRepo.save(sampleToUpdate)
         if (!image.isEmpty ) saveSampleCover(type, id, image, sample)
 

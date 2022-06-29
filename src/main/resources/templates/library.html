@@ -18,10 +18,11 @@
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/nice-select.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/select2.min.css" type="text/css">
+
 </head>
 
 <body>
@@ -56,7 +57,6 @@
                     <div class="header__right">
                         <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
                         <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
-                        <a href="#" class="search-switch"><span class="icon_search"></span></a>
                         <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
                         <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
@@ -101,11 +101,67 @@
 
     <!-- Msg notification End-->
 
-    <!-- Product Section Begin -->
+    <!-- Library Section Begin -->
     <section class="product-page spad">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
+                    <!-- Search Bar -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form action="/library" method="get">
+                                <div class="justify-content-center text-center field has-addons">
+                                    <div class="col-12 col-md-8 control has-icons-right">
+                                        <input type="text" class="input is-rounded" placeholder="Busca un anime aquí..." name="title" th:value="${title}">
+                                    </div>
+                                    <div class="anime__details__btn has-element-left">
+                                        <a type="submit" class="follow-btn"><i class="fa fa-search"></i></a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Search Bar End -->
+                    </div>
+                    <!-- Filter Bar -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="filters text-center">
+                                <form class="align-items-center" action="/library" method="get">
+                                    <span class="input-select" >
+                                        <select class="type-select"  id="type" name="type">
+                                            <option></option>
+                                            <option th:each="type : ${all_types}"
+                                                    th:value="${type.name}"
+                                                    th:text="${type.name}"></option>
+                                        </select>
+                                    </span>
+                                    <span class="input-select">
+                                        <select class="demography-select" id="demography" name="demography" >
+                                            <option></option>
+                                            <option th:each="demography : ${all_demographics}"
+                                                    th:value="${demography.name}"
+                                                    th:text="${demography.name}"></option>
+                                        </select>
+                                    </span>
+                                    <span class="input-select">
+                                            <select class="select-genres" multiple="multiple" name="genres[]"
+                                                    id="genres[]">
+                                                <option th:each="genre : ${all_genres}"
+                                                        th:value="${genre.name}"
+                                                        th:text="${genre.name}"></option>
+                                            </select>
+                                    </span>
+                                    <button type="submit" class="button is-red is-small">
+                                        <span class="fa fa-filter" aria-hidden="true"></span> Filtrar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <!-- End of Filter -->
+                </div>
+                <!-- Book List -->
+                <div class="col-lg-12">
                     <div class="row">
                         <div class="col-lg-4 col-md-6 col-sm-6" th:each="sample : ${list_samples}">
                             <div class="product__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}, demography= ${sample.attributes.?[type.name == 'demografía'].get(0).name}">
@@ -139,108 +195,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-8">
-                    <div class="product__sidebar">
-                        <div class="product__sidebar__view">
-                            <div class="section-title">
-                                <h5>Top Views</h5>
-                            </div>
-                            <ul class="filter__controls">
-                                <li class="active" data-filter="*">Day</li>
-                                <li data-filter=".week">Week</li>
-                                <li data-filter=".month">Month</li>
-                                <li data-filter=".years">Years</li>
-                            </ul>
-                            <div class="filter__gallery">
-                                <div class="product__sidebar__view__item set-bg mix day years"
-                                data-setbg="img/sidebar/tv-1.jpg">
-                                <div class="ep">18 / ?</div>
-                                <div class="view"><i class="fa fa-eye"></i> 9141</div>
-                                <h5><a href="#">Boruto: Naruto next generations</a></h5>
-                            </div>
-                            <div class="product__sidebar__view__item set-bg mix month week"
-                            data-setbg="img/sidebar/tv-2.jpg">
-                            <div class="ep">18 / ?</div>
-                            <div class="view"><i class="fa fa-eye"></i> 9141</div>
-                            <h5><a href="#">The Seven Deadly Sins: Wrath of the Gods</a></h5>
-                        </div>
-                        <div class="product__sidebar__view__item set-bg mix week years"
-                        data-setbg="img/sidebar/tv-3.jpg">
-                        <div class="ep">18 / ?</div>
-                        <div class="view"><i class="fa fa-eye"></i> 9141</div>
-                        <h5><a href="#">Sword art online alicization war of underworld</a></h5>
-                    </div>
-                    <div class="product__sidebar__view__item set-bg mix years month"
-                    data-setbg="img/sidebar/tv-4.jpg">
-                    <div class="ep">18 / ?</div>
-                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
-                    <h5><a href="#">Fate/stay night: Heaven's Feel I. presage flower</a></h5>
-                </div>
-                <div class="product__sidebar__view__item set-bg mix day"
-                data-setbg="img/sidebar/tv-5.jpg">
-                <div class="ep">18 / ?</div>
-                <div class="view"><i class="fa fa-eye"></i> 9141</div>
-                <h5><a href="#">Fate stay night unlimited blade works</a></h5>
-            </div>
-        </div>
-    </div>
-    <div class="product__sidebar__comment">
-        <div class="section-title">
-            <h5>New Comment</h5>
-        </div>
-        <div class="product__sidebar__comment__item">
-            <div class="product__sidebar__comment__item__pic">
-                <img src="img/sidebar/comment-1.jpg" alt="">
-            </div>
-            <div class="product__sidebar__comment__item__text">
-                <ul>
-                    <li>Active</li>
-                    <li>Movie</li>
-                </ul>
-                <h5><a href="#">The Seven Deadly Sins: Wrath of the Gods</a></h5>
-                <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
-            </div>
-        </div>
-        <div class="product__sidebar__comment__item">
-            <div class="product__sidebar__comment__item__pic">
-                <img src="img/sidebar/comment-2.jpg" alt="">
-            </div>
-            <div class="product__sidebar__comment__item__text">
-                <ul>
-                    <li>Active</li>
-                    <li>Movie</li>
-                </ul>
-                <h5><a href="#">Shirogane Tamashii hen Kouhan sen</a></h5>
-                <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
-            </div>
-        </div>
-        <div class="product__sidebar__comment__item">
-            <div class="product__sidebar__comment__item__pic">
-                <img src="img/sidebar/comment-3.jpg" alt="">
-            </div>
-            <div class="product__sidebar__comment__item__text">
-                <ul>
-                    <li>Active</li>
-                    <li>Movie</li>
-                </ul>
-                <h5><a href="#">Kizumonogatari III: Reiket su-hen</a></h5>
-                <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
-            </div>
-        </div>
-        <div class="product__sidebar__comment__item">
-            <div class="product__sidebar__comment__item__pic">
-                <img src="img/sidebar/comment-4.jpg" alt="">
-            </div>
-            <div class="product__sidebar__comment__item__text">
-                <ul>
-                    <li>Active</li>
-                    <li>Movie</li>
-                </ul>
-                <h5><a href="#">Monogatari Series: Second Season</a></h5>
-                <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
-            </div>
-        </div>
-    </div>
+                <!-- End of Book List -->
 </div>
 </div>
 </div>
@@ -271,28 +226,18 @@
     </footer>
   <!-- Footer Section End -->
 
-  <!-- Search model Begin -->
-  <div class="search-model">
-    <div class="h-100 d-flex align-items-center justify-content-center">
-        <div class="search-close-switch"><i class="icon_close"></i></div>
-        <form class="search-model-form">
-            <input type="text" id="search-input" placeholder="Search here.....">
-        </form>
-    </div>
-</div>
-<!-- Search model end -->
-
 <!-- Js Plugins -->
 <script src="/static/js/jquery-3.3.1.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/jquery.nice-select.min.js"></script>
 <script src="/static/js/mixitup.min.js"></script>
 <script src="/static/js/jquery.slicknav.js"></script>
 <script src="/static/js/owl.carousel.min.js"></script>
 <script src="/static/js/main.js"></script>
+<script src="/static/js/select2.min.js"></script>
 <script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     $(document).ready(function() {
+        //show rating for each book
         let samples = [[${list_samples}]];
         for (let i = 0; i < samples.length; i++) {
             $.get("sample_average_rate", {sampleId: samples[i].id}, function (data) {
@@ -300,6 +245,26 @@
                 $("#" + samples[i].id).append(data);
             });
         }
+        $('.type-select').select2({
+            placeholder: "Seleccione el tipo",
+            allowClear: true,
+            width: '100%'
+        }).val("[[${type}]]").trigger('change');
+
+        let genres = "[[${sample_genres}]]".replace(/\[|\]/g,'').split(",").map(item => item.trim())
+        console.log(genres)
+
+        $('.select-genres').select2({
+            placeholder: "Seleccione los géneros",
+            allowClear: true,
+            width: '100%'
+        }).val(genres).trigger('change');
+
+        $('.demography-select').select2({
+            placeholder: "Seleccione la demografía",
+            allowClear: true,
+            width: '100%'
+        }).val("[[${sample_demography}]]").trigger('change');
     })
     /*]]>*/
 </script>

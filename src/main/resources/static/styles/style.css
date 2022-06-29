@@ -1378,6 +1378,10 @@ ol {
 	width: 115px;
 	display: inline-block;
 }
+.anime__details__btn.has-element-left a{
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
 
 .anime__details__btn .follow-btn {
 	font-size: 13px;
@@ -2813,4 +2817,63 @@ div.vote-input div.star-bar input+label:before {
 }
 input[type="radio" i]{
 	margin: 3px 3px 0 5px;
+}
+
+.field.has-addons {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.control {
+	box-sizing: border-box;
+	clear: both;
+	font-size: 1.1rem;
+	position: relative;
+	text-align: left;
+}
+
+.control input{
+	background-color: #111;
+	color: #fff;
+	outline: none;
+	border-color: #e53637;
+	line-height: 1.5;
+	height: 100%;
+	width: 100%;
+}
+
+.control.has-icons-right {
+	padding-right: 0;
+}
+.input.is-rounded {
+	border-radius: 500px;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.field.has-addons .control:first-child:not(:only-child) .button, .field.has-addons .control:first-child:not(:only-child) .input, .field.has-addons .control:first-child:not(:only-child) .select select {
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.filters {
+	margin-bottom: 15px!important;
+}
+
+.filters .input-select {
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 5px;
+	margin-bottom: 10px;
+}
+
+.button.is-red {
+	background-color: #e53637;
+	border-color: transparent;
+	color: #fff;
+}
+
+.button.is-small {
+	border-radius: 2px;
+	font-size: .75rem;
 }
