@@ -126,10 +126,11 @@
                                     <input type="text" name="name" required placeholder="Nombre de ejemplar" th:value="${sample.name}">
                                     <span class="icon_pencil"></span>
                                 </div>
-                                    <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required th:text="${sample.synopsis}"></textarea>
+                                    <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar" required
+                                              th:text="${sample.synopsis}" maxlength="2000"></textarea>
                                 <div class="input__item" style="width: auto">
                                     <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}"
-                                           placeholder="Fecha de publicacion" th:value="${sample.publicationDate}">
+                                           placeholder="Fecha de publicacion" th:value="${sample.publicationDate}" required>
                                     <span class="icon_calendar"></span>
                                 </div>
 
@@ -147,7 +148,7 @@
                                 </div>
 
                                 <div class="input__select">
-                                    <select class="demographic-select" id="demographic" name="demographic">
+                                    <select class="demographic-select" id="demographic" name="demographic" required>
                                         <option></option>
                                         <option th:each="demographic : ${all_demographics}"
                                                 th:value="${demographic.name}"
@@ -155,7 +156,7 @@
                                     </select>
                                 </div>
                                 <div class="input__select">
-                                    <select class="select-genres" multiple="multiple" name="genres[]"
+                                    <select class="select-genres" multiple="multiple" name="genres[]" required
                                             id="genres[]">
                                         <option th:each="genre : ${all_genres}"
                                                 th:value="${genre.name}"
@@ -163,7 +164,7 @@
                                     </select>
                                 </div>
                                 <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
-                                       style="display: none;" th:value="'/images/samples/'+${sample.id}">
+                                       style="display: none;">
                                 <button type="submit" class="site-btn text-center">Subir</button>
                             </form>
                             </div>
@@ -236,7 +237,7 @@
 
             $('#fileImage').change(function (){
                 showImageThumbnail(this);
-            });
+            })
 
             let genres = "[[${sample_genres}]]".replace(/\[|\]/g,'').split(",").map(item => item.trim())
             console.log(genres)

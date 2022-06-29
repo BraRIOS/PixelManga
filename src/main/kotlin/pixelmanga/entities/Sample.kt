@@ -16,7 +16,7 @@ open class Sample {
     @Column(name = "name", nullable = false)
     open var name: String? = null
 
-    @Column(name = "synopsis", nullable = false, length = 800)
+    @Column(name = "synopsis", nullable = false, length = 2000)
     open var synopsis: String? = null
 
     @Column(name = "publication_date")

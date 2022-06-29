@@ -187,19 +187,19 @@ class AppController {
 
     @GetMapping("/library")
     fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("type", required = false) type: String?): String{
-        val page = pageNumber ?: 0
+        val page: Int = pageNumber?.minus(1) ?:  0
 
-        val samplePage = sampleRepo.findAll(PageRequest.of(page, 20))
+        val samplePage = sampleRepo.findAll(PageRequest.of(page, 10))
         val totalPage = samplePage.totalPages
         if (totalPage > 0){
             val pages = IntStream.rangeClosed(1, totalPage).toList()
             model.addAttribute("pages", pages)
-            model.addAttribute("current", page+1)
-            model.addAttribute("next", page+2)
-            model.addAttribute("prev", page)
-            model.addAttribute("last", totalPage)
         }
         model.addAttribute("list_samples", samplePage.content)
+        model.addAttribute("current", page+1)
+        model.addAttribute("next", page+2)
+        model.addAttribute("prev", page)
+        model.addAttribute("last", totalPage)
 
         return "library"
     }
@@ -209,12 +209,14 @@ class AppController {
         val sample = sampleRepo.findById(id).get()
         val chapters = chapterRepo.findAllBySampleId(id)
         val average = getSampleAverageRate(sample.id as Long)
+        val urlSampleName = URLSampleName(sample)
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
         model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía"}?.name)
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("chapters", chapters)
+        model.addAttribute("urlSampleName", urlSampleName)
         return "sample_view"
     }
 
@@ -228,6 +230,7 @@ class AppController {
         model.addAttribute("sample_genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("all_genres",attributeRepo.findByType_Name("género").sortedBy { it.name })
         model.addAttribute("all_demographics",attributeRepo.findByType_Name("demografía").sortedBy { it.name })
+        model.addAttribute("urlSampleName", URLSampleName(sample))
         return "sample_form"
     }
 
@@ -236,17 +239,19 @@ class AppController {
                        @RequestParam("type") type: String,
                        @RequestParam("demographic") demographic:String, @RequestParam("fileImage") image: MultipartFile,
                        @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
-        sample.id = id
-        sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
-        sample.attributes.add(attributeRepo.findByName(type))
-        sample.attributes.add(attributeRepo.findByName(demographic))
+        val sampleToUpdate = sampleRepo.findById(id).get()
+        sampleToUpdate.name = sample.name
+        sampleToUpdate.synopsis = sample.synopsis
+        sampleToUpdate.attributes.clear()
+        sampleToUpdate.attributes.addAll(genres.map { attributeRepo.findByName(it) })
+        sampleToUpdate.attributes.add(attributeRepo.findByName(type))
+        sampleToUpdate.attributes.add(attributeRepo.findByName(demographic))
+        sampleRepo.save(sampleToUpdate)
+        if (!image.isEmpty ) saveSampleCover(type, id, image, sample)
 
-        sampleRepo.save(sample)
-
-        saveSampleCover(type, id, image, sample)
-
+        val urlSampleName = URLSampleName(sample)
         ra.addFlashAttribute("message", "Se han guardado los cambios de ${sample.name}")
-        return "redirect:/library/$type/$id/${sample.name}"
+        return "redirect:/library/$type/${sample.id}/$urlSampleName"
     }
 
     @PostMapping("/user_rating_sample")
@@ -271,10 +276,15 @@ class AppController {
             rateRepo.save(newRate)
         }
         val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
-        val regex = """\s|\*|"|\\|>|/|<|:|\|""".toRegex()
-        val urlName = regex.replace(sample.name as String, "-").replace("?", "")
+        val urlSampleName = URLSampleName(sample)
         ra.addFlashAttribute("message", "Valoración añadida correctamente")
-        return "redirect:/library/$type/${sample.id}/$urlName"
+        return "redirect:/library/$type/${sample.id}/$urlSampleName"
+    }
+
+    private fun URLSampleName(sample: Sample): String {
+        val urlRegex = """\s|\\|/""".toRegex()
+        val urlSampleName = urlRegex.replace(sample.name as String, "-").replace("?", "")
+        return urlSampleName
     }
 
     @GetMapping("/sample_average_rate")
@@ -367,9 +377,10 @@ class AppController {
         }
         val imagePath = uploadPath.resolve(name)
         image.transferTo(imagePath)
-
+        val urlRegex = """\s|/|\\""".toRegex()
+        val urlSampleName = urlRegex.replace(sample.name as String, "-").replace("?", "")
         ra.addFlashAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
-        return "redirect:/library/$type/${sample.id}/${sample.name}"
+        return "redirect:/library/$type/${sample.id}/$urlSampleName"
 
     }
 
@@ -379,6 +390,7 @@ class AppController {
         val chapters = chapterRepo.findAllBySampleId(sampleId)
         model.addAttribute("chapter", chapter)
         model.addAttribute("chapters", chapters)
+        model.addAttribute("urlSampleName", URLSampleName(chapter.sample as Sample))
         return "chapter_view"
     }
 

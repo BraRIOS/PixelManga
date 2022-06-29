@@ -115,7 +115,7 @@
                         </div>
                         <a th:with="type= ${chapter.sample.attributes.?[type.name == 'tipo de libro'].get(0).name}"
                            th:each="chapter : ${chapters}"
-                           th:href="@{'/view/'+${type}+'/'+${chapter.sample.id}+'/'+*{chapter.sample.name}+'/chapters/'+${chapter.number}}"
+                           th:href="@{'/view/'+${type}+'/'+${chapter.sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}"
                            th:text="'Ep '+${chapter.number}"></a>
                     </div>
 

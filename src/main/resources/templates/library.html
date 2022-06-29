@@ -125,10 +125,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="product__pagination text-center">
-                        <a th:classappend="${prev == 0? 'hidden' : ''}" th:href="@{|/?page=${prev}|}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
-                        <a th:classappend="${page == current? 'current-page' : ''}" class="current-page" th:each="page :${pages}" th:id="'page '+${page}" th:href="@{|/?page=${page}|}" th:text="${page}"></a>
-                        <a th:classappend="${current == last? 'hidden' : ''}" th:href="@{|/?page=${next}|}"><i th:classappend="${current==last? '' : 'fa fa-angle-double-left'}"></i></a>
+                    <div>
+                        <ul class="product__pagination text-center">
+                            <li>
+                                <a th:classappend="${prev == 0? 'hidden disabled' : ''}" th:href="@{|/library?page=${prev}|}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
+                            </li>
+                            <li>
+                                <a class="current-page" th:each="page :${pages}" th:classappend="${current == page? 'current-page' : ''}" th:href="@{|/library?page=${page}|}" th:text="${page}"></a>
+                            </li>
+                            <li>
+                                <a th:classappend="${current == last? 'hidden disabled' : ''}" th:href="@{|/library?page=${next}|}"><i th:classappend="${current==last? '' : 'fa fa-angle-double-rigth'}"></i></a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-8">
@@ -262,12 +270,6 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
-
-              </div>
           </div>
       </div>
   </footer>
