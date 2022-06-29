@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import pixelmanga.entities.Chapter
-import pixelmanga.entities.Rate
-import pixelmanga.entities.Sample
-import pixelmanga.entities.User
+import pixelmanga.entities.*
 import pixelmanga.repositories.*
 import pixelmanga.security.CustomUserDetails
 import java.nio.file.Files
@@ -55,6 +52,9 @@ class AppController {
 
     @Autowired
     private lateinit var rateRepo: RateRepository
+
+    @Autowired
+    private lateinit var listRepo: UserSamplesListRepository
 
     @GetMapping("")
     fun root(): String {
@@ -406,11 +406,6 @@ class AppController {
         return "chapter_view"
     }
 
-    @GetMapping("/index")
-    fun showIndexPage(): String {
-        return "index"
-    }
-
     @GetMapping("/images/samples/{id}")
     fun getSampleImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val sample = sampleRepo.findById(id).get()
@@ -436,4 +431,30 @@ class AppController {
             ResponseEntity.ok().body(image)
         }
     }
+
+    @GetMapping("/register_list")
+    fun ListForm(model: Model): String {
+        return "list_form"
+    }
+
+    @PostMapping("/create_user_sample_list")
+    fun createUserSampleList(@RequestParam("user_name") userName: String,
+                             @RequestParam("list_name") listName: String,
+                             @RequestParam("list_description") listDescription: String,
+                             ra: RedirectAttributes): String {
+        val user = userRepo.findByUsername(userName)
+        val list = UserSamplesList()
+        list.listName= listName
+        list.listDescription= listDescription
+        list.user= user
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "Se ha creado la lista ${list.listName} correctamente")
+        return "redirect:/list"
+    }
+
+    @GetMapping("/list")
+    fun showListPage(model: Model): String {
+        return "list"
+    }
+
 }
