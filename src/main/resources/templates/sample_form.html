@@ -48,8 +48,8 @@
                     <div class="header__nav">
                         <nav class="header__menu mobile-menu">
                             <ul>
-                                <li><a href="./categories.html">Géneros </a></li>
-                                <li><a href="./blog.html">Siguiendo</a></li>
+                                <li><a th:href="@{/library}">Biblioteca </a></li>
+                                <li><a href="#">Siguiendo</a></li>
                                 <li><a href="#">Listas</a></li>
                             </ul>
                         </nav>
@@ -57,7 +57,11 @@
                 </div>
                 <div class="col-lg-2">
                     <div class="header__right">
+                        <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
+                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
+                        <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
+                        <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                     </div>
                 </div>
@@ -186,8 +190,8 @@
                     <div class="footer__nav">
                         <ul>
                             <li class="active"><a href="/home">Home</a></li>
-                            <li><a href="../../../../../../Downloads/anime-main/categories.html">Géneros</a></li>
-                            <li><a href="../../../../../../Downloads/anime-main/blog.html">Siguiendo</a></li>
+                            <li><a th:href="@{/library}">Biblioteca</a></li>
+                            <li><a href="#">Siguiendo</a></li>
                             <li><a href="#">Listas</a></li>
                         </ul>
                     </div>
