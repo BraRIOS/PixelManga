@@ -142,12 +142,13 @@
                         <div class="row">
                             <div class="col-lg-2 col-md-4 col-sm-4" th:each="list : ${list}">
                                 <div class="product__item">
-                                    <a th:href="">
-                                        <div class="product__item__pic set-bg" th:data-setbg="/static/images/img.png">
+                                    <a th:href="'/list/'+${list.id}">
+                                        <div class="product__item__pic set-bg" data-setbg="/static/images/img.png">
                                         </div>
                                         <div class="product__item__text">
                                             <h5 class="product__item__title" th:text="${list.name}"></h5>
                                         </div>
+                                        <p class="product__item__text" th:text="${list.description}"></p>
                                     </a>
                                 </div>
                             </div>

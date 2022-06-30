@@ -15,10 +15,10 @@ open class UserSamplesList {
     open var user: User? = null
 
     @Column(name = "list_name", nullable = false)
-    open var listName: String? = null
+    open var name: String? = null
 
     @Column(name = "list_description")
-    open var listDescription: String? = null
+    open var description: String? = null
 
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JoinTable(
@@ -27,4 +27,6 @@ open class UserSamplesList {
         inverseJoinColumns = [JoinColumn(name = "samples_id")]
     )
     open var samples: MutableSet<Sample> = mutableSetOf()
+
+
 }

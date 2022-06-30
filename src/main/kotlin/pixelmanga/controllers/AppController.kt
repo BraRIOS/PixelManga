@@ -152,6 +152,7 @@ class AppController {
 
         return "redirect:/register_sample"
     }
+
     @GetMapping("/register_sample")
     fun showSampleRegistrationForm(model: Model): String {
         model.addAttribute("sample", Sample())
@@ -194,7 +195,7 @@ class AppController {
         val pageable = PageRequest.of(page, 10)
         val samplePages: Page<Sample>
         if (title!=null){
-            samplePages = sampleRepo.findAllByNameContaining(title,pageable)
+            samplePages = sampleRepo.findAllByNameContainingTitle(title,pageable)
             model.addAttribute("title", title)
         } else{
             samplePages = sampleRepo.findAll(pageable)
@@ -222,6 +223,11 @@ class AppController {
         val chapters = chapterRepo.findAllBySampleId(id)
         val average = getSampleAverageRate(sample.id as Long)
         val urlSampleName = URLSampleName(sample)
+
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication != null || authentication !is AnonymousAuthenticationToken) {
+            model.addAttribute("user_sample_lists", listRepo.findByUser_Username((authentication as Authentication).name))
+        }
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
@@ -433,28 +439,56 @@ class AppController {
     }
 
     @GetMapping("/register_list")
-    fun ListForm(model: Model): String {
+    fun ListForm(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder crear una lista")
+            return "redirect:/login"
+        }
+        model.addAttribute("username", authentication.name)
+        model.addAttribute("list", UserSamplesList())
+        model.addAttribute("is_register", true)
         return "list_form"
     }
 
     @PostMapping("/create_user_sample_list")
     fun createUserSampleList(@RequestParam("user_name") userName: String,
-                             @RequestParam("list_name") listName: String,
-                             @RequestParam("list_description") listDescription: String,
+                             @RequestParam("listName") listName: String,
+                             @RequestParam("listDescription") listDescription: String,
                              ra: RedirectAttributes): String {
         val user = userRepo.findByUsername(userName)
         val list = UserSamplesList()
-        list.listName= listName
-        list.listDescription= listDescription
+        list.name= listName
+        list.description= listDescription
         list.user= user
         listRepo.save(list)
-        ra.addFlashAttribute("message", "Se ha creado la lista ${list.listName} correctamente")
+        ra.addFlashAttribute("message", "Se ha creado la lista ${list.name} correctamente")
         return "redirect:/list"
     }
 
     @GetMapping("/list")
-    fun showListPage(model: Model): String {
+    fun showListPage(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus listas")
+            return "redirect:/login"
+        }
+        val list = listRepo.findByUser_Username(authentication.name)
+        model.addAttribute("list", list)
         return "list"
     }
 
+    @PostMapping("/add_sample_to_list")
+    fun addSampleToUserList(@RequestParam("sample_id") sample_id: Long, @RequestParam("list_id") list_id: Long, ra: RedirectAttributes):String{
+        val list = listRepo.findById(list_id).get()
+        val sample = sampleRepo.findById(sample_id).get()
+        list.samples.add(sample)
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a la lista ${list.name}")
+        return "redirect:/list"
+    }
+
+    @GetMapping("/list/{id}")
+    fun showList(@PathVariable id: Long, model: Model) :String{
+        model.addAttribute("list",listRepo.findById(id).get())
+        return "list_view"
+    }
 }

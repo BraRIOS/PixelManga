@@ -27,7 +27,7 @@ interface SampleRepository : JpaRepository<Sample, Long> {
 
 
     @Query("select s from Sample s where s.name like concat('%', ?1, '%') order by s.name")
-    fun findAllByNameContaining(
+    fun findAllByNameContainingTitle(
         title: String,
         pageable: Pageable
     ): Page<Sample>

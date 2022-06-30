@@ -155,8 +155,8 @@
                             <div class="anime__details__title">
                                 <h3 th:text="*{name}"></h3>
                             </div>
-                            <div class="anime__details__rating" sec:authorize="hasAuthority('AUTHOR')">
-                                <div class="anime__details__btn">
+                            <div class="anime__details__rating">
+                                <div class="anime__details__btn" sec:authorize="hasAuthority('AUTHOR')">
                                 <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/edit'}"><i class="fa fa-pencil"></i> Editar</a>
                                 </div>
                             </div>
@@ -177,7 +177,7 @@
                             <div class="anime__details__btn">
                                 <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Seguir</a>
                                 <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')">Subir capítulo</a>
-                                </div>
+                                <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" ><i class="fa fa-pencil"></i>Agregar a lista</a>
                             </div>
                         </div>
                     </div>
@@ -254,7 +254,36 @@
         </div>
         <!-- Search model end -->
 
-        <!-- Js Plugins -->
+    <!-- Modal -->
+    <div id="addList" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar el ejemplar a la lista:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <form th:action="@{/add_sample_to_list}" method="post">
+                        <div class="input__select">
+                            <input hidden th:value="${sample.id}" name="sample_id">
+                            <select class="user-list-select" name="list_id" required>
+                                <option th:each="list : ${user_sample_lists}"
+                                        th:value="${list.id}"
+                                        th:text="${list.name}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+
+    <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/player.js"></script>
@@ -282,6 +311,12 @@
             function() {
                 document.getElementById("vote").innerHTML = "";
             })
+        })
+
+        $('.user-list-select').select2({
+            placeholder: "Seleccione la demografía",
+            allowClear: true,
+            width:'style'
         })
 
     </script>
