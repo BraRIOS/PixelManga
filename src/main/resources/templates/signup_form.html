@@ -48,7 +48,7 @@
                         <ul>
                             <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
                             <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
-                            <li th:classappend="${is_following != null? 'active':''}"><a href="#">Siguiendo</a></li>
+                            <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
                             <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
                         </ul>
                     </nav>

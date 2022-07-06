@@ -582,10 +582,14 @@ class AppController {
     fun addSampleToUserList(@RequestParam("sample_id") sample_id: Long, @RequestParam("list_id") list_id: Long, ra: RedirectAttributes):String{
         val list = listRepo.findById(list_id).get()
         val sample = sampleRepo.findById(sample_id).get()
+        if (list.samples.contains(sample)) {
+            ra.addFlashAttribute("info", "La lista '${list.name}' ya contiene: ${sample.name}")
+            return "redirect:/lists/${list.id}"
+        }
         list.samples.add(sample)
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a la lista ${list.name}")
-        return "redirect:/lists"
+        return "redirect:/lists/${list.id}"
     }
 
     @GetMapping("/lists/{id}")
@@ -594,5 +598,37 @@ class AppController {
         model.addAttribute("list",list)
         model.addAttribute("list_samples_id", list.samples.map { it.id })
         return "list_view"
+    }
+
+    @PostMapping("/add_sample_to_favorite")
+    fun addSampleToUserFavorite(@RequestParam("sample_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder agregar a favoritos")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val sample = sampleRepo.findById(sample_id).get()
+        if (user.favoriteSamples.contains(sample)){
+            ra.addFlashAttribute("info", "${sample.name} ya está en tus favoritos")
+            return "redirect:/favorite"
+        }
+        user.favoriteSamples.add(sample)
+        userRepo.save(user)
+        ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a favoritos")
+        return "redirect:/favorite"
+    }
+
+    @GetMapping("/favorite")
+    fun showFavorite(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus favoritos")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val list = user.favoriteSamples
+        model.addAttribute("list", list)
+        model.addAttribute("list_samples_id", list.map { it.id })
+        model.addAttribute("is_following", true)
+        return "favorite_view"
     }
 }
