@@ -7,10 +7,12 @@ CREATE TABLE attributes
     CONSTRAINT pk_attributes PRIMARY KEY (id)
 );
 
+
 CREATE TABLE chapters
 (
     id         BIGINT AUTO_INCREMENT NOT NULL,
     sample_id  BIGINT       NOT NULL,
+    title      VARCHAR(255) NULL,
     image      VARCHAR(255) NOT NULL,
     number     BIGINT       NULL,
     CONSTRAINT pk_chapters PRIMARY KEY (id)

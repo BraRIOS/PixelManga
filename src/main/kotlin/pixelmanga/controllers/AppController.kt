@@ -464,6 +464,8 @@ class AppController {
     fun showUploadChapterForm(model: Model, @PathVariable sampleId: Long): String {
         val sample = sampleRepo.findById(sampleId).get()
         model.addAttribute("sample", sample)
+        model.addAttribute("chapter_number", chapterRepo.findAllBySampleId(sampleId).size + 1)
+        model.addAttribute("sample_type", sample.attributes.find { it.type?.name == "tipo de libro" }?.name)
         return "chapter_form"
     }
 

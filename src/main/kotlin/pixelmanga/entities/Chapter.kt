@@ -11,6 +11,9 @@ open class Chapter {
     @Column(name = "id", nullable = false)
     open var id: Long? = null
 
+    @Column(name = "title")
+    open var title: String? = null
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "sample_id", nullable = false)
     open var sample: Sample? = null

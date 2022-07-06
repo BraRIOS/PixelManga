@@ -113,16 +113,19 @@
                     <div class="col-lg-3">
                     </div>
                     <div class="col-lg-9">
+                        <h3>Nuevo capítulo</h3>
                         <div class="login__form">
-                            <h3>Nuevo capítulo</h3>
                             <form th:action="@{/perform_chapter_upload}" method="post" enctype="multipart/form-data">
-                                <div class="input__item" th:with="type= ${sample.attributes.?[type.name == 'tipo de libro'].get(0).name}">
+                                <div class="input__item">
                                     <input type="hidden" name="sample_id" th:value="${sample.id}">
                                     <div class="item-text" th:text="${sample.name}"></div>
-                                    <div class="badge" th:classappend="'badge-'+${type}" th:text="${type.toUpperCase()}"></div>
+                                    <div class="badge" th:classappend="'badge-'+${sample_type}" th:text="${sample_type.toUpperCase()}"></div>
                                     <span class="icon_pencil"></span>
                                 </div>
-
+                                <div class="input__item">
+                                    <input type="text" name="chapter_name" placeholder="Título del capítulo">
+                                    <span class="icon_pencil"></span>
+                                </div>
                                 <div class="input__item">
                                     <input type="file" id="fileImage" name="fileImage" placeholder="Subir imagen del capítulo" required>
                                     <span class="icon_image"></span>
@@ -182,11 +185,50 @@
     <script src="/static/js/select2.min.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function (){
-            $('#fileImage').change(function (){
-                showImageThumbnail(this);
-            })
+        var filesToUpload = [];
 
+
+        $function preview_images(event) {
+            if (!event) event = window.event;
+            const target = event.target || event.srcElement;
+            var total_files_add = document.getElementById("files").files.length;
+            for (var i = 0; i < total_files_add; i++) {
+                if (!validImageTypes.includes(target.files[i].type)) {
+                    alert("Comprueba que el archivo " + target.files[i].name + " es una imágen válida (JPEG o PNG)");
+                } else {
+                    if (filesToUpload.length === max_files) {
+                        alert('Máximo de archives alcanzado (' + max_files + ')');
+                    } else {
+                        if (target.files[i].size <= 4194304) {
+                            $('<div class="col-6 col-sm-4 col-md-3 col-lg-2 p-1 m-0 card-element">' +
+                                '<div class="card">' +
+                                '<h5 class="card-header card-element-header">' +
+                                '<i class="fa fa-arrows-alt fa-fw"></i> Pag: ' + (filesToUpload.length + 1) + '</h5>' +
+                                '<img class="card-img-top" style="max-height:200px;" src="' + URL.createObjectURL(target.files[i]) + '">' +
+                                '<div class="card-body p-1">' +
+                                '<div class="progress upload-progress" style="display:none">' +
+                                '<div class="progress-bar bg-info upload-progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
+                                '</div>' +
+                                '<small class="card-text">' +
+                                '<i class="fa fa-trash fa-fw delete-file text-danger" data-file="' + (filesToUpload.length) + '"></i>' + target.files[i].name +
+                                '</small>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>').hide().appendTo('#images_preview').fadeIn(2000);
+                            filesToUpload.push(target.files[i]);
+                        } else {
+                            alert('La imagen ' + target.files[i].name + " no cumple los requisitos");
+                        }
+                    }
+                }
+            }
+            if (filesToUpload.length > 0) {
+                $('#btnSubmit').prop('disabled', false);
+            } else {
+                $('#btnSubmit').prop('disabled', true);
+            }
+        }
+        $(document).ready(function (){
             $('.select-multiple').select2({
                 placeholder: "Seleccione los géneros",
                 allowClear: true,
@@ -203,21 +245,6 @@
                 width:'resolve'
             });
         });
-
-        function showImageThumbnail(fileInput){
-            file = fileInput.files[0];
-            reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('#thumbnail').attr('src', e.target.result);
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        function open_explorer(){
-            document.getElementById('fileImage').click();
-        }
     </script>
 
 </body>
