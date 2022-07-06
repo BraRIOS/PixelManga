@@ -277,21 +277,28 @@ class AppController {
             model.addAttribute("order", orderBy)
             model.addAttribute("order_dir", orderDir)
         }
-        val start = pageable.offset.toInt()
-        val end = (start + pageable.pageSize).coerceAtMost(samples.size)
-        samplePages = PageImpl(samples.subList(start, end), pageable, samples.size.toLong())
-        val totalPage = samplePages.totalPages
-        if (totalPage > 0){
-            val pages = IntStream.rangeClosed(1, totalPage).toList()
-            model.addAttribute("pages", pages)
+
+        if(samples.isEmpty()) {
+            model.addAttribute("search_message", "No se encontraron resultados")
         }
-        model.addAttribute("parameters", parameters)
-        model.addAttribute("list_samples", samplePages.content)
-        model.addAttribute("list_samples_id", samplePages.content.map { it.id as Long })
-        model.addAttribute("current", page+1)
+        else {
+            val start = pageable.offset.toInt()
+            val end = (start + pageable.pageSize).coerceAtMost(samples.size)
+            samplePages = PageImpl(samples.subList(start, end), pageable, samples.size.toLong())
+            val totalPage = samplePages.totalPages
+            if (totalPage > 0){
+                val pages = IntStream.rangeClosed(1, totalPage).toList()
+                model.addAttribute("pages", pages)
+            }
+            model.addAttribute("list_samples", samplePages.content)
+            model.addAttribute("list_samples_id", samplePages.content.map { it.id as Long })
+            model.addAttribute("last", totalPage)
+            model.addAttribute("current", page+1)
+        }
+
         model.addAttribute("next", page+2)
         model.addAttribute("prev", page)
-        model.addAttribute("last", totalPage)
+        model.addAttribute("parameters", parameters)
         model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro")
             .sortedBy { it.name }.map { it.name?.substring(0, 1)?.uppercase() + it.name?.substring(1) })
         model.addAttribute("all_genres", attributeRepo.findByType_Name("género")
