@@ -32,41 +32,42 @@
 </div>
 
 <!-- Header Section Begin -->
-    <header class="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-2">
-                    <div class="header__logo">
-                        <a href="/home">
-                            <img src="/static/images/logo.png" alt="">
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-8">
-                    <div class="header__nav">
-                        <nav class="header__menu mobile-menu">
-                            <ul>
-                                <li><a th:href="@{/library}">Biblioteca </a></li>
-                                <li><a href="#">Siguiendo</a></li>
-                                <li><a href="#">Listas</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <div class="header__right">
-                        <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
-                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
-                        <a href="#" class="search-switch"><span class="icon_search"></span></a>
-                        <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
-                        <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
-                        <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
-                    </div>
+<header class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="header__logo">
+                    <a href="/home">
+                        <img src="/static/images/logo.png" alt="">
+                    </a>
                 </div>
             </div>
-            <div id="mobile-menu-wrap"></div>
+            <div class="col-lg-8">
+                <div class="header__nav">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                            <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                            <li th:classappend="${is_following != null? 'active':''}"><a href="#">Siguiendo</a></li>
+                            <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="header__right">
+                    <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
+                    <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
+                    <a href="#" class="search-switch"><span class="icon_search"></span></a>
+                    <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
+                    <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
+                    <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+                </div>
+            </div>
         </div>
-    </header>
+        <div id="mobile-menu-wrap"></div>
+    </div>
+</header>
 <!-- Header End -->
 
     <!-- Msg notification -->
@@ -189,8 +190,8 @@
 <div class="search-model">
     <div class="h-100 d-flex align-items-center justify-content-center">
         <div class="search-close-switch"><i class="icon_close"></i></div>
-        <form class="search-model-form">
-            <input type="text" id="search-input" placeholder="Busque aquí.....">
+        <form class="search-model-form" action="/library">
+            <input type="text" name="title" id="search-input" placeholder="Busque aquí.....">
         </form>
     </div>
 </div>

@@ -1,13 +1,11 @@
 package pixelmanga.entities
 
-import org.hibernate.validator.constraints.Range
 import javax.persistence.*
 
 @Entity
-@Table(name = "rate")
+@Table(name = "rates")
 open class Rate {
 
-    @Range(min = 0, max = 10)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

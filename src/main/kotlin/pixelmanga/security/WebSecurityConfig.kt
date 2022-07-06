@@ -40,7 +40,6 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/users").authenticated()
             .antMatchers("/make_author").authenticated()
             .antMatchers("/register_sample").hasAnyAuthority("ADMIN","AUTHOR")
             .antMatchers("/perform_sample_register").hasAnyAuthority("ADMIN", "AUTHOR")
@@ -48,6 +47,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .antMatchers("/**/edit").hasAnyAuthority("ADMIN", "AUTHOR")
             .antMatchers("/**/delete").hasAnyAuthority("ADMIN", "AUTHOR")
             .antMatchers("/perform_sample_edit").hasAnyAuthority("ADMIN", "AUTHOR")
+            .antMatchers("/create_user_sample_list").authenticated()
             .anyRequest().permitAll()
             .and()
             .formLogin().loginPage("/login")

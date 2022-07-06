@@ -1,2 +1,14 @@
-ALTER TABLE samples
-    MODIFY synopsis VARCHAR (800) NOT NULL;
+CREATE TABLE rate
+(
+    id        BIGINT AUTO_INCREMENT NOT NULL,
+    rate      INT    NOT NULL,
+    user_id   BIGINT NOT NULL,
+    sample_id BIGINT NOT NULL,
+    CONSTRAINT pk_rate PRIMARY KEY (id)
+);
+
+ALTER TABLE rate
+    ADD CONSTRAINT FK_RATE_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
+
+ALTER TABLE rate
+    ADD CONSTRAINT FK_RATE_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

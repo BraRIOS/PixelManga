@@ -10,7 +10,6 @@ CREATE TABLE attributes
 CREATE TABLE chapters
 (
     id         BIGINT AUTO_INCREMENT NOT NULL,
-    image_path VARCHAR(255) NULL,
     sample_id  BIGINT       NOT NULL,
     image      VARCHAR(255) NOT NULL,
     number     BIGINT       NULL,
@@ -34,9 +33,8 @@ CREATE TABLE sample_attributes
 CREATE TABLE samples
 (
     id               BIGINT AUTO_INCREMENT NOT NULL,
-    cover_path       VARCHAR(255) NULL,
     name             VARCHAR(255) NOT NULL,
-    synopsis         VARCHAR(255) NOT NULL,
+    synopsis         VARCHAR(2000) NULL,
     publication_date date NULL,
     cover            VARCHAR(255) NULL,
     CONSTRAINT pk_samples PRIMARY KEY (id)
@@ -72,9 +70,6 @@ ALTER TABLE attributes
 
 ALTER TABLE roles
     ADD CONSTRAINT uc_roles_name UNIQUE (name);
-
-ALTER TABLE samples
-    ADD CONSTRAINT uc_samples_name UNIQUE (name);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);

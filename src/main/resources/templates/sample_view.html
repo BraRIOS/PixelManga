@@ -46,9 +46,10 @@
                     <div class="header__nav">
                         <nav class="header__menu mobile-menu">
                             <ul>
-                                <li><a th:href="@{/library}">Biblioteca </a></li>
-                                <li><a href="#">Siguiendo</a></li>
-                                <li><a href="#">Listas</a></li>
+                                <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                                <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                                <li th:classappend="${is_following != null? 'active':''}"><a href="#">Siguiendo</a></li>
+                                <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -114,8 +115,9 @@
                                 <i class="fa fa-star"></i>
                                 <span th:text="${average}"></span>
                             </span>
-                            <div class="demography" th:classappend="${demography}"
-                                 th:text="${ demography.substring(0, 1).toUpperCase() + demography.substring(1)}"></div>
+                            <div class="demography" th:classappend="${demography.name}"
+                                 th:text="${ demography.name.substring(0, 1).toUpperCase() + demography.name.substring(1)}"
+                                 th:title="${demography.description != null? demography.description : '' }"></div>
                             <img class="book-thumbnail" src="" th:src="'/images/samples/'+${sample.id}">
                         </div>
                         <div class="anime__details__rating2">
@@ -247,7 +249,7 @@
         <div class="search-model">
             <div class="h-100 d-flex align-items-center justify-content-center">
                 <div class="search-close-switch"><i class="icon_close"></i></div>
-                <form class="search-model-form">
+                <form class="search-model-form" action="/library">
                     <input type="text" id="search-input" placeholder="Busque aquí.....">
                 </form>
             </div>

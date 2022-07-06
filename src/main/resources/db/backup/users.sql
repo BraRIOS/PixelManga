@@ -1,0 +1,2 @@
+INSERT INTO pixelmanga.users (id, email, user_name, password, born_year, icon) VALUES (1, 'admin@admin', 'admin', '$2a$12$O32kJafSfDDPYReIVPp9NOhmfDz.zmWrpY419jFqnoN1jg9pOUxze', 0, null);
+INSERT INTO pixelmanga.users (id, email, user_name, password, born_year, icon) VALUES (2, 'braian.rios@hotmail.com', 'braian', '$2a$10$K4VhlTO45wZVupoHq6K2p.NbR8Voiw8090tJ/wdcPTSYOxVQg6o6K', 1999, null);

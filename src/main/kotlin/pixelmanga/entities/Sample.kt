@@ -16,7 +16,7 @@ open class Sample {
     @Column(name = "name", nullable = false)
     open var name: String? = null
 
-    @Column(name = "synopsis", nullable = false, length = 2000)
+    @Column(name = "synopsis", length = 2000)
     open var synopsis: String? = null
 
     @Column(name = "publication_date")
@@ -33,6 +33,8 @@ open class Sample {
 
     @Column(name = "cover")
     open var cover: String? = null
+
+
 
     @Transient
     open fun coverPath(): String? {

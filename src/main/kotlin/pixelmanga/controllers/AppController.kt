@@ -2,6 +2,7 @@ package pixelmanga.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,6 @@ import pixelmanga.repositories.*
 import pixelmanga.security.CustomUserDetails
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 import kotlin.io.path.exists
@@ -67,6 +67,7 @@ class AppController {
         val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(12)
         model.addAttribute("random_samples", randomSamples)
         model.addAttribute("latest_samples", latestSamples)
+        model.addAttribute("is_home", true)
         return "home"
     }
 
@@ -81,14 +82,14 @@ class AppController {
     }
 
     @GetMapping("/check_username")
-    fun checkUsername(@RequestParam username: String): Boolean {
+    fun checkUsernameAvailable(@RequestParam username: String): Boolean {
         if (userRepo.findByUsername(username) != null)
             return false
         return true
     }
 
     @GetMapping("/check_email")
-    fun checkEmail(@RequestParam email: String): Boolean {
+    fun checkEmailAvailable(@RequestParam email: String): Boolean {
         if (userRepo.findByEmail(email) != null)
             return false
         return true
@@ -190,30 +191,114 @@ class AppController {
     @GetMapping("/library")
     fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("title", required = false) title: String?,
                     @RequestParam("type", required = false) type: String?, @RequestParam("demography", required = false) demography: String?,
-                    @RequestParam("genres[]", required = false) genre: Array<String>?): String {
+                    @RequestParam("genres[]", required = false) genres: Array<String>?, @RequestParam("order") orderBy: String?,
+                    @RequestParam("order_dir") orderDir: String?): String {
         val page: Int = pageNumber?.minus(1) ?:  0
         val pageable = PageRequest.of(page, 10)
         val samplePages: Page<Sample>
-        if (title!=null){
-            samplePages = sampleRepo.findAllByNameContainingTitle(title,pageable)
+        var samples: List<Sample>
+        var parameters=""
+
+        if (title!=null && title!="") {
+            samples = sampleRepo.findAllByNameContaining(title)
+            parameters+="&title=$title"
             model.addAttribute("title", title)
         } else{
-            samplePages = sampleRepo.findAll(pageable)
+            samples = sampleRepo.findAll()
         }
+
+        if (type!=null && type!="") {
+            samples = samples.filter { it.attributes.contains(attributeRepo.findByName(type)) }
+            parameters+="&type=$type"
+            model.addAttribute("type", type)
+        }
+
+        if (demography!=null && demography!="") {
+            samples = samples.filter { it.attributes.contains(attributeRepo.findByName(demography)) }
+            parameters+="&demography=$demography"
+            model.addAttribute("demography", demography)
+        }
+
+        if (genres!=null && genres.isNotEmpty()) {
+            samples = samples.filter { sample -> sample.attributes.containsAll(genres.map { attributeRepo.findByName(it) }) }
+            genres.forEach { parameters+="&genres%5B%5D=${it.replace(" ","+")}" }
+            model.addAttribute("genres", genres)
+        }
+
+        if (orderDir==null || orderBy==null){
+            samples = samples.sortedBy { it.name }
+            parameters+="&order=alphabetically&order_dir=asc"
+            model.addAttribute("order", "alphabetically")
+            model.addAttribute("order_dir", "asc")
+        }
+        else {
+            if (orderDir == "asc") {
+                when (orderBy) {
+                    "alphabetically" -> samples = samples.sortedBy { it.name }
+                    "rating" -> samples = samples.sortedBy {
+                            sample ->
+                        val ratings = rateRepo.findAllBySample_Id(sample.id as Long)
+                        if(ratings.isEmpty())
+                            0.0
+                        else
+                            ratings.map { it.rating }.average() }
+                    "popularity" -> samples = samples.sortedBy {
+                            sample ->
+                        val ratingsCount = rateRepo.findAllBySample_Id(sample.id as Long).size
+                        if(ratingsCount == 0)
+                            0
+                        else
+                            ratingsCount }
+                    "publication_date" -> samples = samples.sortedBy { it.publicationDate }
+                    "num_chapters" -> samples = samples.sortedBy { chapterRepo.countBySampleId(it.id as Long) }
+                }
+            } else {
+                when (orderBy) {
+                    "alphabetically" -> samples = samples.sortedByDescending { it.name }
+                    "rating" -> samples = samples.sortedByDescending {
+                            sample ->
+                        val ratings = rateRepo.findAllBySample_Id(sample.id as Long)
+                        if(ratings.isEmpty())
+                            0.0
+                        else
+                            ratings.map { it.rating }.average() }
+                    "popularity" -> samples = samples.sortedByDescending {
+                            sample ->
+                        val ratingsCount = rateRepo.findAllBySample_Id(sample.id as Long).size
+                        if(ratingsCount == 0)
+                            0
+                        else
+                            ratingsCount }
+                    "publication_date" -> samples = samples.sortedByDescending { it.publicationDate }
+                    "num_chapters" -> samples = samples.sortedByDescending { chapterRepo.countBySampleId(it.id as Long) }
+                }
+            }
+            parameters+="&order=$orderBy&order_dir=$orderDir"
+            model.addAttribute("order", orderBy)
+            model.addAttribute("order_dir", orderDir)
+        }
+        val start = pageable.offset.toInt()
+        val end = (start + pageable.pageSize).coerceAtMost(samples.size)
+        samplePages = PageImpl(samples.subList(start, end), pageable, samples.size.toLong())
         val totalPage = samplePages.totalPages
         if (totalPage > 0){
             val pages = IntStream.rangeClosed(1, totalPage).toList()
             model.addAttribute("pages", pages)
         }
+        model.addAttribute("parameters", parameters)
         model.addAttribute("list_samples", samplePages.content)
+        model.addAttribute("list_samples_id", samplePages.content.map { it.id as Long })
         model.addAttribute("current", page+1)
         model.addAttribute("next", page+2)
         model.addAttribute("prev", page)
         model.addAttribute("last", totalPage)
-        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
-        model.addAttribute("all_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
-        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
-
+        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro")
+            .sortedBy { it.name }.map { it.name?.substring(0, 1)?.uppercase() + it.name?.substring(1) })
+        model.addAttribute("all_genres", attributeRepo.findByType_Name("género")
+            .sortedBy { it.name }.map { it.name?.substring(0, 1)?.uppercase() + it.name?.substring(1) })
+        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía")
+            .sortedBy { it.name }.map { it.name?.substring(0, 1)?.uppercase() + it.name?.substring(1) })
+        model.addAttribute("is_library", true)
         return "library"
     }
 
@@ -231,7 +316,7 @@ class AppController {
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
-        model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía"}?.name)
+        model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía"})
         model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
         model.addAttribute("chapters", chapters)
         model.addAttribute("urlSampleName", urlSampleName)
@@ -265,7 +350,7 @@ class AppController {
         sampleToUpdate.attributes.add(attributeRepo.findByName(type))
         sampleToUpdate.attributes.add(attributeRepo.findByName(demography))
         sampleRepo.save(sampleToUpdate)
-        if (!image.isEmpty ) saveSampleCover(type, id, image, sample)
+        saveSampleCover(type, id, image, sample)
 
         val urlSampleName = URLSampleName(sample)
         ra.addFlashAttribute("message", "Se han guardado los cambios de ${sample.name}")
@@ -338,10 +423,18 @@ class AppController {
         if (!image.isEmpty) {
             val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
             val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
+
+            if (sample.cover != null) {
+                val oldCover = Paths.get(sample.coverPath() as String)
+                if (oldCover.exists()) {
+                    oldCover.toFile().delete()
+                }
+            }
+
             sampleRepo.updateCoverById(name, id)
 
             val imagePath = uploadPath.resolve(name)
-            Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(image.inputStream, imagePath)
         }
     }
 
@@ -386,8 +479,8 @@ class AppController {
 
         chapter.image= name
 
-        val uploadDir = "./resources/images/samples/$type/${sample.id}/chapters/${chapter.number}"
         chapterRepo.save(chapter)
+        val uploadDir = "./resources/images/samples/$type/${sample.id}/chapters/${chapter.number}"
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
@@ -395,8 +488,7 @@ class AppController {
         }
         val imagePath = uploadPath.resolve(name)
         image.transferTo(imagePath)
-        val urlRegex = """\s|/|\\""".toRegex()
-        val urlSampleName = urlRegex.replace(sample.name as String, "-").replace("?", "")
+        val urlSampleName = URLSampleName(sample)
         ra.addFlashAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
         return "redirect:/library/$type/${sample.id}/$urlSampleName"
 
@@ -462,10 +554,10 @@ class AppController {
         list.user= user
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha creado la lista ${list.name} correctamente")
-        return "redirect:/list"
+        return "redirect:/lists"
     }
 
-    @GetMapping("/list")
+    @GetMapping("/lists")
     fun showListPage(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus listas")
@@ -473,7 +565,8 @@ class AppController {
         }
         val list = listRepo.findByUser_Username(authentication.name)
         model.addAttribute("list", list)
-        return "list"
+        model.addAttribute("is_lists", true)
+        return "lists"
     }
 
     @PostMapping("/add_sample_to_list")
@@ -483,12 +576,14 @@ class AppController {
         list.samples.add(sample)
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a la lista ${list.name}")
-        return "redirect:/list"
+        return "redirect:/lists"
     }
 
-    @GetMapping("/list/{id}")
+    @GetMapping("/lists/{id}")
     fun showList(@PathVariable id: Long, model: Model) :String{
-        model.addAttribute("list",listRepo.findById(id).get())
+        val list = listRepo.findById(id).get()
+        model.addAttribute("list",list)
+        model.addAttribute("list_samples_id", list.samples.map { it.id })
         return "list_view"
     }
 }

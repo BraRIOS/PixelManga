@@ -33,6 +33,15 @@
     // Search model
     $('.search-switch').on('click', function () {
         $('.search-model').fadeIn(400);
+        $('.search-model input').focus();
+        $(document).keydown(function (e) {
+            if (e.keyCode === 13) {
+                $('#search_submit').trigger('click');
+            }
+            if (e.keyCode === 27) {
+                $('.search-close-switch').trigger('click');
+            }
+        });
     });
 
     $('.search-close-switch').on('click', function () {
@@ -67,11 +76,6 @@
         autoplay: true,
         mouseDrag: false
     });
-
-    /*------------------
-        Niceselect
-    --------------------*/
-    $('select').niceSelect();
 
     /*------------------
         Scroll To Top

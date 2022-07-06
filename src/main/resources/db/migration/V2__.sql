@@ -13,7 +13,7 @@ INSERT INTO `types` (`name`) VALUES ('género');
 INSERT INTO `types` (`name`) VALUES ('demografía');
 
 INSERT INTO `attributes` (`name` , `type_id`) VALUES ('manga', 1);
-INSERT INTO `attributes` (`name` , `type_id`) VALUES ('manwha', 1);
+INSERT INTO `attributes` (`name` , `type_id`) VALUES ('manhwa', 1);
 INSERT INTO `attributes` (`name` , `type_id`) VALUES ('manhua', 1);
 INSERT INTO `attributes` (`name` , `type_id`) VALUES ('novela', 1);
 
