@@ -631,4 +631,10 @@ class AppController {
         model.addAttribute("is_following", true)
         return "favorite_view"
     }
+
+    @PostMapping("/failed_login")
+    fun failedLogin(ra: RedirectAttributes): String {
+        ra.addFlashAttribute("error", "Usuario o contraseña incorrectos")
+        return "redirect:/login"
+    }
 }

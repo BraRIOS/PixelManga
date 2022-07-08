@@ -52,6 +52,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .and()
             .formLogin().loginPage("/login")
             .loginProcessingUrl("/login")
+            .failureForwardUrl("/failed_login")
             .permitAll()
             .and()
             .logout().logoutSuccessUrl("/").permitAll()
