@@ -97,6 +97,18 @@ class AppController {
 
     @PostMapping("/process_register")
     fun registerUser(user: User, redirectAttributes: RedirectAttributes): String {
+        if (!checkUsernameAvailable(user.username as String) && !checkEmailAvailable(user.email as String)){
+            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' y el email: '${user.email}' ya estan en uso")
+            return "redirect:/register"
+        }
+        if (!checkEmailAvailable(user.email as String)){
+            redirectAttributes.addFlashAttribute("error", "El email: '${user.email}' ya esta en uso")
+            return "redirect:/register"
+        }
+        if (!checkUsernameAvailable(user.username as String)){
+            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' ya esta en uso")
+            return "redirect:/register"
+        }
         val passwordEncoder = BCryptPasswordEncoder()
         val encodedPassword = passwordEncoder.encode(user.password)
         user.password = encodedPassword
