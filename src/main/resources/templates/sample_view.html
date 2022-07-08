@@ -266,8 +266,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body text-center">
-                    <form th:action="@{/add_sample_to_list}" method="post">
+                <form th:action="@{/add_sample_to_list}" method="post">
+                    <div class="modal-body text-center">
                         <div class="input__select">
                             <input hidden th:value="${sample.id}" name="sample_id">
                             <select class="user-list-select" name="list_id" required>
@@ -276,9 +276,12 @@
                                         th:text="${list.name}"></option>
                             </select>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" href="/register_list" class="btn btn-secondary" data-bs-dismiss="modal">Nueva lista</a>
                         <button type="submit" class="btn btn-primary">Agregar</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
