@@ -9,7 +9,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Anime | Template</title>
+    <title th:text="${chapter.sample.name}+'-- Capítulo '+${chapter.number}+' | PIXELmanga' "></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -111,10 +111,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="image_cascade" class="anime__video__player" style="text-align: center">
-                        <img loading="lazy" th:each="imageNumber : ${imageNumberList}"
+                    <div class="anime__video__player" style="text-align: center">
+                        <img th:each="imageNumber : ${imageNumberList}"
                              th:data-src="'/images/samples/'+${chapter.sample.id}+'/chapters/'+${chapter.number}+'/'+${imageNumber}"
-                             alt="…" class="lazyload" src="/static/images/loading.gif"/>
+                             alt="…" class="lazy" src="/static/images/loading.gif"/>
                     </div>
                     <div class="anime__details__episodes">
                         <div class="section-title">
@@ -195,8 +195,62 @@
     <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/select2.min.js"></script>
-    <script src="/static/js/lazysizes.min.js" async=""></script>
+    <script>
+        $(document).ready(function() {
+            var lazyloadImages;
 
+            if ("IntersectionObserver" in window) {
+                lazyloadImages = document.querySelectorAll(".lazy");
+                var imageObserver = new IntersectionObserver(function(entries, observer) {
+                    console.log(observer);
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            var image = entry.target;
+                            image.src = image.dataset.src;
+                            image.classList.remove("lazy");
+                            imageObserver.unobserve(image);
+                        }
+                    });
+                }, {
+                    root: document.querySelector("#container"),
+                    rootMargin: "0px 0px 500px 0px"
+                });
+
+                lazyloadImages.forEach(function(image) {
+                    imageObserver.observe(image);
+                });
+            } else {
+                let lazyloadThrottleTimeout;
+                lazyloadImages = $(".lazy");
+
+                function lazyload () {
+                    if(lazyloadThrottleTimeout) {
+                        clearTimeout(lazyloadThrottleTimeout);
+                    }
+
+                    lazyloadThrottleTimeout = setTimeout(function() {
+                        var scrollTop = $(window).scrollTop();
+                        lazyloadImages.each(function() {
+                            var el = $(this);
+                            if(el.offset().top < window.innerHeight + scrollTop + 500) {
+                                var url = el.attr("data-src");
+                                el.attr("src", url);
+                                el.removeClass("lazy");
+                                lazyloadImages = $(".lazy");
+                            }
+                        });
+                        if(lazyloadImages.length === 0) {
+                            $(document).off("scroll");
+                            $(window).off("resize");
+                        }
+                    }, 20);
+                }
+
+                $(document).on("scroll", lazyload);
+                $(window).on("resize", lazyload);
+            }
+        })
+    </script>
 </body>
 
 </html>

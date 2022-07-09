@@ -8,7 +8,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pixelmanga | Sample</title>
+    <title th:text="'Nuevo capítulo -- '+${sample.name}+' -- '+${sample_type}+' | PIXELmanga'"></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -132,7 +132,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between mb-1">
                                 <a class="btn btn-danger btn-lg" th:href="@{'/library/'+${sample_type}+'/'+${sample.id}+'/'+${sample.name}}" id="btnCancel"><i class="fa fa-times"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success btn-lg" id="btnSubmit" disabled=""><i class="fa fa-upload"></i> Subir</button>
                             </div>
@@ -227,9 +227,9 @@
                         alert('Máximo de archivos alcanzado (' + max_files + ')');
                     } else {
                         if (target.files[i].size <= 4194304) {
-                            $('<div class="col-6 col-sm-4 col-md-3 col-lg-2 p-1 m-0 card-element">' +
+                            $('<div class="col-6 col-sm-4 col-md-4 col-lg-3 p-1 m-0 card-element">' +
                                 '<div class="card">' +
-                                '<h5 class="card-header card-element-header">' +
+                                '<h5 class="card-header card-element-header text-center">' +
                                 '<i class="fa fa-arrows-alt fa-fw"></i> Pag: ' + (filesToUpload.length + 1) + '</h5>' +
                                 '<img class="card-img-top" style="max-height:200px;" src="' + URL.createObjectURL(target.files[i]) + '">' +
                                 '<div class="card-body p-1">' +
@@ -265,6 +265,7 @@
             filesToUpload.splice(file_index,1);
             $(this).closest('.card-element').fadeOut(800,function(){
                 $(this).remove();
+                refreshImages();
             });
             if (filesToUpload.length === 0) {
                 $('#btnSubmit').prop('disabled', true);

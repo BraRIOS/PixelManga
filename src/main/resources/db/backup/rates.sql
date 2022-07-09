@@ -5,3 +5,7 @@ INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (4, 3, 2, 2);
 INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (5, 10, 2, 8);
 INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (6, 10, 2, 7);
 INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (7, 9, 2, 11);
+INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (8, 10, 1, 19);
+INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (9, 10, 1, 13);
+INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (10, 10, 2, 4);
+INSERT INTO pixelmanga.rates (id, rate, user_id, sample_id) VALUES (11, 7, 2, 18);

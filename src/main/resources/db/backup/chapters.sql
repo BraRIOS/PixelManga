@@ -1,0 +1,2 @@
+INSERT INTO pixelmanga.chapters (id, sample_id, title, number) VALUES (29, 13, '30 minutos de cabeza dura gg', 1);
+INSERT INTO pixelmanga.chapters (id, sample_id, title, number) VALUES (30, 19, 'Capítulo de prueba', 1);

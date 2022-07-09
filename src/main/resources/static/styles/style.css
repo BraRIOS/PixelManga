@@ -37,7 +37,7 @@ h4,
 h5,
 h6 {
 	margin: 0;
-	color: #ffffff;
+	color: #535353;
 	font-weight: 400;
 	font-family: "Mulish", sans-serif;
 }
@@ -3001,4 +3001,9 @@ input[type="radio" i]{
 	padding-left: 76px;
 	align-items: center;
 	font-weight: bold;
+}
+
+.card-element-header {
+	cursor: move;
+	color: #e53637;
 }

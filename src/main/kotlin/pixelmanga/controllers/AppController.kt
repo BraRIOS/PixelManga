@@ -331,12 +331,17 @@ class AppController {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication != null || authentication !is AnonymousAuthenticationToken) {
             model.addAttribute("user_sample_lists", listRepo.findByUser_Username((authentication as Authentication).name))
+            model.addAttribute("is_favorite", userRepo.existsByFavoriteSamples_IdAndUsername(id, authentication.name))
+        }
+        else {
+            model.addAttribute("is_favorite", false)
         }
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
         model.addAttribute("type", type)
         model.addAttribute("demography", sample.attributes.find { it.type?.name == "demografía"})
-        model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map { attribute -> attribute.name })
+        model.addAttribute("genres",sample.attributes.filter { attribute -> attribute.type?.name == "género" }.map
+        { attribute -> (attribute.name as String).substring(0, 1).uppercase() + (attribute.name as String).substring(1) })
         model.addAttribute("chapters", chapters)
         model.addAttribute("urlSampleName", urlSampleName)
         return "sample_view"
@@ -522,7 +527,7 @@ class AppController {
     fun showChapter(model: Model, @PathVariable sampleId: Long, @PathVariable number:Long): String {
         val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
         val chapters = chapterRepo.findAllBySampleId(sampleId)
-        model.addAttribute("imageNumberList", chapter.images.map { it.split("-").last().split(".").first() })
+        model.addAttribute("imageNumberList", chapter.images.map { it.split("-").last().split(".").first().toInt()})
         model.addAttribute("chapter", chapter)
         model.addAttribute("chapters", chapters)
         model.addAttribute("urlSampleName", URLSampleName(chapter.sample as Sample))
@@ -551,9 +556,9 @@ class AppController {
                 val image = Files.readAllBytes(Paths.get(imagePath))
                 image
             }
-           ResponseEntity.ok(images[imageNumber.toInt()])
+           ResponseEntity.ok(images[imageNumber.toInt()-1])
         } else {
-            val image = Files.readAllBytes(Paths.get("./resources/images/samples/default.png"))
+            val image = Files.readAllBytes(Paths.get("./static/images/loading.gif"))
             ResponseEntity.ok(image)
         }
     }
@@ -627,15 +632,24 @@ class AppController {
         }
         val user = userRepo.findByUsername(authentication.name) as User
         val sample = sampleRepo.findById(sample_id).get()
-        if (user.favoriteSamples.contains(sample)){
-            ra.addFlashAttribute("info", "${sample.name} ya está en tus favoritos")
-            return "redirect:/favorite"
-        }
+        val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
         user.favoriteSamples.add(sample)
         userRepo.save(user)
         ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a favoritos")
-        return "redirect:/favorite"
+        return "redirect:/library/${type}/${sample.id}/${URLSampleName(sample)}"
     }
+
+    @PostMapping("/remove_sample_from_favorite")
+    fun removeSampleFromUserFavorite(@RequestParam("sample_id") sample_id: Long, authentication: Authentication,ra: RedirectAttributes):String{
+        val user = userRepo.findByUsername(authentication.name) as User
+        val sample = sampleRepo.findById(sample_id).get()
+        val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
+        user.favoriteSamples.remove(sample)
+        userRepo.save(user)
+        ra.addFlashAttribute("message", "Se ha eliminado ${sample.name} de favoritos")
+        return "redirect:/library/${type}/${sample.id}/${URLSampleName(sample)}"
+    }
+
 
     @GetMapping("/favorite")
     fun showFavorite(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {

@@ -7,7 +7,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pixelmanga | Sample</title>
+    <title th:text="${sample.name}+' - '+${type}+' | PIXELmanga'"></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -101,6 +101,22 @@
         </div>
     </div>
 
+    <div class="row" th:if="${info}">
+
+        <div class="col-sm-12">
+            <div class="alert fade alert-simple alert-warning alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
+                <button type="button" class="close font__size-18" data-dismiss="alert">
+									<span aria-hidden="true">
+										<i class="fa fa-times warning"></i>
+									</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <i class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>
+                <strong class="font__weight-semibold" th:text="${info}"></strong>
+            </div>
+        </div>
+    </div>
+
     <!-- Msg notification End-->
 
     <!-- Anime Section Begin -->
@@ -148,7 +164,7 @@
                                 </div>
                                 <b id="vote"></b>
                                 <input type="hidden" name="sample_id" th:value="${sample.id}">
-                                <button id="acceder" hidden type="submit">Acceder</button>
+                                <button id="makeVote" hidden type="submit"></button>
                             </form>
                         </div>
                     </div>
@@ -171,13 +187,13 @@
                                         </ul>
                                         <h5 style="color: #FFFFFF">Géneros</h5>
                                         <h6 style="display: inline-block;" th:each="genre : ${genres}">
-                                            <a class="badge badge-dark py-2 px-4 mx-1 my-2" th:text="${genre.toUpperCase()}" href="#"></a>
+                                            <a class="badge badge-dark py-2 px-4 mx-1 my-2" th:text="${genre.toUpperCase()}" th:href="@{/library(genres[]=${genre})}"></a>
                                         </h6>
                                     </div>
                                 </div>
                             </div>
                             <div class="anime__details__btn">
-                                <a href="javascript:{}" onclick="document.getElementById('addFavorite').submit();" class="follow-btn"><i class="fa fa-heart-o"></i> Favorito</a>
+                                <a href="#" id="favoriteBtn" class="follow-btn"><i th:classappend="${is_favorite? 'fa fa-heart' : 'fa fa-heart-o'}"></i> Favorito</a>
                                 <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')">Subir capítulo</a>
                                 <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" ><i class="fa fa-pencil"></i>Agregar a lista</a>
                             </div>
@@ -187,7 +203,7 @@
                     <div class="section-title">
                         <h5>Capítulos</h5>
                     </div>
-                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}" th:text="'Ep '+${chapter.number}"></a>
+                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}" th:text="'Ep '+${chapter.number}+': '+${chapter.title}"></a>
                 </div>
                 </div>
                 <div class="row">
@@ -287,10 +303,14 @@
     </div>
     <!-- End Modal -->
 
-    <!-- Add Favorite -->
+    <!-- Favorite -->
 
-    <div style="display: none">
+    <div class="d-none">
         <form th:action="@{/add_sample_to_favorite}" method="post" id="addFavorite">
+            <input hidden th:value="${sample.id}" name="sample_id">
+            <button type="submit" class="btn btn-primary"></button>
+        </form>
+        <form  th:action="@{/remove_sample_from_favorite}" method="post" id="removeFavorite">
             <input hidden th:value="${sample.id}" name="sample_id">
             <button type="submit" class="btn btn-primary"></button>
         </form>
@@ -309,13 +329,22 @@
     <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#favoriteBtn').on('click', function () {
+            if ([[${is_favorite}]]) {
+                $('#removeFavorite').submit();
+            } else {
+                $('#addFavorite').submit();
+            }
+        });
+        /*]]>*/
         let votes = [1,2,3,4,5,6,7,8,9,10];
         let voteText = document.getElementById("vote")
         votes.forEach(vote => {
             $("#votebar-"+vote).click(
             function () {
-                document.getElementById("acceder").click()
+                document.getElementById("makeVote").click()
             })
             $("#label-"+vote).hover(
             function() {
@@ -330,7 +359,7 @@
         })
 
         $('.user-list-select').select2({
-            placeholder: "Seleccione la demografía",
+            placeholder: "Seleccione la lista",
             allowClear: true,
             width:'style'
         })

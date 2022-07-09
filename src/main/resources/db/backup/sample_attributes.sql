@@ -11,7 +11,9 @@ INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (1, 4
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (7, 4);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (9, 4);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (14, 4);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (28, 4);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (49, 4);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (55, 4);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (2, 5);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (7, 5);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (9, 5);
@@ -81,3 +83,11 @@ INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (7, 1
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (9, 18);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (50, 18);
 INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (55, 18);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (1, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (7, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (9, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (12, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (25, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (28, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (50, 19);
+INSERT INTO pixelmanga.sample_attributes (attributes_id, sample_id) VALUES (55, 19);
