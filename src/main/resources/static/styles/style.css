@@ -37,7 +37,7 @@ h4,
 h5,
 h6 {
 	margin: 0;
-	color: #111111;
+	color: #ffffff;
 	font-weight: 400;
 	font-family: "Mulish", sans-serif;
 }
@@ -1237,7 +1237,7 @@ ol {
 	height: 20px;
 }
 
-.fa-times
+.alert-dismissible .fa-times
 {
 	-webkit-animation: blink-1 2s infinite both;
 	animation: blink-1 2s infinite both;
@@ -2078,7 +2078,7 @@ ol {
 
 .login__form form .input__item {
 	position: relative;
-	width: 370px;
+	width: auto;
 	margin-bottom: 20px;
 }
 
@@ -2907,4 +2907,98 @@ input[type="radio" i]{
 .button.is-small {
 	border-radius: 2px;
 	font-size: .75rem;
+}
+
+/*------------Chapter Form-------------*/
+.chapter__form {
+	display: flex;
+	justify-content: center;
+}
+
+.chapter__form h3 {
+	color: #ffffff;
+	font-weight: 700;
+	font-family: "Oswald", sans-serif;
+	margin-bottom: 30px;
+}
+
+.chapter__form form .input__item {
+	position: relative;
+	width: auto;
+	margin-bottom: 20px;
+}
+
+.chapter__form form .input__select {
+	position: relative;
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+.chapter__form form .input__item:before {
+	position: absolute;
+	left: 50px;
+	top: 10px;
+	height: 30px;
+	width: 1px;
+	background: #b7b7b7;
+	content: "";
+}
+
+.chapter__form form .input__item input {
+	height: 50px;
+	width: 100%;
+	font-size: 15px;
+	color: #535353;
+	background: #ffffff;
+	border: none;
+	padding-left: 76px;
+	align-items: center;
+}
+
+.chapter__form form .input__item input::-webkit-input-placeholder {
+	color: #b7b7b7;
+}
+
+.chapter__form form .input__item input::-moz-placeholder {
+	color: #b7b7b7;
+}
+
+.chapter__form form .input__item input:-ms-input-placeholder {
+	color: #b7b7b7;
+}
+
+.chapter__form form .input__item input::-ms-input-placeholder {
+	color: #b7b7b7;
+}
+
+.chapter__form form .input__item input::placeholder {
+	color: #b7b7b7;
+}
+
+.chapter__form form .input__item span {
+	color: #b7b7b7;
+	font-size: 20px;
+	position: absolute;
+	left: 15px;
+	top: 13px;
+}
+
+.chapter__form form .input__item .badge {
+	font-size: 15px;
+	position: absolute;
+	left: 85%;
+	top: 25%;
+}
+
+.chapter__form form .input__item .item-text {
+	display: flex;
+	height: 50px;
+	width: 100%;
+	font-size: 15px;
+	color: #535353;
+	background: #ffffff;
+	border: none;
+	padding-left: 76px;
+	align-items: center;
+	font-weight: bold;
 }

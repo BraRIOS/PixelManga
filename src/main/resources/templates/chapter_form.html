@@ -20,11 +20,9 @@
     <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/plyr.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/nice-select.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/select2.min.css" type="text/css">
 </head>
 
 <body>
@@ -73,8 +71,7 @@
     <!-- Header End -->
     <!-- Msg notification -->
 
-    <div class="row" th:if="${message}">
-
+    <div class="row d-none" id="success_msg_div" th:data-url="'/library/'+${sample_type}+'/'+${sample.id}+'/'+${sample.name}">
         <div class="col-sm-12">
             <div class="alert fade alert-simple alert-success alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show">
                 <button type="button" class="close font__size-18" data-dismiss="alert">
@@ -83,13 +80,12 @@
                     </a></span>
                     <span class="sr-only">Close</span>
                 </button>
-                <strong class="font__weight-semibold" th:text="${message}"></strong>
+                <strong id="success_msg" class="font__weight-semibold"></strong>
             </div>
         </div>
     </div>
 
-    <div class="row" th:if="${error}">
-
+    <div class="row d-none" id="error_msg_div">
         <div class="col-sm-12">
             <div class="alert fade alert-simple alert-danger alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
                 <button type="button" class="close font__size-18" data-dismiss="alert">
@@ -98,7 +94,7 @@
 									</span>
                     <span class="sr-only">Close</span>
                 </button>
-                <strong class="font__weight-semibold" th:text="${error}"></strong>
+                <strong id="error_msg" class="font__weight-semibold"></strong>
             </div>
         </div>
     </div>
@@ -109,30 +105,38 @@
     <section class="anime-details spad">
         <div class="container">
             <div class="anime__details__content">
-                <div class="row">
-                    <div class="col-lg-3">
-                    </div>
-                    <div class="col-lg-9">
+                <div class="chapter__form">
+                    <div class="col-md-8">
                         <h3>Nuevo capítulo</h3>
-                        <div class="login__form">
-                            <form th:action="@{/perform_chapter_upload}" method="post" enctype="multipart/form-data">
-                                <div class="input__item">
-                                    <input type="hidden" name="sample_id" th:value="${sample.id}">
-                                    <div class="item-text" th:text="${sample.name}"></div>
-                                    <div class="badge" th:classappend="'badge-'+${sample_type}" th:text="${sample_type.toUpperCase()}"></div>
-                                    <span class="icon_pencil"></span>
+                        <form id="form_upload" th:action="@{/perform_chapter_upload}" method="post" enctype="multipart/form-data">
+                            <div class="input__item">
+                                <input type="hidden" name="sample_id" th:value="${sample.id}">
+                                <div class="item-text" th:text="${sample.name}"></div>
+                                <div class="badge" th:classappend="'badge-'+${sample_type}" th:text="${sample_type.toUpperCase()}"></div>
+                                <span><i class="icon_book"></i></span>
+                            </div>
+                            <div class="input__item">
+                                <div class="item-text" th:text="'Capítulo ' + ${chapter_number}"></div>
+                                <span class="fa fa-hashtag"></span>
+                            </div>
+                            <div class="input__item">
+                                <input type="text" name="chapter_title" placeholder="Título del capítulo" maxlength="255">
+                                <span class="icon_pencil"></span>
+                            </div>
+                            <div class="row" style="" id="images_selection">
+                                <div class="col-12">
+                                    <input type="file" class="form-control" id="files" multiple="" accept="image/x-png,image/jpeg">
                                 </div>
-                                <div class="input__item">
-                                    <input type="text" name="chapter_name" placeholder="Título del capítulo">
-                                    <span class="icon_pencil"></span>
+                                <div class="container">
+                                    <div class="row" id="images_preview">
+                                    </div>
                                 </div>
-                                <div class="input__item">
-                                    <input type="file" id="fileImage" name="fileImage" placeholder="Subir imagen del capítulo" required>
-                                    <span class="icon_image"></span>
-                                </div>
-                                <button type="submit" class="site-btn text-center">Subir</button>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <a class="btn btn-danger btn-lg" th:href="@{'/library/'+${sample_type}+'/'+${sample.id}+'/'+${sample.name}}" id="btnCancel"><i class="fa fa-times"></i> Cancelar</a>
+                                <button type="submit" class="btn btn-success btn-lg" id="btnSubmit" disabled=""><i class="fa fa-upload"></i> Subir</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -177,27 +181,50 @@
     <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/player.js"></script>
-    <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
-    <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
-    <script src="/static/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <script type="text/javascript">
-        var filesToUpload = [];
+        const filesToUpload = [];
+        let validImageTypes = ['image/jpeg', 'image/png'];
+        let max_files = 500;
+        let sortableElement = document.getElementById('images_preview');
+        let sortable = Sortable.create(sortableElement,{
+            handle: '.card-header',
+            onSort: function (evt) {
+                filesToUpload.move(evt.oldIndex,evt.newIndex);
+                refreshImages();
+            },
+        });
+
+        Array.prototype.move = function(from,to){
+            while (from < 0) {
+                from += this.length;
+            }
+            while (to < 0) {
+                to += this.length;
+            }
+            if (to >= this.length) {
+                var k = to - this.length;
+                while ((k--) + 1) {
+                    this.push(undefined);
+                }
+            }
+            this.splice(to, 0, this.splice(from, 1)[0]);
+            return this;
+        };
 
 
-        $function preview_images(event) {
-            if (!event) event = window.event;
+        function previewImages(event) {
             const target = event.target || event.srcElement;
-            var total_files_add = document.getElementById("files").files.length;
-            for (var i = 0; i < total_files_add; i++) {
+            const total_files_add = document.getElementById("files").files.length;
+            for (let i = 0; i < total_files_add; i++) {
                 if (!validImageTypes.includes(target.files[i].type)) {
                     alert("Comprueba que el archivo " + target.files[i].name + " es una imágen válida (JPEG o PNG)");
                 } else {
                     if (filesToUpload.length === max_files) {
-                        alert('Máximo de archives alcanzado (' + max_files + ')');
+                        alert('Máximo de archivos alcanzado (' + max_files + ')');
                     } else {
                         if (target.files[i].size <= 4194304) {
                             $('<div class="col-6 col-sm-4 col-md-3 col-lg-2 p-1 m-0 card-element">' +
@@ -206,15 +233,12 @@
                                 '<i class="fa fa-arrows-alt fa-fw"></i> Pag: ' + (filesToUpload.length + 1) + '</h5>' +
                                 '<img class="card-img-top" style="max-height:200px;" src="' + URL.createObjectURL(target.files[i]) + '">' +
                                 '<div class="card-body p-1">' +
-                                '<div class="progress upload-progress" style="display:none">' +
-                                '<div class="progress-bar bg-info upload-progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
-                                '</div>' +
                                 '<small class="card-text">' +
-                                '<i class="fa fa-trash fa-fw delete-file text-danger" data-file="' + (filesToUpload.length) + '"></i>' + target.files[i].name +
+                                '<i class="fa fa-trash fa-fw delete-file text-danger" data-file="'+ target.files[i].name +'"></i>' + target.files[i].name +
                                 '</small>' +
                                 '</div>' +
                                 '</div>' +
-                                '</div>').hide().appendTo('#images_preview').fadeIn(2000);
+                                '</div>').hide().appendTo('#images_preview').fadeIn(1000);
                             filesToUpload.push(target.files[i]);
                         } else {
                             alert('La imagen ' + target.files[i].name + " no cumple los requisitos");
@@ -228,22 +252,77 @@
                 $('#btnSubmit').prop('disabled', true);
             }
         }
+
+        function refreshImages(){
+            $('.card-element').each(function(index){
+                $(this).find('.card-header').html('<i class="fa fa-arrows-alt fa-fw"></i> Pag: '+(index+1));
+            });
+        }
+
+        $('#images_preview').on('click', '.delete-file',function(event){
+            const target = event.target || event.srcElement;
+            const file_index = filesToUpload.findIndex(file => file.name === target.dataset.file);
+            filesToUpload.splice(file_index,1);
+            $(this).closest('.card-element').fadeOut(800,function(){
+                $(this).remove();
+            });
+            if (filesToUpload.length === 0) {
+                $('#btnSubmit').prop('disabled', true);
+            }
+        })
+
+        $('#btnSubmit').on('click',function(event){
+            event.preventDefault();
+            const form = $('#form_upload');
+            const form_data = new FormData(form[0]);
+            for (let i = 0; i < filesToUpload.length; i++) {
+                form_data.append('files[]', filesToUpload[i]);
+            }
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form_data,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $('#btnCancel').prop('disabled', true).addClass('disabled');
+                    $('#btnSubmit').prop('disabled', true);
+                    $('#btnSubmit').html('<i class="fa fa-spinner fa-spin"></i> Subiendo...');
+                    sortable.sort = false;
+                },
+                success: function(message) {
+                    $('#btnSubmit').html('<i class="fa fa-check"></i> Subido');
+                    $('#success_msg_div').removeClass('d-none');
+                    $('#success_msg').html(message);
+                    $('.card-element').each(function () {
+                        $(this).hide();
+                    });
+                    smoothScrollTo('#success_msg_div');
+                    setTimeout(function(){
+                        window.location.replace($('#success_msg_div').data('url'));
+                    },3000);
+                },
+                error: function(e) {
+                    $('#error_msg_div').removeClass('d-none');
+                    $('#error_msg').html(e.responseJSON.error + ': ' + e.responseJSON.message);
+                    $('#btnSubmit').html('<i class="fa fa-times"></i> Error');
+                    setTimeout(function(){
+                        $('#btnSubmit').html('<i class="fa fa-upload"></i> Subir');
+                    },1000);
+                    $('#btnSubmit').prop('disabled', false);
+                    $('#btnCancel').prop('disabled', false).removeClass('disabled');
+                }
+            });
+        })
+
+        function smoothScrollTo(id){
+            $('html, body').animate({
+                scrollTop: $(id).offset().top - 100
+            }, 1000);
+        }
+
         $(document).ready(function (){
-            $('.select-multiple').select2({
-                placeholder: "Seleccione los géneros",
-                allowClear: true,
-                width:'resolve'
-            });
-            $('.type-select').select2({
-                placeholder: "Seleccione el tipo",
-                allowClear: true,
-                width:'resolve'
-            });
-            $('.demographic-select').select2({
-                placeholder: "Seleccione la demografía",
-                allowClear: true,
-                width:'resolve'
-            });
+            document.querySelector('input[id="files"]').onchange=previewImages;
         });
     </script>
 

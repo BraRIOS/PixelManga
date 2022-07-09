@@ -39,14 +39,14 @@ open class Sample {
     @Transient
     open fun coverPath(): String? {
         return if (cover != null) {
-            samplePath()+"/"+cover
+            path()+"/"+cover
         } else {
             null
         }
     }
 
     @Transient
-    open fun samplePath(): String? {
+    open fun path(): String? {
         return if (id != null) {
             val type = attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
             "./resources/images/samples/$type/$id"

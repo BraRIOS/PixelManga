@@ -1,4 +1,4 @@
-CREATE TABLE rate
+CREATE TABLE rates
 (
     id        BIGINT AUTO_INCREMENT NOT NULL,
     rate      INT    NOT NULL,
@@ -7,8 +7,8 @@ CREATE TABLE rate
     CONSTRAINT pk_rate PRIMARY KEY (id)
 );
 
-ALTER TABLE rate
+ALTER TABLE rates
     ADD CONSTRAINT FK_RATE_ON_SAMPLE FOREIGN KEY (sample_id) REFERENCES samples (id);
 
-ALTER TABLE rate
+ALTER TABLE rates
     ADD CONSTRAINT FK_RATE_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

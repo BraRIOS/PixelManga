@@ -462,7 +462,7 @@ class AppController {
         val sample = sampleRepo.findById(id).get()
         chapterRepo.deleteAll(chapterRepo.findAllBySampleId(id))
         sampleRepo.delete(sample)
-        val uploadDir = sample.samplePath() as String
+        val uploadDir = sample.path() as String
         val uploadPath = Paths.get(uploadDir)
         if (uploadPath.exists()) {
             uploadPath.toFile().deleteRecursively()
@@ -482,36 +482,39 @@ class AppController {
     }
 
     @PostMapping("/perform_chapter_upload")
-    fun saveChapter(@RequestParam("fileImage") image: MultipartFile,
-                    @RequestParam("sample_id") sampleId: Long, ra: RedirectAttributes): String {
-        if (image.isEmpty) {
-            ra.addFlashAttribute("error", "No se ha seleccionado una imagen")
-            return "redirect:/upload_chapter/${sampleId}"
-        }
+    fun saveChapter(@RequestParam("files[]") images: Array<MultipartFile>,
+                    @RequestParam("sample_id") sampleId: Long, @RequestParam("chapter_title") chapterTitle:String?): ResponseEntity<String> {
+
         val chapter = Chapter()
         val sample = sampleRepo.findById(sampleId).get()
 
         chapter.number = chapterRepo.countBySampleId(sample.id as Long) + 1
         chapter.sample = sample
+        if (chapterTitle != null) {
+            chapter.title = chapterTitle
+        } else {
+            chapter.title = ""
+        }
 
-        val type = sample.attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
         val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
-        val name = "${regex.replace(sample.name as String,"_")}_capítulo_${chapter.number}.${image.contentType?.split("/")?.last()}"
+        for (i in images.indices) {
+            val image = images[i]
+            val name = "${regex.replace(sample.name as String, "_")}-chapter_${chapter.number}-${i + 1}.${image.contentType?.split("/")?.last()}"
+            chapter.images.add(name)
+        }
+        val savedChapter = chapterRepo.save(chapter)
 
-        chapter.image= name
-
-        chapterRepo.save(chapter)
-        val uploadDir = "./resources/images/samples/$type/${sample.id}/chapters/${chapter.number}"
+        val uploadDir = savedChapter.path()
 
         val uploadPath = Paths.get(uploadDir)
         if (!uploadPath.exists()) {
             uploadPath.toFile().mkdirs()
         }
-        val imagePath = uploadPath.resolve(name)
-        image.transferTo(imagePath)
-        val urlSampleName = URLSampleName(sample)
-        ra.addFlashAttribute("message", "El capítulo ${chapter.number} se ha registrado correctamente")
-        return "redirect:/library/$type/${sample.id}/$urlSampleName"
+        savedChapter.images.forEachIndexed { index, image ->
+            val imagePath = uploadPath.resolve(image)
+            Files.copy(images[index].inputStream, imagePath)
+        }
+        return ResponseEntity.ok("El capítulo ${chapter.number} se ha creado correctamente")
 
     }
 
@@ -519,6 +522,7 @@ class AppController {
     fun showChapter(model: Model, @PathVariable sampleId: Long, @PathVariable number:Long): String {
         val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
         val chapters = chapterRepo.findAllBySampleId(sampleId)
+        model.addAttribute("imageNumberList", chapter.images.map { it.split("-").last().split(".").first() })
         model.addAttribute("chapter", chapter)
         model.addAttribute("chapters", chapters)
         model.addAttribute("urlSampleName", URLSampleName(chapter.sample as Sample))
@@ -538,21 +542,24 @@ class AppController {
         }
     }
 
-    @GetMapping("/images/samples/{id}/chapters/{number}")
-    fun getChapterImage(@PathVariable id: Long, @PathVariable number: Long): ResponseEntity<ByteArray> {
-        val chapter = chapterRepo.findBySampleIdAndNumber(id, number)
-        return if (chapter.imagePath() != null) {
-            val imagePath = Paths.get(chapter.imagePath() as String)
-            val image = Files.readAllBytes(imagePath)
-            ResponseEntity.ok().body(image)
-        } else{
+    @GetMapping("/images/samples/{sampleId}/chapters/{number}/{imageNumber}")
+    fun getChapterImages(@PathVariable sampleId: Long, @PathVariable number: Long,
+                         @PathVariable imageNumber: Number): ResponseEntity<ByteArray> {
+        val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
+        return if (chapter.imagesPathList().isNotEmpty()) {
+            val images = chapter.imagesPathList().map { imagePath ->
+                val image = Files.readAllBytes(Paths.get(imagePath))
+                image
+            }
+           ResponseEntity.ok(images[imageNumber.toInt()])
+        } else {
             val image = Files.readAllBytes(Paths.get("./resources/images/samples/default.png"))
-            ResponseEntity.ok().body(image)
+            ResponseEntity.ok(image)
         }
     }
 
     @GetMapping("/register_list")
-    fun ListForm(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
+    fun listForm(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder crear una lista")
             return "redirect:/login"

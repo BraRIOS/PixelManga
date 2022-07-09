@@ -126,13 +126,13 @@
                             </div>
 
                             <form th:action="${is_register == true}? '/perform_sample_register' : '/perform_sample_edit'" autocomplete="off" th:object="${sample}" method="post" enctype="multipart/form-data">
-                                <div class="input__item" style="width: auto">
+                                <div class="input__item">
                                     <input type="text" name="name" required placeholder="Nombre de ejemplar" th:value="${sample.name}" minlength="2">
                                     <span class="icon_pencil"></span>
                                 </div>
                                     <textarea name="synopsis" placeholder="Descripción / sinopsis del ejemplar"
                                               th:text="${sample.synopsis}" maxlength="2000"></textarea>
-                                <div class="input__item" style="width: auto">
+                                <div class="input__item">
                                     <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}"
                                            placeholder="Fecha de publicacion" th:value="${sample.publicationDate}" required>
                                     <span class="icon_calendar"></span>

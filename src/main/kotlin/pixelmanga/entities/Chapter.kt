@@ -18,18 +18,25 @@ open class Chapter {
     @JoinColumn(name = "sample_id", nullable = false)
     open var sample: Sample? = null
 
-    @Column(name = "image", nullable = false)
-    open var image: String? = null
-
     @Column(name = "number")
     open var number: Long? = null
 
+    @ElementCollection
+    @CollectionTable(name = "chapters_images", joinColumns = [JoinColumn(name = "chapter_id")])
+    @Column(name = "image")
+    open var images: MutableList<String> = mutableListOf()
+
     @Transient
-    open fun imagePath(): String? {
-        return if (image != null) {
-            "${sample?.samplePath()}/chapters/$number/$image"
+    open fun path(): String {
+        return if (id != null) {
+            "${sample?.path()}/chapters/$number"
         } else {
-            null
+            ""
         }
+    }
+
+    @Transient
+    open fun imagesPathList(): List<String> {
+        return images.map { "${path()}/$it" }
     }
 }
