@@ -599,7 +599,7 @@ class AppController {
         val list = listRepo.findByUser_Username(authentication.name)
         model.addAttribute("list", list)
         model.addAttribute("is_lists", true)
-        return "lists"
+        return "user_lists"
     }
 
     @PostMapping("/add_sample_to_list")
