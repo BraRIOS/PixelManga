@@ -111,7 +111,7 @@
             <div class="anime__details__content">
                 <div class="row">
                     <div class="col-lg-3 col-md-3 text-center">
-                        <img class="anime__details__pic" th:src="${sample.id != null}? '/images/samples/'+${sample.id} : '/static/images/img.png'" id="thumbnail"
+                        <img class="anime__details__pic" th:src="${sample.id != null}? '/images/samples/'+${sample.id} : '/static/images/default.png'" id="thumbnail"
                              onclick="open_explorer();">
                         <div class="view" style="color: white" th:if="${!is_register}">Editar portada</div>
                     </div>
@@ -260,14 +260,18 @@
         });
 
         function showImageThumbnail(fileInput){
+            let validImageTypes = ['image/jpeg', 'image/png'];
             file = fileInput.files[0];
             reader = new FileReader();
 
+            if (!validImageTypes.includes(file.type)) {
+                alert("Comprueba que el archivo " + file.name + " es una imágen válida (JPEG o PNG)");
+            } else {
             reader.onload = function (e) {
                 $('#thumbnail').attr('src', e.target.result);
             };
 
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file);}
         }
 
         function open_explorer(){
