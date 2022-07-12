@@ -139,16 +139,44 @@ class AppController {
         return "profile"
     }
 
-    @GetMapping("/profile/edit")
-    fun showProfileEdit(model: Model, ra: RedirectAttributes): String {
+    @PostMapping("/profile_edit") //TODO: editar perfil
+    fun editUser(user: User, redirectAttributes: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-        if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            ra.addFlashAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
-            return "redirect:/login"
+        val userDB = userRepo.findByUsername(authentication?.name as String) as User
+
+        if (!checkUsernameAvailable(user.username as String) && !checkEmailAvailable(user.email as String) && user.username != userDB.username && user.email != userDB.email) {
+            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' y el email: '${user.email}' ya estan en uso")
+            return "redirect:/profile"
         }
-        val user = userRepo.findByUsername(authentication.name)
-        model.addAttribute("user", user)
-        return "profile_edit"
+        if (!checkEmailAvailable(user.email as String) && user.email != userDB.email) {
+            redirectAttributes.addFlashAttribute("error", "El email: '${user.email}' ya esta en uso")
+            return "redirect:/profile"
+        }
+        if (!checkUsernameAvailable(user.username as String) && user.username != userDB.username) {
+            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' ya esta en uso")
+            return "redirect:/profile"
+        }
+        val passwordEncoder = BCryptPasswordEncoder()
+        val encodedPassword = passwordEncoder.encode(user.password)
+        userDB.password = encodedPassword
+        userDB.username = user.username
+        userDB.email = user.email
+        userRepo.save(user)
+
+        redirectAttributes.addFlashAttribute("message", "Has modificado tus datos correctamente")
+        return "redirect:/profile"
+    }
+
+    @PostMapping("/profile_delete")
+    fun deleteUser(redirectAttributes: RedirectAttributes): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        val userDB = userRepo.findByUsername(authentication?.name as String) as User
+        userDB.roles.remove(roleRepo.findByName("USER"))
+        userDB.roles.remove(roleRepo.findByName("AUTHOR"))
+        userRepo.delete(userDB)
+        redirectAttributes.addFlashAttribute("message", "Has eliminado tu cuenta correctamente")
+        SecurityContextHolder.getContext().authentication = null
+        return "redirect:/home"
     }
 
     @PostMapping("/make_author")
