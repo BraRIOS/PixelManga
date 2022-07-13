@@ -122,7 +122,7 @@ ol {
 	top: -6px;
 	height: 32px;
 	width: 4px;
-	background: #e53637;
+	background: #9b6bf2;
 	content: "";
 }
 
@@ -171,7 +171,7 @@ ol {
 .site-btn {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	font-weight: 700;
 	border: none;
 	border-radius: 2px;
@@ -179,6 +179,11 @@ ol {
 	text-transform: uppercase;
 	display: inline-block;
 	padding: 12px 30px;
+}
+
+.site-btn:hover {
+	background: #5E4399;
+	color: #ffffff;
 }
 
 /* Preloder */
@@ -338,7 +343,7 @@ ol {
 }
 
 .header__menu ul li.active a {
-	background: #e53637;
+	background: #9b6bf2;
 	color: #ffffff;
 }
 
@@ -471,7 +476,7 @@ ol {
 
 .hero__text .label {
 	font-size: 13px;
-	color: #e53637;
+	color: #9b6bf2;
 	background: #ffffff;
 	padding: 5px 14px 3px;
 	display: inline-block;
@@ -523,7 +528,7 @@ ol {
 .hero__text a span {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	font-weight: 700;
 	letter-spacing: 2px;
@@ -536,7 +541,7 @@ ol {
 .hero__text a i {
 	font-size: 20px;
 	display: inline-block;
-	background: #e53637;
+	background: #9b6bf2;
 	padding: 11px 5px 16px 8px;
 	color: #ffffff;
 	border-radius: 0 4px 4px 0;
@@ -760,7 +765,7 @@ ol {
 .product__item__pic .ep {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	padding: 2px 12px;
 	border-radius: 4px;
@@ -834,7 +839,7 @@ ol {
 	top: -6px;
 	height: 32px;
 	width: 4px;
-	background: #e53637;
+	background: #9b6bf2;
 	content: "";
 }
 
@@ -876,7 +881,7 @@ ol {
 .product__sidebar__view__item .ep {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	padding: 2px 12px;
 	border-radius: 4px;
@@ -1393,7 +1398,7 @@ ol {
 .anime__details__btn .follow-btn {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	font-weight: 700;
 	letter-spacing: 2px;
@@ -1404,14 +1409,14 @@ ol {
 }
 
 .follow-btn:hover {
-	background: #CC3131;
-	border-color: #A62828;
+	background: #5E4399;
+	border-color: #5E4399;
 }
 
 .anime__details__btn .watch-btn span {
 	font-size: 13px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	font-weight: 700;
 	letter-spacing: 2px;
@@ -1424,10 +1429,15 @@ ol {
 .anime__details__btn .watch-btn i {
 	font-size: 20px;
 	display: inline-block;
-	background: #e53637;
+	background: #9b6bf2;
 	padding: 11px 5px 16px 8px;
 	color: #ffffff;
 	border-radius: 0 4px 4px 0;
+}
+
+.anime__details__btn .watch-btn:hover {
+	background: #5E4399;
+	border-color: #5E4399;
 }
 
 .anime__details__review {
@@ -1506,10 +1516,15 @@ ol {
 	font-weight: 700;
 	letter-spacing: 2px;
 	text-transform: uppercase;
-	background: #e53637;
+	background: #9b6bf2;
 	border: none;
 	padding: 10px 15px;
 	border-radius: 2px;
+}
+
+.anime__details__form form button:hover {
+	background: #5E4399;
+	border-color: #5E4399;
 }
 
 /*---------------------
@@ -1640,7 +1655,7 @@ ol {
 
 .breadcrumb__links a i {
 	margin-right: 5px;
-	color: #e53637;
+	color: #9b6bf2;
 }
 
 .breadcrumb__links a:after {
@@ -1737,7 +1752,7 @@ ol {
 }
 
 .blog__item__text p span {
-	color: #e53637;
+	color: #9b6bf2;
 	margin-right: 5px;
 }
 
@@ -1967,7 +1982,7 @@ ol {
 }
 
 .blog__details__comment__item__text a:hover {
-	background: #e53637;
+	background: #5E4399;
 }
 
 .blog__details__form {
@@ -2183,8 +2198,12 @@ ol {
 }
 
 .login__register .primary-btn {
-	background: #e53637;
+	background: #9b6bf2;
 	padding: 12px 42px;
+}
+
+.login__register .primary-btn:hover {
+	background: #5E4399;
 }
 
 .login__social {
@@ -2266,7 +2285,7 @@ ol {
 }
 
 .signup .login__form h5 a {
-	color: #e53637;
+	color: #9b6bf2;
 	font-weight: 700;
 }
 
@@ -2311,7 +2330,7 @@ ol {
 	color: #ffffff;
 	height: 50px;
 	width: 50px;
-	background: #e53637;
+	background: #9b6bf2;
 	line-height: 50px;
 	text-align: center;
 	border-radius: 50%;
@@ -2352,7 +2371,7 @@ ol {
 }
 
 .footer__copyright__text a {
-	color: #e53637;
+	color: #9b6bf2;
 }
 
 /*--------------------------------- Responsive Media Quaries -----------------------------*/
@@ -2865,7 +2884,7 @@ input[type="radio" i]{
 	background-color: #111;
 	color: #fff;
 	outline: none;
-	border-color: #e53637;
+	border-color: #9b6bf2;
 	line-height: 1.5;
 	height: 100%;
 	width: 100%;
@@ -2889,7 +2908,7 @@ input[type="radio" i]{
 .search-btn{
 	font-size: 15px;
 	color: #ffffff;
-	background: #e53637;
+	background: #9b6bf2;
 	display: inline-block;
 	font-weight: 700;
 	letter-spacing: 2px;
@@ -2897,6 +2916,10 @@ input[type="radio" i]{
 	padding: 14px 20px;
 	border-radius: 0 30px 30px 0;
 	border : none;
+}
+
+search-btn:hover{
+	background: #5E4399;
 }
 
 .filters {
@@ -2917,7 +2940,7 @@ input[type="radio" i]{
 }
 
 .button.is-red {
-	background-color: #e53637;
+	background-color: #9b6bf2;
 	border-color: transparent;
 	color: #fff;
 }
@@ -3023,7 +3046,7 @@ input[type="radio" i]{
 
 .card-element-header {
 	cursor: move;
-	color: #e53637;
+	color: #9b6bf2;
 }
 /*-------------/
 
@@ -3108,5 +3131,5 @@ Thumbnail list
 }
 
 .list-color{
-	color: #e53637;
+	color: white;
 }
