@@ -170,15 +170,11 @@ class AppController {
             return "redirect:/login"
         }
         val userDB = userRepo.findByUsername(authentication.name) as User
-        if (!checkUsernameAvailable(user.username as String) && !checkEmailAvailable(user.email as String) && user.username != userDB.username && user.email != userDB.email) {
-            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' y el email: '${user.email}' ya estan en uso")
-            return "redirect:/profile"
-        }
-        if (!checkEmailAvailable(user.email as String) && user.email != userDB.email) {
+        if (!checkEmailAvailable(user.email as String)) {
             redirectAttributes.addFlashAttribute("error", "El email: '${user.email}' ya esta en uso")
             return "redirect:/profile"
         }
-        if (!checkUsernameAvailable(user.username as String) && user.username != userDB.username) {
+        if (!checkUsernameAvailable(user.username as String)) {
             redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' ya esta en uso")
             return "redirect:/profile"
         }
@@ -186,8 +182,8 @@ class AppController {
         userDB.email = user.email
         val passwordEncoder = BCryptPasswordEncoder()
         val encodedPassword = passwordEncoder.encode(user.password)
-        user.password = encodedPassword
-        userDB.password = user.password
+        userDB.password = encodedPassword
+        userDB.birthDate = user.birthDate
         saveImage(image, userDB)
         userRepo.save(userDB)
         redirectAttributes.addFlashAttribute("message", "Se ha editado correctamente")
