@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+    <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -143,10 +145,11 @@
                             <div class="input__item">
                                 <input type="password" id="password" name="password" required placeholder="Contraseña">
                                 <span class="icon_lock"></span>
+                                <i class="toggle-password fas fa-fw fa-eye-slash" style="position: absolute; top: 32%; left: 92%; color: #b7b7b7;"></i>
                             </div>
                             <button type="submit" class="site-btn">Acceder</button>
                         </form>
-                        <a href="#" class="forget_pass">¿Olvidaste tu contraseña?</a>
+                        <!--a href="#" class="forget_pass">¿Olvidaste tu contraseña?</a-->
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -199,7 +202,18 @@
     <script src="/static/js/jquery.nice-select.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/main.js"></script>
+    <script>
+        $("body").on('click', '.toggle-password', function() {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            let input = $("#password");
+            if (input.attr("type") === "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
 
+        });
+    </script>
 
 </body>
 
