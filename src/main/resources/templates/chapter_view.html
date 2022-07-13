@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns="http://www.w3.org/1999/html">
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="Anime Template">
@@ -39,11 +37,9 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-3">
-                    <div class="header__logo">
-                        <a href="/home">
-                            <img src="/static/images/logo.png" alt="">
-                        </a>
-                    </div>
+                    <a href="/home">
+                        <img src="/static/images/logo.jpg" alt="">
+                    </a>
                 </div>
                 <div class="col-lg-9">
                     <div class="header__nav">
@@ -153,13 +149,26 @@
                     <i class="fas fa-link fa-fw"></i> Compartir
                 </button>
                 <script>
-                    function copyToClipboard() {
-                        let copyText = document.getElementById("copyToClipboard").data('url');
-                        copyText.select();
-                        copyText.setSelectionRange(0, 99999);
-                        document.execCommand("copy");
-                        alert("Copiado al portapapeles");
-                    }
+                    const copyToClipboard = str => {
+                        const el = document.createElement('textarea');  // Create a <textarea> element
+                        el.value = str;                                 // Set its value to the string that you want copied
+                        el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+                        el.style.position = 'absolute';
+                        el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+                        document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+                        const selected =
+                            document.getSelection().rangeCount > 0        // Check if there is any content selected previously
+                                ? document.getSelection().getRangeAt(0)     // Store selection if found
+                                : false;                                    // Mark as false to know no selection existed before
+                        el.select();                                    // Select the <textarea> content
+                        document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+                        document.body.removeChild(el);                  // Remove the <textarea> element
+                        if (selected) {                                 // If a selection existed before copying
+                            document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
+                            document.getSelection().addRange(selected);   // Restore the original selection
+                        }
+                        alert('Enlace copiado en el portapapeles');
+                    };
                 </script>
             </div>
             <div class="col-6 col-sm-2 order-2 order-sm-3 chapter-arrow chapter-next">
@@ -182,29 +191,31 @@
             </div>
         </nav>
     </section>
-    <div class="container">
-        <div id="disqus_thread m-5"></div>
-    </div>
-    <script>
-        /**
-         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-            var d = document, s = d.createElement('script');
-            s.src = 'https://pixelmanga.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', +new Date());
-            (d.head || d.body).appendChild(s);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    <!-- Anime Section End -->
+    <section>
+        <div class="container mt-4 mb-4">
+            <div id="disqus_thread"></div>
+            <script>
+                /**
+                 *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                 *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+                /*
+                var disqus_config = function () {
+                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                };
+                */
+                (function() { // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+                    s.src = 'https://pixelmanga.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            <!-- Anime Section End -->
+        </div>
 
+    </section>
     <!-- Footer Section Begin -->
     <footer class="footer">
         <div class="page-up">
@@ -223,7 +234,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </footer>
     <!-- Footer Section End -->

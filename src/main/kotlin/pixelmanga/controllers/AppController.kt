@@ -195,7 +195,7 @@ class AppController {
     }
 
     @GetMapping("/profile/delete")
-fun deleteProfile(ra: RedirectAttributes): String {
+    fun deleteProfile(ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder eliminar tu perfil")

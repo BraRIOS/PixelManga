@@ -32,14 +32,12 @@
 <header class="header">
     <div class="container">
         <div class="row">
-            <div class="col-lg-2">
-                <div class="header__logo">
-                    <a href="/home">
-                        <img src="/static/images/logo.png" alt="">
-                    </a>
-                </div>
+            <div class="col-lg-3">
+                <a href="/home">
+                    <img src="/static/images/logo.jpg" alt="" >
+                </a>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <div class="header__nav">
                     <nav class="header__menu mobile-menu">
                         <ul>
@@ -129,18 +127,22 @@
                         <h3 th:text="*{username}"></h3>
                     </div>
                     <div class="anime__details__rating">
-                        <div class="anime__details__btn" sec:authorize="hasAuthority('AUTHOR')">
+                        <div class="anime__details__btn">
                             <a class="btn follow-btn" th:href="@{'/profile/edit'}"><i class="fa fa-edit fa-fw"></i> Editar Perfil</a>
                         </div>
                     </div>
                     <div class="anime__details__widget">
                         <div class="row">
-                            <div class="col-lg-12 col-md-12">
+                            <div class="col-lg-12 col-md-12 mb-4">
                                 <h5 class="text-white">Roles:</h5>
                                 <h5 class="badge badge-pill badge-info py-2 px-3 mt-3" th:each="rol : ${roles}"
                                       th:text="${rol}">
                                 </h5>
-                                <span class="badge badge-pill badge-grey py-2 px-3">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 mb-4">
+                                <span th:if="*{birthDate}" class="badge badge-pill badge-grey py-2 px-3">
                                     <i class="fa fa-birthday-cake fa-fw"></i>
                                     <span th:text="*{birthDate}"></span>
                                 </span>

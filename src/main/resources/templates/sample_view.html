@@ -35,14 +35,12 @@
     <header class="header">
         <div class="container">
             <div class="row">
-                <div class="col-lg-2">
-                    <div class="header__logo">
-                        <a href="/home">
-                            <img src="/static/images/logo.png" alt="">
-                        </a>
-                    </div>
+                <div class="col-lg-3">
+                    <a href="/home">
+                        <img src="/static/images/logo.jpg" alt="" >
+                    </a>
                 </div>
-                <div class="col-lg-8">
+                <div class="col-lg-7">
                     <div class="header__nav">
                         <nav class="header__menu mobile-menu">
                             <ul>
@@ -346,31 +344,33 @@
             }
         });
         /*]]>*/
+    </script>
+    <script>
         let votes = [1,2,3,4,5,6,7,8,9,10];
         let voteText = document.getElementById("vote")
         votes.forEach(vote => {
             $("#votebar-"+vote).click(
-            function () {
-                document.getElementById("makeVote").click()
-            })
+                function () {
+                    document.getElementById("makeVote").click()
+                })
             $("#label-"+vote).hover(
-            function() {
-                //console.log(vote)
-                voteText.innerHTML = vote.toString();
-                voteText.style.color = "#FF7D3A";
-                voteText.style.fontSize = "1.2rem";
-            },
-            function() {
-                document.getElementById("vote").innerHTML = "";
+                function() {
+                    //console.log(vote)
+                    voteText.innerHTML = vote.toString();
+                    voteText.style.color = "#FF7D3A";
+                    voteText.style.fontSize = "1.2rem";
+                },
+                function() {
+                    document.getElementById("vote").innerHTML = "";
+                })
+        })
+        /*$(document).ready(function(){
+            $('.user-list-select').select2({
+                placeholder: "Seleccione la lista",
+                allowClear: true,
+                width:'style'
             })
-        })
-
-        $('.user-list-select').select2({
-            placeholder: "Seleccione la lista",
-            allowClear: true,
-            width:'style'
-        })
-
+        })*/
     </script>
 </body>
 </html>
