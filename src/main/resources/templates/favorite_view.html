@@ -232,7 +232,7 @@
             let samples = [[${list_samples_id}]];
             for (let i = 0; i < samples.length; i++) {
                 $.get("/sample_average_rate", {sampleId: samples[i]}, function (data) {
-                    console.log(data);
+                    //console.log(data);
                     $("#" + samples[i]).append(data);
                 });
             }

@@ -30,6 +30,22 @@
         $(this).css('background-image', 'url(' + bg + ')');
     });
 
+    /*------------------
+        Thumbnails
+    ------------------*/
+    $('.thumbnail-list').each(function () {
+        let id = parseInt($(this).data('id'))
+        let style = document.createElement('style');
+        style.textContent= `
+                .list-thumbnail-${id}::before{
+                    background-image: url('/images/lists/${id}');
+                }
+            `;
+        $(this).addClass(`list-thumbnail-${id}`);
+        $(this).removeClass('thumbnail-list');
+        $(this).append(style);
+    });
+
     // Search model
     $('.search-switch').on('click', function () {
         $('.search-model').fadeIn(400);

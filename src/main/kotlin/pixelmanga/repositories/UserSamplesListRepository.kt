@@ -8,6 +8,6 @@ interface UserSamplesListRepository : JpaRepository<UserSamplesList, Long> {
 
 
     @Query("select u from UserSamplesList u where u.user.username = ?1")
-    fun findByUser_Username(username: String): List<UserSamplesList>
+    fun findAllByUser_Username(username: String): List<UserSamplesList>
 
 }

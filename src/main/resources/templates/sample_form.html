@@ -8,7 +8,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pixelmanga | Sample</title>
+    <title th:text="${is_register}? 'Nuevo Ejemplar  | PIXELmanga': 'Editar - '+${sample.name}+' - '+${type.substring(0,1).toUpperCase()+type.substring(1)}+' | PIXELmanga'"></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -111,7 +111,7 @@
             <div class="anime__details__content">
                 <div class="row">
                     <div class="col-lg-3 col-md-3 text-center">
-                        <img class="anime__details__pic" th:src="${sample.id != null}? '/images/samples/'+${sample.id} : '/static/images/default.png'" id="thumbnail"
+                        <img class="anime__details__pic" th:src="${is_register}?'./static/images/no-cover.png':'/images/samples/'+${sample.id}" id="thumbnail"
                              onclick="open_explorer();">
                         <div class="view" style="color: white" th:if="${!is_register}">Editar portada</div>
                     </div>
@@ -121,7 +121,7 @@
                             <h3 th:if="${!is_register}">Editar ejemplar</h3>
                             <div class="anime__details__rating" th:if="${!is_register}">
                                 <div class="anime__details__btn">
-                                    <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name.replaceAll('\s|\\|\/','-').replace('?','')}+'/delete'}"><i class="fa fa-exclamation-circle"></i> Eliminar</a>
+                                    <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+*{name.replaceAll('\s|\\|\/','-').replace('?','')}+'/delete'}"><i class="fa fa-trash fa-fw"></i> Eliminar</a>
                                 </div>
                             </div>
 
@@ -134,7 +134,7 @@
                                               th:text="${sample.synopsis}" maxlength="2000"></textarea>
                                 <div class="input__item">
                                     <input type="date" id="publication_date" name="publication_date" th:field ="*{publicationDate}"
-                                           placeholder="Fecha de publicacion" th:value="${sample.publicationDate}" required>
+                                           placeholder="Fecha de publicación" th:value="${sample.publicationDate}" required>
                                     <span class="icon_calendar"></span>
                                 </div>
 
@@ -169,7 +169,7 @@
                                 </div>
                                 <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"
                                        style="display: none;">
-                                <button type="submit" class="site-btn text-center">Subir</button>
+                                <button type="submit" class="site-btn text-center"><i class="fa fa-upload"></i>Subir</button>
                             </form>
                             </div>
                         </div>
@@ -216,10 +216,7 @@
         <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/player.js"></script>
-    <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
-    <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/select2.min.js"></script>
 
@@ -244,7 +241,7 @@
             })
 
             let genres = "[[${sample_genres}]]".replace(/\[|\]/g,'').split(",").map(item => item.trim())
-            console.log(genres)
+            //console.log(genres)
 
             $('.select-genres').select2({
                 placeholder: "Seleccione los géneros",

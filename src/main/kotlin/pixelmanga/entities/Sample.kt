@@ -1,12 +1,13 @@
 package pixelmanga.entities
 
 import org.hibernate.Hibernate
+import org.springframework.web.multipart.MultipartFile
 import java.sql.Date
 import javax.persistence.*
 
 @Entity
 @Table(name = "samples")
-open class Sample {
+open class Sample: Pathable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,25 +35,28 @@ open class Sample {
     @Column(name = "cover")
     open var cover: String? = null
 
-
+    @Transient
+    override fun path(): String? {
+        val type = attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
+        return "./resources/images/samples/$type/$id"
+    }
 
     @Transient
-    open fun coverPath(): String? {
-        return if (cover != null) {
+    override fun imagePath(): String {
+        return if (existsImage()) {
             path()+"/"+cover
         } else {
-            null
+            "./resources/images/defaults/no-cover.png"
         }
     }
 
     @Transient
-    open fun path(): String? {
-        return if (id != null) {
-            val type = attributes.first { attribute -> attribute.type?.name == "tipo de libro" }.name
-            "./resources/images/samples/$type/$id"
-        } else {
-            null
-        }
+    override fun existsImage(): Boolean = cover != null
+
+    @Transient
+    override fun setPersonalizedImageName(image: MultipartFile) {
+        val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
+        cover = "${regex.replace(name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
     }
 
     override fun equals(other: Any?): Boolean {

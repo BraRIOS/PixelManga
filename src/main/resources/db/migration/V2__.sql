@@ -2,7 +2,7 @@ INSERT INTO `roles` (`name`) VALUES ('USER');
 INSERT INTO `roles` (`name`) VALUES ('AUTHOR');
 INSERT INTO `roles` (`name`) VALUES ('ADMIN');
 
-INSERT INTO `users` (`user_name`, `email`, `password`,`born_year`) VALUES ('admin', 'admin@admin','$2a$12$O32kJafSfDDPYReIVPp9NOhmfDz.zmWrpY419jFqnoN1jg9pOUxze', 0000);
+INSERT INTO pixelmanga.users (id, email, user_name, password, avatar, birth_date) VALUES (1, 'admin@admin', 'admin', '$2a$12$O32kJafSfDDPYReIVPp9NOhmfDz.zmWrpY419jFqnoN1jg9pOUxze', null, '2022-01-01');
 
 INSERT INTO `users_roles` (`user_id`, `role_id`) VALUES (1, 3);
 INSERT INTO `users_roles` (`user_id`, `role_id`) VALUES (1, 2);

@@ -42,9 +42,6 @@ h6 {
 	font-family: "Mulish", sans-serif;
 }
 
-h1 {
-	font-size: 70px;
-}
 
 h2 {
 	font-size: 36px;
@@ -136,7 +133,7 @@ ol {
 }
 
 .spad {
-	padding-top: 100px;
+	padding-top: 80px;
 	padding-bottom: 100px;
 }
 
@@ -1049,7 +1046,7 @@ ol {
 -----------------------*/
 
 .anime-details {
-	padding-top: 60px;
+	padding-top: 40px;
 }
 
 .anime__details__content {
@@ -1386,7 +1383,6 @@ ol {
 
 .anime__details__widget ul li span {
 	color: #b7b7b7;
-	width: 115px;
 	display: inline-block;
 }
 .anime__details__btn.has-element-left a{
@@ -1405,6 +1401,11 @@ ol {
 	padding: 14px 20px;
 	border-radius: 4px;
 	margin-right: 11px;
+}
+
+.follow-btn:hover {
+	background: #CC3131;
+	border-color: #A62828;
 }
 
 .anime__details__btn .watch-btn span {
@@ -2719,6 +2720,10 @@ textarea::placeholder{
 	color: #b7b7b7;
 }
 
+.badge{
+	color: white;
+}
+
 .badge.badge-manga, .bg-manga{
 	background-color: #7986cb;
 }
@@ -2734,6 +2739,19 @@ textarea::placeholder{
 .badge.badge-novela, .bg-novela{
 	background-color: #e57373;
 }
+
+.badge.badge-grey, .bg-grey{
+	background-color: rgba(34,34,34,.35);
+}
+
+.badge.badge-list, .bg-list {
+	background-color: #ba68c8;
+}
+
+.badge.badge-user, .bg-user{
+	background-color: #2957ba;
+}
+
 
 div.vote-input {
 	display: inline-flex;
@@ -3019,19 +3037,22 @@ Thumbnail list
 	width: 100%;
 	overflow: hidden;
 }
+.thumbnail::before {
+	background-size: cover;
+	width: 100%;
+	height: 100%;
+	content: "";
+	position: absolute;
+	background-position: 50%;
+	opacity: .9;
+	z-index: 0;
+}
 
 .thumbnail.list {
 	height: 12.25rem;
 }
 .thumbnail.list:before {
 	opacity: .65;
-	background-size: cover;
-	width: 100%;
-	height: 100%;
-	content: "";
-	position: absolute;
-	background-position: center;
-	z-index: 0;
 }
 .thumbnail.list-bg{
 	background-image: radial-gradient(at 10% 30%,#424375 0,#252642 100%);
@@ -3062,6 +3083,9 @@ Thumbnail list
 	overflow: hidden;
 	z-index: 1;
 }
+.thumbnail .thumbnail-description p{
+	color: #fff;
+}
 .text-truncate {
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -3081,4 +3105,8 @@ Thumbnail list
 	z-index: 1;
 	bottom: 0;
 	text-align: right;
+}
+
+.list-color{
+	color: #e53637;
 }

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Anime Template">
+    <meta name="keywords" content="Anime, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title th:text="'Información - '+${user.username}+' - Usuarios | PIXELmanga'"></title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+</head>
+
+<body>
+<!-- Page Preloder -->
+<div id="preloder">
+    <div class="loader"></div>
+</div>
+
+<!-- Header Section Begin -->
+<header class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="header__logo">
+                    <a href="/home">
+                        <img src="/static/images/logo.png" alt="">
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="header__nav">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                            <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                            <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
+                            <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="header__right">
+                    <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
+                    <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
+                    <a href="#" class="search-switch"><span class="icon_search"></span></a>
+                    <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
+                    <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
+                    <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu-wrap"></div>
+    </div>
+</header>
+<!-- Header End -->
+<!-- Msg notification -->
+
+<div class="row" th:if="${message}">
+    <div class="col-sm-12">
+        <div class="alert fade alert-simple alert-success alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show">
+            <button type="button" class="close font__size-18" data-dismiss="alert">
+									<span aria-hidden="true"><a>
+                    <i class="fa fa-times greencross"></i>
+                    </a></span>
+                <span class="sr-only">Close</span>
+            </button>
+            <strong class="font__weight-semibold" th:text="${message}"></strong>
+        </div>
+    </div>
+</div>
+
+<div class="row" th:if="${error}">
+    <div class="col-sm-12">
+        <div class="alert fade alert-simple alert-danger alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
+            <button type="button" class="close font__size-18" data-dismiss="alert">
+									<span aria-hidden="true">
+										<i class="fa fa-times danger "></i>
+									</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <strong class="font__weight-semibold" th:text="${error}"></strong>
+        </div>
+    </div>
+</div>
+
+<div class="row" th:if="${info}">
+    <div class="col-sm-12">
+        <div class="alert fade alert-simple alert-warning alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
+            <button type="button" class="close font__size-18" data-dismiss="alert">
+									<span aria-hidden="true">
+										<i class="fa fa-times warning"></i>
+									</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <i class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>
+            <strong class="font__weight-semibold" th:text="${info}"></strong>
+        </div>
+    </div>
+</div>
+
+<!-- Msg notification End-->
+
+<!-- Anime Section Begin -->
+<section class="anime-details spad" th:object="${user}">
+    <header class="container">
+        <div class="row anime__details__content mb-2">
+            <div class="col 12 col-md-3 text-center" >
+                <h1 class="book-type bg-manga mt-2 bg-user">USUARIO</h1>
+                <div class="book__details__thumbnail">
+                    <img class="book-thumbnail" src="" th:src="'/images/users/'+${user.id}+'/avatar'">
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="anime__details__text">
+                    <div class="anime__details__title">
+                        <h3 th:text="*{username}"></h3>
+                    </div>
+                    <div class="anime__details__rating">
+                        <div class="anime__details__btn" sec:authorize="hasAuthority('AUTHOR')">
+                            <a class="btn follow-btn" th:href="@{'/profile/edit'}"><i class="fa fa-edit fa-fw"></i> Editar Perfil</a>
+                        </div>
+                    </div>
+                    <div class="anime__details__widget">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                                <h5 class="text-white">Roles:</h5>
+                                <h5 class="badge badge-pill badge-info py-2 px-3 mt-3" th:each="rol : ${roles}"
+                                      th:text="${rol}">
+                                </h5>
+                                <span class="badge badge-pill badge-grey py-2 px-3">
+                                    <i class="fa fa-birthday-cake fa-fw"></i>
+                                    <span th:text="*{birthDate}"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main role="main" class="container-fluid element-body p-0">
+        <div class="container p-0 p-sm-2">
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 mt-2 d-flex justify-content-between">
+                            <h2 class="list-color">Mis Listas</h2>
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createListModal"><i class="fa fa-plus"></i> Crear nueva lista y añadir</button>
+                        </div>
+                        <div th:if="${user_lists.isEmpty()}" class="col-12 text-center my-5">
+                            <h3 class="text-dark"><i class="fa fa-times fa-5x"></i></h3>
+                            <h5>No hay elementos</h5>
+                        </div>
+                        <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${user_lists}">
+                            <a th:href="'/lists/'+${list.id}">
+                                <div th:data-id="${list.id}" class="thumbnail list list-bg thumbnail-list">
+                                    <div class="thumbnail-title text-white">
+                                        <h5 class="text-truncate" th:text="${list.name}"></h5>
+                                    </div>
+                                    <div class="thumbnail-description">
+                                        <p class="text-truncate" th:text="${list.description}"></p>
+                                    </div>
+                                    <div class="thumbnail-container">
+                                        <span class="followers_count"><i class="fa fa-users fa-fw"></i> 0</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-12 mt-2 anime__details__btn">
+                            <a class="follow-btn" href="/profile/lists"><i class="fa fa-list fa-fw"></i> Ir a Mis Listas</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <h2 class="list-color">Listas Seguidas</h2>
+                        </div>
+                        <div class="col-12 text-center my-5">
+                            <h3 class="text*-dark"><i class="fa fa-times fa-5x"></i></h3>
+                            <h5>No hay elementos</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="createListModal" tabindex="-1" role="dialog" aria-labelledby="createListModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createListModalLabel">Crear nueva lista</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <form method="POST" th:action="@{/lists/create}" accept-charset="UTF-8" class="form-horizontal-edit">
+                                <div class="modal-body">
+                                    <div class="form-group row">
+                                        <label for="title" class="col-form-label col-12 col-sm-3">Título</label>
+                                        <div class="col-12 col-sm-9">
+                                            <input class="form-control" maxlength="255" placeholder="Nombre de la lista" required="required" name="listName" type="text" id="title">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                                    <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Crear</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+<!-- Anime Section End -->
+
+<!-- Footer Section Begin -->
+<footer class="footer">
+    <div class="page-up">
+        <a href="#" id="scrollToTopButton"><span class="arrow_carrot-up"></span></a>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="footer__nav">
+                    <ul>
+                        <li class="active"><a href="/home">Home</a></li>
+                        <li><a th:href="@{/library}">Biblioteca</a></li>
+                        <li><a href="/favorite">Siguiendo</a></li>
+                        <li><a href="#">Listas</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</footer>
+<!-- Footer Section End -->
+
+<!-- Search model Begin -->
+<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch"><i class="icon_close"></i></div>
+        <form class="search-model-form" action="/library">
+            <input type="text" id="search-input" placeholder="Busque aquí.....">
+        </form>
+    </div>
+</div>
+<!-- Search model end -->
+
+
+<!-- Js Plugins -->
+<script src="/static/js/jquery-3.3.1.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.nice-select.min.js"></script>
+<script src="/static/js/jquery.slicknav.js"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

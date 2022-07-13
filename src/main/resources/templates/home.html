@@ -265,7 +265,7 @@
         let latestSamples = [[${latest_samples}]];
         for (let i = 0; i < latestSamples.length; i++) {
             $.get("/sample_average_rate", {sampleId: latestSamples[i].id}, function (data) {
-                console.log(data);
+                //console.log(data);
                 $("#" + latestSamples[i].id).append(data);
             });
         }

@@ -7,7 +7,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title th:text="${sample.name}+' - '+${type}+' | PIXELmanga'"></title>
+    <title th:text="${sample.name}+' - '+${type.substring(0,1).toUpperCase()+type.substring(1)}+' | PIXELmanga'"></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -125,7 +125,7 @@
             <div class="anime__details__content">
                 <div class="row" style="margin-bottom: 12px">
                     <div class="col 12 col-md-3 text-center" >
-                        <h1 class="book-type bg-manga mt-2" th:classappend="'bg-'+${type}" th:text="${type.toUpperCase()}"></h1>
+                        <h1 class="book-type mt-2" th:classappend="'bg-'+${type}" th:text="${type.toUpperCase()}"></h1>
                         <div class="book__details__thumbnail my-2">
                             <span class="score" th:id="${sample.id}">
                                 <i class="fa fa-star"></i>
@@ -175,7 +175,7 @@
                             </div>
                             <div class="anime__details__rating">
                                 <div class="anime__details__btn" sec:authorize="hasAuthority('AUTHOR')">
-                                <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/edit'}"><i class="fa fa-pencil"></i> Editar</a>
+                                <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/edit'}"><i class="fa fa-edit fa-fw"></i> Editar</a>
                                 </div>
                             </div>
                             <p th:text="*{synopsis}"></p>
@@ -183,7 +183,13 @@
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12">
                                         <ul>
-                                            <li th:text="'Fecha de publicación: '+*{publicationDate}"></li>
+                                            <li>
+                                                Fecha de publicación:
+                                                <span class="badge badge-pill badge-grey py-2 px-3">
+                                                    <i class="fa fa-calendar fa-fw"></i>
+                                                    <span th:text="*{publicationDate}"></span>
+                                                </span>
+                                            </li>
                                         </ul>
                                         <h5 style="color: #FFFFFF">Géneros</h5>
                                         <h6 style="display: inline-block;" th:each="genre : ${genres}">
@@ -194,8 +200,10 @@
                             </div>
                             <div class="anime__details__btn">
                                 <a href="#" id="favoriteBtn" class="follow-btn"><i th:classappend="${is_favorite? 'fa fa-heart' : 'fa fa-heart-o'}"></i> Favorito</a>
-                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')">Subir capítulo</a>
-                                <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" ><i class="fa fa-pencil"></i>Agregar a lista</a>
+                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')"><i class="fa fa-upload fa-fw"></i> Subir capítulo</a>
+                                <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" >
+                                    <i class="fa fa-pencil"></i>Agregar a lista
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -203,7 +211,8 @@
                     <div class="section-title">
                         <h5>Capítulos</h5>
                     </div>
-                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}" th:text="'Ep '+${chapter.number}+': '+${chapter.title}"></a>
+                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}"
+                       th:text="'Ep '+${chapter.number}+': '+${chapter.title}"></a>
                 </div>
                 </div>
                 <div class="row">
@@ -294,7 +303,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" href="/register_list" class="btn btn-secondary" data-bs-dismiss="modal">Nueva lista</a>
+                        <a type="button" href="/lists/create" class="btn btn-secondary">Nueva lista</a>
                         <button type="submit" class="btn btn-primary">Agregar</button>
                     </div>
                 </form>
@@ -322,12 +331,10 @@
     <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/player.js"></script>
     <script src="/static/js/jquery.nice-select.min.js"></script>
-    <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
-    <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/select2.min.js"></script>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -348,7 +355,7 @@
             })
             $("#label-"+vote).hover(
             function() {
-                console.log(vote)
+                //console.log(vote)
                 voteText.innerHTML = vote.toString();
                 voteText.style.color = "#FF7D3A";
                 voteText.style.fontSize = "1.2rem";

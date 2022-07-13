@@ -51,12 +51,12 @@ CREATE TABLE types
 
 CREATE TABLE users
 (
-    id        BIGINT AUTO_INCREMENT NOT NULL,
-    email     VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255) NOT NULL,
-    password  VARCHAR(255) NOT NULL,
-    born_year INT          NOT NULL,
-    icon      VARCHAR(255) NULL,
+    id         BIGINT AUTO_INCREMENT NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    user_name  VARCHAR(255) NOT NULL,
+    password   VARCHAR(255) NOT NULL,
+    birth_date date NULL,
+    avatar     VARCHAR(255) NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

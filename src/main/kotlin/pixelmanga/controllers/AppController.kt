@@ -26,6 +26,7 @@ import pixelmanga.repositories.*
 import pixelmanga.security.CustomUserDetails
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 import kotlin.io.path.exists
@@ -131,11 +132,21 @@ class AppController {
     fun showProfile(model: Model, ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tu perfil")
+            ra.addFlashAttribute("info", "Debes iniciar sesión para poder ver tu perfil")
             return "redirect:/login"
         }
-        val user = userRepo.findByUsername(authentication.name)
+        val user = userRepo.findByUsername(authentication.name) as User
+        val roles = user.roles.map{
+            role -> when(role.name){
+                "ADMIN" -> "Administrador"
+                "USER" -> "Lector"
+                "AUTHOR" -> "Autor"
+                else -> "Desconocido"
+            }
+        }
         model.addAttribute("user", user)
+        model.addAttribute("user_lists", listRepo.findAllByUser_Username(user.username as String))
+        model.addAttribute("roles", roles)
         return "profile"
     }
 
@@ -151,6 +162,39 @@ class AppController {
         return "profile_edit"
     }
 
+    @PostMapping("/profile/edit")
+    fun editProfile(user: User,@RequestParam("fileImage") image: MultipartFile, redirectAttributes: RedirectAttributes): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
+            return "redirect:/login"
+        }
+        val userDB = userRepo.findByUsername(authentication.name) as User
+        userDB.username = user.username
+        userDB.email = user.email
+        val passwordEncoder = BCryptPasswordEncoder()
+        val encodedPassword = passwordEncoder.encode(user.password)
+        user.password = encodedPassword
+        userDB.password = user.password
+        saveImage(image, userDB)
+        userRepo.save(userDB)
+        redirectAttributes.addFlashAttribute("message", "Se ha editado correctamente")
+        return "redirect:/profile"
+    }
+
+    @GetMapping("/profile/delete")
+fun deleteProfile(ra: RedirectAttributes): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder eliminar tu perfil")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        userRepo.delete(user)
+        ra.addFlashAttribute("message", "Se ha eliminado correctamente. Esperamos verte pronto")
+        return "redirect:/login"
+    }
+
     @PostMapping("/make_author")
     fun makeAuthor(authentication: Authentication): String {
         val user = userRepo.findByUsername(authentication.name) as User
@@ -164,40 +208,6 @@ class AppController {
         userRepo.save(user)
 
         return "redirect:/register_sample"
-    }
-
-    @GetMapping("/register_sample")
-    fun showSampleRegistrationForm(model: Model): String {
-        model.addAttribute("sample", Sample())
-        model.addAttribute("is_register", true)
-        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
-        model.addAttribute("all_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
-        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
-
-        return "sample_form"
-    }
-
-    @PostMapping("/perform_sample_register")
-    fun saveSample(sample: Sample, @RequestParam("type") type: String,
-                   @RequestParam("demography") demography:String, @RequestParam("fileImage") image: MultipartFile,
-                   @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
-
-        sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
-        sample.attributes.add(attributeRepo.findByName(type))
-        sample.attributes.add(attributeRepo.findByName(demography))
-
-        if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
-            ra.addFlashAttribute("error", "${sample.name} ya existe")
-            return "redirect:/register_sample"
-        }
-        sampleRepo.save(sample)
-
-        val id = sample.id as Long
-
-        saveSampleCover(type, id, image, sample)
-
-        ra.addFlashAttribute("message", "${sample.name} registrado correctamente")
-        return "redirect:/home"
     }
 
     @GetMapping("/library")
@@ -321,6 +331,38 @@ class AppController {
         return "library"
     }
 
+    @GetMapping("/register_sample")
+    fun showSampleRegistrationForm(model: Model): String {
+        model.addAttribute("sample", Sample())
+        model.addAttribute("is_register", true)
+        model.addAttribute("all_types", attributeRepo.findByType_Name("tipo de libro").sortedBy { it.name })
+        model.addAttribute("all_genres", attributeRepo.findByType_Name("género").sortedBy { it.name })
+        model.addAttribute("all_demographics", attributeRepo.findByType_Name("demografía").sortedBy { it.name })
+
+        return "sample_form"
+    }
+
+    @PostMapping("/perform_sample_register")
+    fun saveSample(sample: Sample, @RequestParam("type") type: String,
+                   @RequestParam("demography") demography:String, @RequestParam("fileImage") image: MultipartFile,
+                   @RequestParam("genres[]") genres: Array<String>, ra: RedirectAttributes): String {
+
+        sample.attributes.addAll(genres.map { attributeRepo.findByName(it) })
+        sample.attributes.add(attributeRepo.findByName(type))
+        sample.attributes.add(attributeRepo.findByName(demography))
+
+        if (sampleRepo.findByName(sample.name as String) != null && sampleRepo.findByName(sample.name as String)!!.attributes.contains(attributeRepo.findByName(type))) {
+            ra.addFlashAttribute("error", "${sample.name} ya existe")
+            return "redirect:/register_sample"
+        }
+        sampleRepo.save(sample)
+        saveImage(image, sample)
+        sampleRepo.save(sample)
+
+        ra.addFlashAttribute("message", "${sample.name} registrado correctamente")
+        return "redirect:/home"
+    }
+
     @GetMapping("/library/{type}/{id}/{name}")
     fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
         val sample = sampleRepo.findById(id).get()
@@ -330,7 +372,7 @@ class AppController {
 
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication != null || authentication !is AnonymousAuthenticationToken) {
-            model.addAttribute("user_sample_lists", listRepo.findByUser_Username((authentication as Authentication).name))
+            model.addAttribute("user_sample_lists", listRepo.findAllByUser_Username((authentication as Authentication).name))
             model.addAttribute("is_favorite", userRepo.existsByFavoriteSamples_IdAndUsername(id, authentication.name))
         }
         else {
@@ -373,12 +415,37 @@ class AppController {
         sampleToUpdate.attributes.addAll(genres.map { attributeRepo.findByName(it) })
         sampleToUpdate.attributes.add(attributeRepo.findByName(type))
         sampleToUpdate.attributes.add(attributeRepo.findByName(demography))
+        saveImage(image, sampleToUpdate)
         sampleRepo.save(sampleToUpdate)
-        saveSampleCover(type, id, image, sample)
 
         val urlSampleName = URLSampleName(sample)
         ra.addFlashAttribute("message", "Se han guardado los cambios de ${sample.name}")
         return "redirect:/library/$type/${sample.id}/$urlSampleName"
+    }
+
+    private fun saveImage(
+        image: MultipartFile,
+        pathable: Pathable
+    ) {
+        val uploadDir = pathable.path() as String
+
+        val uploadPath = Paths.get(uploadDir)
+        if (!uploadPath.exists()) {
+            uploadPath.toFile().mkdirs()
+        }
+
+        if (!image.isEmpty) {
+            if (pathable.existsImage()) {
+                val oldCover = Paths.get(pathable.imagePath())
+                if (oldCover.exists()) {
+                    oldCover.toFile().delete()
+                }
+            }
+            pathable.setPersonalizedImageName(image)
+
+            val imagePath = Paths.get(pathable.imagePath())
+            Files.copy(image.inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
+        }
     }
 
     @PostMapping("/user_rating_sample")
@@ -428,37 +495,6 @@ class AppController {
             }
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error")
-        }
-    }
-
-    private fun saveSampleCover(
-        type: String,
-        id: Long,
-        image: MultipartFile,
-        sample: Sample
-    ) {
-        val uploadDir = "./resources/images/samples/$type/$id"
-
-        val uploadPath = Paths.get(uploadDir)
-        if (!uploadPath.exists()) {
-            uploadPath.toFile().mkdirs()
-        }
-
-        if (!image.isEmpty) {
-            val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
-            val name = "${regex.replace(sample.name as String, "_")}-cover.${image.contentType?.split("/")?.last()}"
-
-            if (sample.cover != null) {
-                val oldCover = Paths.get(sample.coverPath() as String)
-                if (oldCover.exists()) {
-                    oldCover.toFile().delete()
-                }
-            }
-
-            sampleRepo.updateCoverById(name, id)
-
-            val imagePath = uploadPath.resolve(name)
-            Files.copy(image.inputStream, imagePath)
         }
     }
 
@@ -524,27 +560,50 @@ class AppController {
     }
 
     @GetMapping("/view/{type}/{sampleId}/{sampleName}/chapters/{number}")
-    fun showChapter(model: Model, @PathVariable sampleId: Long, @PathVariable number:Long): String {
+    fun showChapter(model: Model, @PathVariable type: String, @PathVariable sampleId: Long, @PathVariable number:Long,
+                    @PathVariable sampleName: String
+    ): String {
         val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
         val chapters = chapterRepo.findAllBySampleId(sampleId)
+        when(type){
+            "manga" -> model.addAttribute("reading_direction", "rtl")
+            else -> model.addAttribute("reading_direction", "ltr")
+        }
+        val prevChapter = chapters.find { it.number == number - 1 }?.number
+        if (prevChapter != null){
+            model.addAttribute("prev_chapter_url", "/view/$type/$sampleId/$sampleName/chapters/$prevChapter")
+        }
+        val nextChapter = chapters.find { it.number == number + 1 }?.number
+        if (nextChapter != null){
+            model.addAttribute("next_chapter_url", "/view/$type/$sampleId/$sampleName/chapters/$nextChapter")
+        }
         model.addAttribute("imageNumberList", chapter.images.map { it.split("-").last().split(".").first().toInt()})
         model.addAttribute("chapter", chapter)
-        model.addAttribute("chapters", chapters)
-        model.addAttribute("urlSampleName", URLSampleName(chapter.sample as Sample))
+        model.addAttribute("currentUrl", "/view/$type/$sampleId/$sampleName/chapters/$number")
+        model.addAttribute("sampleUrl", "/library/$type/$sampleId/$sampleName")
         return "chapter_view"
     }
 
+    @GetMapping("/images/users/{userId}/avatar")
+    fun getUserAvatar(@PathVariable userId: Long): ResponseEntity<ByteArray> {
+        val user = userRepo.findById(userId).get()
+        val imagePath = Paths.get(user.imagePath())
+        return ResponseEntity.ok(Files.readAllBytes(imagePath))
+    }
+
+
     @GetMapping("/images/samples/{id}")
-    fun getSampleImage(@PathVariable id: Long): ResponseEntity<ByteArray> {
+    fun getSampleCover(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val sample = sampleRepo.findById(id).get()
-        return if (sample.coverPath() != null) {
-            val imagePath = Paths.get(sample.coverPath() as String)
-            val image = Files.readAllBytes(imagePath)
-            ResponseEntity.ok().body(image)
-        } else{
-            val image = Files.readAllBytes(Paths.get("./resources/images/samples/default.png"))
-            ResponseEntity.ok().body(image)
-        }
+        val imagePath = Paths.get(sample.imagePath())
+        return ResponseEntity.ok().body(Files.readAllBytes(imagePath))
+    }
+
+    @GetMapping("/images/lists/{id}")
+    fun getListCover(@PathVariable id: Long): ResponseEntity<ByteArray> {
+        val list = listRepo.findById(id).get()
+        val imagePath = Paths.get(list.coverPath())
+        return ResponseEntity.ok().body(Files.readAllBytes(imagePath))
     }
 
     @GetMapping("/images/samples/{sampleId}/chapters/{number}/{imageNumber}")
@@ -563,43 +622,51 @@ class AppController {
         }
     }
 
-    @GetMapping("/register_list")
+    @GetMapping("/lists/create")
     fun listForm(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder crear una lista")
             return "redirect:/login"
         }
-        model.addAttribute("username", authentication.name)
         model.addAttribute("list", UserSamplesList())
         model.addAttribute("is_register", true)
         return "list_form"
     }
 
-    @PostMapping("/create_user_sample_list")
-    fun createUserSampleList(@RequestParam("user_name") userName: String,
+    @PostMapping("/lists/create")
+    fun createUserSampleList(authentication: Authentication,
                              @RequestParam("listName") listName: String,
-                             @RequestParam("listDescription") listDescription: String,
+                             @RequestParam("listDescription", required = false) listDescription: String?,
                              ra: RedirectAttributes): String {
-        val user = userRepo.findByUsername(userName)
+        val user = userRepo.findByUsername(authentication.name)
         val list = UserSamplesList()
         list.name= listName
         list.description= listDescription
         list.user= user
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha creado la lista ${list.name} correctamente")
-        return "redirect:/lists"
+        return "redirect:/lists/{id}".replace("{id}", list.id.toString())
     }
 
-    @GetMapping("/lists")
+    // TODO: Separar vista de listas del usuario (/profile/lists) de listas de todos los usuarios (/lists)
+    @GetMapping("/lists", "/profile/lists")
     fun showListPage(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus listas")
             return "redirect:/login"
         }
-        val list = listRepo.findByUser_Username(authentication.name)
-        model.addAttribute("list", list)
+        val lists = listRepo.findAllByUser_Username(authentication.name)
+        model.addAttribute("lists", lists)
         model.addAttribute("is_lists", true)
         return "user_lists"
+    }
+
+    @GetMapping("/lists/{id}")
+    fun showList(@PathVariable id: Long, model: Model) :String{
+        val list = listRepo.findById(id).get()
+        model.addAttribute("list",list)
+        model.addAttribute("list_samples_id", list.samples.map { it.id })
+        return "list_view"
     }
 
     @PostMapping("/add_sample_to_list")
@@ -614,14 +681,6 @@ class AppController {
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a la lista ${list.name}")
         return "redirect:/lists/${list.id}"
-    }
-
-    @GetMapping("/lists/{id}")
-    fun showList(@PathVariable id: Long, model: Model) :String{
-        val list = listRepo.findById(id).get()
-        model.addAttribute("list",list)
-        model.addAttribute("list_samples_id", list.samples.map { it.id })
-        return "list_view"
     }
 
     @PostMapping("/add_sample_to_favorite")

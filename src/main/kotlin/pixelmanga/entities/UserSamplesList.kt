@@ -1,6 +1,8 @@
 package pixelmanga.entities
 
+import java.nio.file.Paths
 import javax.persistence.*
+import kotlin.io.path.exists
 
 @Entity
 @Table(name = "user_samples_list")
@@ -20,6 +22,7 @@ open class UserSamplesList {
     @Column(name = "list_description")
     open var description: String? = null
 
+
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_samples_list_samples",
@@ -28,5 +31,21 @@ open class UserSamplesList {
     )
     open var samples: MutableSet<Sample> = mutableSetOf()
 
+    @Transient
+    open fun coverPath(): String {
+        return if (Paths.get(path() as String).exists()) {
+            path()+"/cover"
+        } else {
+            "./resources/images/defaults/no-cover.png"
+        }
+    }
 
+    @Transient
+    open fun path(): String? {
+        return if (id != null) {
+            "./resources/images/lists/$id"
+        } else {
+            null
+        }
+    }
 }

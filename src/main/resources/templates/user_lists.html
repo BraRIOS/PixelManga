@@ -132,21 +132,16 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <div class="anime__details__btn">
-                            <a href="/register_list" class="follow-btn">Crear Lista</a>
+                            <a href="/lists/create" class="follow-btn">Crear Lista</a>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${list}">
+                    <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${lists}">
                         <a th:href="'/lists/'+${list.id}">
-                            <div class="thumbnail list list-bg list-thumbnail">
-                                <style>
-                                    .list-thumbnail::before{
-                                        background-image: url('/static/images/default.png');
-                                    }
-                                </style>
-                                <div class="thumbnail-title">
-                                    <h4 class="text-truncate" th:text="${list.name}"></h4>
+                            <div th:data-id="${list.id}" class="thumbnail list list-bg thumbnail-list">
+                                <div class="thumbnail-title text-white">
+                                    <h5 class="text-truncate" th:text="${list.name}"></h5>
                                 </div>
                                 <div class="thumbnail-description">
                                     <p class="text-truncate" th:text="${list.description}"></p>
@@ -205,20 +200,6 @@
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/owl.carousel.min.js"></script>
     <script src="/static/js/main.js"></script>
-
-    <script type="text/javascript" th:inline="javascript">
-        /*<![CDATA[*/
-        $(document).ready(function() {
-            let latestSamples = [[${latest_samples}]];
-            for (let i = 0; i < latestSamples.length; i++) {
-                $.get("sample_average_rate", {sampleId: latestSamples[i].id}, function (data) {
-                    console.log(data);
-                    $("#" + latestSamples[i].id).append(data);
-                });
-            }
-        })
-        /*]]>*/
-    </script>
 
 </body>
 
