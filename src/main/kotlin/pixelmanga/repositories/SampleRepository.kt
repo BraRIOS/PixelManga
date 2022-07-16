@@ -13,12 +13,10 @@ interface SampleRepository : JpaRepository<Sample, Long> {
     fun findByName(name: String): Sample?
 
 
-
     @Transactional
     @Modifying
     @Query("update Sample s set s.cover = ?1 where s.id = ?2")
     fun updateCoverById(cover: String, id: Long): Int
-
 
 
     @Query("select s from Sample s where s.name like concat('%', ?1, '%') order by s.name")

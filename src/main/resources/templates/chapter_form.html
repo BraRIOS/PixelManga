@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome-animation@1.1.1/css/font-awesome-animation.min.css" type="text/css">
+    <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -97,6 +99,27 @@
         </div>
     </div>
 
+    <!-- Modal clear images -->
+    <div class="modal fade" id="clearImagesModal" tabindex="-1" role="dialog" aria-labelledby="clearImagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title" id="clearImagesModalLabel">Eliminar imágenes</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que quieres eliminar todas las imágenes?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="clearImagesModalBtn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Msg notification End-->
 
     <!-- Sample Section Begin -->
@@ -121,9 +144,23 @@
                                 <input type="text" name="chapter_title" placeholder="Título del capítulo" maxlength="255">
                                 <span class="icon_pencil"></span>
                             </div>
-                            <div class="row" style="" id="images_selection">
+                            <div class="row mb-2" style="" id="images_selection">
                                 <div class="col-12">
-                                    <input type="file" class="form-control" id="files" multiple="" accept="image/x-png,image/jpeg">
+                                    <div class="input__item">
+                                        <input type="file" class="form-control" id="files" multiple="" accept="image/x-png,image/jpeg">
+                                        <span class="icon_upload"></span>
+                                    </div>
+                                    <div class="alert alert-info my-2" role="alert" style="pointer-events: none">
+                                        <strong>¡Atención!</strong>
+                                        <ul>
+                                            <li>Solo se permiten imágenes en formato PNG o JPEG.</li>
+                                            <li>Límite de tamaño de cada archivo: <strong>5 MB</strong>.</li>
+                                            <li>Límite de tamaño total de los archivos: <strong>100 MB</strong>.</li>
+                                            <li>Cantidad máxima de imágenes: <strong>500</strong>.</li>
+                                        </ul>
+
+                                    </div>
+                                    <button type="button" class="btn btn-danger float-right d-none" id="showClearModal"><i class="fa fa-trash"></i> Borrar todo</button>
                                 </div>
                                 <div class="container">
                                     <div class="row" id="images_preview">
@@ -187,6 +224,8 @@
         const filesToUpload = [];
         let validImageTypes = ['image/jpeg', 'image/png'];
         let max_files = 500;
+        let max_file_size = 5242880;
+        let max_total_size = 104857600;
         let sortableElement = document.getElementById('images_preview');
         let sortable = Sortable.create(sortableElement,{
             handle: '.card-header',
@@ -217,6 +256,7 @@
         function previewImages(event) {
             const target = event.target || event.srcElement;
             const total_files_add = document.getElementById("files").files.length;
+            let total_size= 0;
             for (let i = 0; i < total_files_add; i++) {
                 if (!validImageTypes.includes(target.files[i].type)) {
                     alert("Comprueba que el archivo " + target.files[i].name + " es una imágen válida (JPEG o PNG)");
@@ -224,29 +264,36 @@
                     if (filesToUpload.length === max_files) {
                         alert('Máximo de archivos alcanzado (' + max_files + ')');
                     } else {
-                        if (target.files[i].size <= 4194304) {
-                            $('<div class="col-6 col-sm-4 col-md-4 col-lg-3 p-1 m-0 card-element">' +
-                                '<div class="card">' +
-                                '<h5 class="card-header card-element-header text-center">' +
-                                '<i class="fa fa-arrows-alt fa-fw"></i> Pag: ' + (filesToUpload.length + 1) + '</h5>' +
-                                '<img class="card-img-top" style="max-height:200px;" src="' + URL.createObjectURL(target.files[i]) + '">' +
-                                '<div class="card-body p-1">' +
-                                '<small class="card-text">' +
-                                '<i class="fa fa-trash fa-fw delete-file text-danger" data-file="'+ target.files[i].name +'"></i>' + target.files[i].name +
-                                '</small>' +
-                                '</div>' +
-                                '</div>' +
-                                '</div>').hide().appendTo('#images_preview').fadeIn(1000);
-                            filesToUpload.push(target.files[i]);
+                        if (total_size + target.files[i].size > max_total_size) {
+                            alert('Tamaño total de archivos excedido (' + max_total_size + ')');
                         } else {
-                            alert('La imagen ' + target.files[i].name + " no cumple los requisitos");
+                            if (target.files[i].size <= max_file_size) {
+                                $('<div class="col-6 col-sm-4 col-md-4 col-lg-3 p-1 m-0 card-element">' +
+                                    '<div class="card">' +
+                                    '<h5 class="card-header card-element-header text-center">' +
+                                    '<i class="fa fa-arrows-alt fa-fw"></i> Pag: ' + (filesToUpload.length + 1) + '</h5>' +
+                                    '<img class="card-img-top" style="max-height:200px;" src="' + URL.createObjectURL(target.files[i]) + '">' +
+                                    '<div class="card-body p-1">' +
+                                    '<small class="card-text">' +
+                                    '<i class="fa fa-trash fa-fw delete-file text-danger" data-file="' + target.files[i].name + '"></i>' + target.files[i].name +
+                                    '</small>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>').hide().appendTo('#images_preview').fadeIn(1000);
+                                filesToUpload.push(target.files[i]);
+                                total_size += target.files[i].size;
+                            } else {
+                                alert('El archivo ' + target.files[i].name + ' es demasiado grande (' + max_file_size + ')');
+                            }
                         }
                     }
                 }
             }
             if (filesToUpload.length > 0) {
+                $('#showClearModal').removeClass('d-none');
                 $('#btnSubmit').prop('disabled', false);
             } else {
+                $('#showClearModal').addClass('d-none');
                 $('#btnSubmit').prop('disabled', true);
             }
         }
@@ -270,6 +317,18 @@
             }
         })
 
+        $('#showClearModal').on('click',function(){
+            $('#clearImagesModal').modal('show');
+        })
+
+        $('#clearImagesModalBtn').click(function(){
+            filesToUpload.splice(0,filesToUpload.length);
+            $('#images_preview').html('');
+            $('#btnSubmit').prop('disabled', true);
+            $('#showClearModal').addClass('d-none');
+            $('#clearImagesModal').modal('hide');
+        });
+
         $('#btnSubmit').on('click',function(event){
             event.preventDefault();
             const form = $('#form_upload');
@@ -284,6 +343,7 @@
                 contentType: false,
                 processData: false,
                 beforeSend: function() {
+                    $('#showClearModal').prop('disabled', true).addClass('disabled');
                     $('#btnCancel').prop('disabled', true).addClass('disabled');
                     $('#btnSubmit').prop('disabled', true);
                     $('#btnSubmit').html('<i class="fa fa-spinner fa-spin"></i> Subiendo...');
@@ -310,6 +370,7 @@
                     },1000);
                     $('#btnSubmit').prop('disabled', false);
                     $('#btnCancel').prop('disabled', false).removeClass('disabled');
+                    $('#showClearModal').prop('disabled', false).removeClass('disabled');
                 }
             });
         })

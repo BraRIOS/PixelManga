@@ -170,11 +170,11 @@ class AppController {
             return "redirect:/login"
         }
         val userDB = userRepo.findByUsername(authentication.name) as User
-        if (!checkEmailAvailable(user.email as String)) {
+        if (!checkEmailAvailable(user.email as String) && user.email != userDB.email) {
             redirectAttributes.addFlashAttribute("error", "El email: '${user.email}' ya esta en uso")
             return "redirect:/profile"
         }
-        if (!checkUsernameAvailable(user.username as String)) {
+        if (!checkUsernameAvailable(user.username as String) && user.username != userDB.username) {
             redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' ya esta en uso")
             return "redirect:/profile"
         }
@@ -561,9 +561,9 @@ class AppController {
         }
         savedChapter.images.forEachIndexed { index, image ->
             val imagePath = uploadPath.resolve(image)
-            Files.copy(images[index].inputStream, imagePath)
+            Files.copy(images[index].inputStream, imagePath, StandardCopyOption.REPLACE_EXISTING)
         }
-        return ResponseEntity.ok("El capítulo ${chapter.number} se ha creado correctamente")
+        return ResponseEntity.ok("El capítulo ${chapter.number} se ha creado correctamente. Redirigiendo a la página del libro...")
 
     }
 

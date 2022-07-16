@@ -1395,7 +1395,7 @@ ol {
 	border-top-left-radius: 0;
 }
 
-.anime__details__btn .follow-btn {
+.follow-btn {
 	font-size: 13px;
 	color: #ffffff;
 	background: #9b6bf2;
@@ -2671,7 +2671,7 @@ ol {
 	.footer__nav ul li {
 		margin-right: 10px;
 	}
-	.anime__details__btn .follow-btn {
+	.follow-btn {
 		padding: 14px 26px;
 		margin-right: 11px;
 		margin-bottom: 25px;
@@ -3131,5 +3131,15 @@ Thumbnail list
 }
 
 .list-color{
+	color: white;
+}
+
+.modal-content {
+	background: #0b0c2a;
+	color: white;
+}
+
+.modal-header {
+	background: #5E4399;
 	color: white;
 }
