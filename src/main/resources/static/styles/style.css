@@ -3134,6 +3134,253 @@ Thumbnail list
 	color: white;
 }
 
+.erc-user-menu.state-sticky {
+	padding-bottom: 4.875rem;
+}
+
+.erc-user-menu.state-open {
+	opacity: 1;
+	transform: translate(0);
+	transition: transform .2s,opacity .2s cubic-bezier(0,0,.25,1),visibility 0s;
+	visibility: visible;
+}
+
+.erc-user-menu {
+	background-color: #141519;
+	display: flex;
+	flex-direction: column;
+	height: calc(100% - 3.75rem);
+	left: 0;
+	min-width: 20rem;
+	opacity: 0;
+	position: fixed;
+	top: 3.75rem;
+	transform: translateY(-.625rem);
+	transition: transform .1s,opacity .1s cubic-bezier(0,0,.25,1),visibility 0s linear .1s;
+	visibility: hidden;
+	width: 100%;
+	z-index: 3;
+}
+
+.erc-user-menu .user-menu-scrollable {
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+.erc-authenticated-user-menu .user-menu-account-section {
+	padding-top: 0.75rem;
+}
+
+.erc-user-menu-account-item {
+	display: flex;
+	margin-bottom: 0.75rem;
+	padding: 0.5rem 1rem;
+}
+
+.erc-user-menu-account-item .account-item-avatar {
+	flex: 0 0 3.5rem;
+	height: 3.5rem;
+	margin-right: 1.25rem;
+	margin-top: 1.5rem;
+}
+
+.erc-header-avatar {
+	border-radius: 50%;
+	flex: 0 0 2.125rem;
+	height: 2.125rem;
+	overflow: hidden;
+	position: relative;
+	width: 2.125rem;
+}
+
+.erc-user-menu-account-item .account-item-meta {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding-bottom: 0.25rem;
+	padding-top: 1.5rem;
+}
+
+.user-menu-section:not(:first-child) {
+	border-top: 0.125rem solid #23252b;
+	padding-bottom: 0.75rem;
+	padding-top: 0.75rem;
+}
+
+.erc-user-menu-nav-item {
+	align-items: flex-start;
+	color: #dadada;
+	display: flex;
+	padding: .875rem 1.5rem;
+	position: relative;
+	width: 100%;
+}
+
+.erc-user-menu-nav-item .nav-item-info {
+	flex: 1;
+	min-width: 0;
+	position: relative;
+}
+
+.erc-authenticated-user-menu .user-menu-sticky {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	width: 100%;
+}
+
+.erc-page-overlay.state-open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.erc-page-overlay {
+	background-color: #23252bcc;
+	height: 100%;
+	left: 0;
+	opacity: 0;
+	position: fixed;
+	top: 0;
+	visibility: hidden;
+	width: 100%;
+	z-index: 2;
+}
+
+@media (min-width: 35.5em){
+	.erc-user-menu {
+		left: auto;
+		right: 0;
+		width: 24.25rem;
+	}
+}
+
+body.state-scroll-blocked {
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.c-text--l.c-text--fixed-size {
+	--line-height: 1.5rem;
+	font-size: 1rem;
+}
+
+.c-text {
+	font-family: Lato,Helvetica Neue,helvetica,sans-serif;
+	font-weight: 500;
+	line-height: var(--line-height);
+}
+
+.erc-user-menu-nav-item > h1, h2, h3, h4, h5, h6, ul {
+	margin: 0;
+	color: #b7b7b7;
+}
+
+.erc-user-menu-nav-item:hover {
+	background-color: #23252bcc;
+}
+
+.erc-user-menu-nav-item .nav-item-icon {
+	height: 1.5rem;
+	margin-right: 1rem;
+	position: relative;
+	transition: fill .2s ease;
+	width: 1.5rem;
+	color: #b7b7b7;
+}
+
+.erc-user-menu-nav-item .nav-item-description {
+	align-items: center;
+	display: flex;
+	margin-top: .25rem;
+	position: relative;
+}
+
+.erc-user-menu-nav-item .description-text {
+	color: #c7c7c7;
+	min-width: 0;
+}
+
+.c-text--m {
+	--line-height: 1.125rem;
+	font-size: .875rem;
+}
+
+.user-menu-section .user-menu-sticky {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	width: 100%;
+}
+
+.erc-user-menu-account-item .account-item-title {
+	word-wrap: break-word;
+	color: #dadada;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+.c-heading--xxs {
+	--line-height: 1.625rem;
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+.c-heading--family-type-one {
+	font-family: Lato,Helvetica Neue,helvetica,sans-serif;
+}
+
+.c-heading {
+	text-rendering: optimizeLegibility;
+	font-weight: 500;
+	line-height: var(--line-height);
+}
+
+.erc-user-menu-account-item .account-item-premium-user {
+	display: flex;
+	padding-top: .25rem;
+}
+
+.c-premium-filled-svg, .c-premium-svg {
+	color: #fab818;
+	margin-right: 5px;
+}
+
+.erc-user-menu-account-item .account-item-premium-label {
+	word-wrap: break-word;
+	color: #fab818;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+.erc-header-avatar .avatar-img {
+	-webkit-backface-visibility: hidden;
+	display: block;
+	left: 0;
+	max-width: 100%;
+	position: absolute;
+	top: 0;
+	transform: translateZ(0);
+	width: 100%;
+	height: 56px;
+	width: 56px;
+}
+
+.c-avatar {
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+}
+
+@media (min-width: 35.5em) {
+	.erc-user-menu-account-item .account-item-avatar {
+		margin-right: 1rem;
+	}
+}
+
 .modal-content {
 	background: #0b0c2a;
 	color: white;

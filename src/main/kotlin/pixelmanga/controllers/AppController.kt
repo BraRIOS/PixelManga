@@ -66,6 +66,13 @@ class AppController {
     fun showHomePage(model: Model): String {
         val randomSamples = sampleRepo.findAll().sortedBy { it.name }.shuffled().take(12)
         val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(12)
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication != null) {
+            val user = userRepo.findByUsername(authentication.name)
+            if (user != null) {
+                model.addAttribute("user", user)
+            }
+        }
         model.addAttribute("random_samples", randomSamples)
         model.addAttribute("latest_samples", latestSamples)
         model.addAttribute("is_home", true)
