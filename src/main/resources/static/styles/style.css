@@ -3283,6 +3283,14 @@ body.state-scroll-blocked {
 	background-color: #23252bcc;
 }
 
+.erc-user-menu-nav-item:hover>span {
+	color: white;
+}
+
+.erc-user-menu-nav-item:hover>div>h5 {
+	color: #9b6bf2;
+}
+
 .erc-user-menu-nav-item .nav-item-icon {
 	height: 1.5rem;
 	margin-right: 1rem;

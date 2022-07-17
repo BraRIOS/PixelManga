@@ -81,7 +81,7 @@
                         <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
                         <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
-                        <a href="#" sec:authorize="isAuthenticated()" class="tuquito"><span class="icon_profile"></span></a>
+                        <a href="#" sec:authorize="isAuthenticated()" class="tuquito"><span class="icon_profile"></span><i class="fa-solid fa-sort-down" style="font-size:12px;padding-left:3px"></i></a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                     </div>
                 </div>
