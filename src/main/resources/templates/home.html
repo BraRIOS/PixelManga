@@ -7,7 +7,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PIXELmanga</title>
+    <title>Pixelmanga</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -31,57 +31,33 @@
         <div class="loader"></div>
     </div>
 
-    <!-- Modal -->
-    <div id="askAuthorModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">¿Quieres convertirte en un autor?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Aún no eres un autor.¿Quieres convertirte en uno?</p>
-                </div>
-                <div class="modal-footer">
-                    <form th:action="@{/make_author}" method="post">
-                        <button type="submit" class="btn btn-primary">Si quiero</button>
-                    </form>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No quiero</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
-
     <!-- Header Section Begin -->
     <header class="header">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3" style="z-index: 4">
+                <div class="col-lg-3 col-md-3 col-sm-3" >
                     <a href="/home">
                         <img src="/static/images/logo.jpg" alt="" >
                     </a>
                 </div>
-                <div class="col-lg-7" style="z-index: 4">
-                    <div class="header__nav">
-                        <nav class="header__menu mobile-menu">
-                            <ul>
-                                <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
-                                <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
-                                <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
-                                <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
-                            </ul>
-                        </nav>
-                    </div>
+                <div class="col-lg-7">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                            <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                            <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
+                            <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
+                        </ul>
+                    </nav>
                 </div>
-                <div class="col-lg-2" style="z-index: 4">
+                <div class="col-lg-2 col-md-3 col-sm-3 d-flex align-items-center justify-content-end">
                     <div class="header__right">
                         <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
-                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
                         <a href="#" class="search-switch"><span class="icon_search"></span></a>
-                        <a href="#" sec:authorize="isAuthenticated()" class="tuquito"><span class="icon_profile"></span><i class="fa-solid fa-sort-down" style="font-size:12px;padding-left:3px"></i></a>
+                        <a href="#" sec:authorize="isAuthenticated()" class="tuquito">
+                            <img class="account-item-avatar" th:src="'/images/users/current/avatar'" alt="">
+                            <i class="fa-solid fa-sort-down" style="font-size:12px;padding-left:3px"></i>
+                        </a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                     </div>
                 </div>
@@ -92,15 +68,15 @@
     <!-- Header End -->
 
     <!-- profile menu begin -->
-    <div class="erc-user-menu state-sticky">
+    <div class="erc-user-menu state-sticky" sec:authorize="isAuthenticated()">
         <div class="user-menu-scrollable">
             <div class="user-menu-section user-menu-account-section">
                 <div class="erc-user-menu-account-item">
                     <div class="erc-header-avatar account-item-avatar">
-                        <img sec:authorize="isAuthenticated()" class="c-avatar avatar-img" th:src="'/images/users/'+${user.id}+'/avatar'" alt="">
+                        <img class="c-avatar avatar-img" th:src="'/images/users/current/avatar'" alt="">
                     </div>
                     <div class="account-item-meta">
-                        <h4 sec:authorize="isAuthenticated()" class="c-heading c-heading--xxs c-heading--family-type-one c-heading--fixed-size account-item-title" th:text="${user.username}"></h4>
+                        <h4 sec:authentication="name" class="c-heading c-heading--xxs c-heading--family-type-one c-heading--fixed-size account-item-title"></h4>
                         <div class="account-item-premium-user">
                             <span class="c-premium-filled-svg account-item-premium-icon fa-solid fa-crown"></span>
                             <p class="c-text c-text--m account-item-premium-label">Miembro premium</p>
@@ -115,6 +91,18 @@
                                 Mi cuenta</h5>
                             <div class="nav-item-description">
                                 <p class="c-text c-text--m description-text">Gestiona tu perfil y tus opciones.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="user-menu-section" sec:authorize="hasAuthority('ADMIN')">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" href="/requests">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-handshake"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Solicitudes</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Gestiona las solicitudes de los usuarios.</p>
                             </div>
                         </div>
                     </a>
@@ -348,31 +336,6 @@
     })
     /*]]>*/
 </script>
-
-    <script>
-        $("body").on('click', '.tuquito', function() {
-            $('.erc-user-menu').toggleClass("state-open");
-            $('.erc-page-overlay').toggleClass("state-open");
-            $("body").toggleClass("state-scroll-blocked");
-
-
-        });
-    </script>
-    <script>
-        $("body").on('click', '.erc-page-overlay', function() {
-            $('.erc-user-menu').toggleClass("state-open");
-            $('.erc-page-overlay').toggleClass("state-open");
-            $("body").toggleClass("state-scroll-blocked");
-
-
-        });
-    </script>
-    <script>
-        $("body").on('click', '#logout', function() {
-            $('#logout-btn').submit();
-
-        });
-    </script>
 
 </body>
 

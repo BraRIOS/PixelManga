@@ -7,7 +7,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title th:text="'Información - '+${user.username}+' - Usuarios | Pixelmanga'"></title>
+    <title>Solicitudes | Pixelmanga</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
     <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
-
 </head>
 
 <body>
@@ -30,58 +29,33 @@
         <div class="loader"></div>
     </div>
 
-    <!-- Modal ask author Begin-->
-    <div class="modal fade" id="askAuthorModal" tabindex="-1" role="dialog" aria-labelledby="askAuthorModalLabel" aria-hidden="true">
+    <!-- Modal reject request Begin-->
+    <div class="modal fade" id="rejectRequestModal" tabindex="-1" role="dialog" aria-labelledby="rejectRequestModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header text-white">
-                    <h5 class="modal-title" id="askAuthorModalLabel">¿Quieres convertirte en un <strong>autor</strong>?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Si quieres convertirte en uno de nuestros autores, a continuación envía tu solicitud, en breve nuestros administradores la revisarán y serás notificado</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <form th:action="@{/askAuthor}" method="post">
-                        <button type="submit" class="btn accept-btn" id="submitAuthorRequest">Enviar solicitud</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal ask author End-->
-
-    <!-- Modal create list Begin-->
-    <div class="modal fade" id="createListModal" tabindex="-1" role="dialog" aria-labelledby="createListModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header text-white">
-                    <h5 class="modal-title" id="createListModalLabel">Crear nueva lista</h5>
+                    <h5 class="modal-title" id="rejectRequestModalLabel">Rechazar solicitud de rol de autor</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form method="POST" th:action="@{/lists/create}" accept-charset="UTF-8" class="form-horizontal-edit">
+                <form method="POST" th:action="@{/reject_author}" accept-charset="UTF-8">
                     <div class="modal-body">
-                        <div class="form-group row">
-                            <label for="title" class="col-form-label col-12 col-sm-3">Título</label>
-                            <div class="col-12 col-sm-9">
-                                <input class="form-control" maxlength="255" placeholder="Nombre de la lista" required="required" name="listName" type="text" id="title">
-                            </div>
+                        <div class="form-group row mb-0">
+                            <input type="hidden" name="requestId" id="requestId" hidden>
+                            <textarea class="form-control mb-0" name="rejectReason" rows="3"
+                                placeholder="Motivo de rechazo"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Crear</button>
+                        <button type="submit" class="btn btn-danger">Rechazar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Modal create list End-->
+    <!-- Modal reject request End-->
 
     <!-- Header Section Begin -->
     <header class="header">
@@ -211,13 +185,14 @@
 
     <!-- Msg notification -->
 
-    <div class="row d-inline" th:if="${message}">
+    <div class="row" th:if="${message}">
+
         <div class="col-sm-12">
             <div class="alert fade alert-simple alert-success alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show">
                 <button type="button" class="close font__size-18" data-dismiss="alert">
-                                        <span aria-hidden="true"><a>
-                        <i class="fa fa-times greencross"></i>
-                        </a></span>
+									<span aria-hidden="true"><a>
+                    <i class="fa fa-times greencross"></i>
+                    </a></span>
                     <span class="sr-only">Close</span>
                 </button>
                 <strong class="font__weight-semibold" th:text="${message}"></strong>
@@ -225,13 +200,14 @@
         </div>
     </div>
 
-    <div class="row d-inline" th:if="${error}">
+    <div class="row" th:if="${error}">
+
         <div class="col-sm-12">
             <div class="alert fade alert-simple alert-danger alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
                 <button type="button" class="close font__size-18" data-dismiss="alert">
-                                        <span aria-hidden="true">
-                                            <i class="fa fa-times danger "></i>
-                                        </span>
+									<span aria-hidden="true">
+										<i class="fa fa-times danger "></i>
+									</span>
                     <span class="sr-only">Close</span>
                 </button>
                 <strong class="font__weight-semibold" th:text="${error}"></strong>
@@ -239,13 +215,14 @@
         </div>
     </div>
 
-    <div class="row d-inline" th:if="${info}">
+    <div class="row" th:if="${info}">
+
         <div class="col-sm-12">
             <div class="alert fade alert-simple alert-warning alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
                 <button type="button" class="close font__size-18" data-dismiss="alert">
-                                        <span aria-hidden="true">
-                                            <i class="fa fa-times warning"></i>
-                                        </span>
+									<span aria-hidden="true">
+										<i class="fa fa-times warning"></i>
+									</span>
                     <span class="sr-only">Close</span>
                 </button>
                 <i class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>
@@ -256,117 +233,86 @@
 
     <!-- Msg notification End-->
 
-    <!-- Anime Section Begin -->
-    <section class="anime-details spad" th:object="${user}">
-        <header class="container">
-            <div class="row anime__details__content mb-2">
-                <div class="col 12 col-md-3 text-center" >
-                    <h1 class="book-type bg-manga mt-2 bg-user">USUARIO</h1>
-                    <div class="book__details__thumbnail">
-                        <img class="book-thumbnail" src="" th:src="'/images/users/'+${user.id}+'/avatar'">
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <div class="anime__details__title">
-                                <h3 th:text="*{username}"></h3>
-                            </div>
-                            <div class="anime__details__widget">
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 mb-4">
-                                        <h5 class="text-white">Roles:</h5>
-                                        <h5 class="badge badge-pill badge-info py-2 px-3 mt-3" th:each="rol : ${roles}"
-                                            th:text="${rol}">
-                                        </h5>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 mb-4">
-                                    <span th:if="*{birthDate}" class="badge badge-pill badge-grey py-2 px-3">
-                                        <i class="fa fa-birthday-cake fa-fw"></i>
-                                        <span th:text="*{birthDate}"></span>
-                                    </span>
-                                    </div>
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="trending__product">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="section-title">
+                                    <h4>Solicitudes</h4>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 d-flex flex-column align-items-center">
-                            <div class="mb-4">
-                                <a class="btn follow-btn" th:href="@{'/profile/edit'}"><i class="fa fa-edit"></i> Editar Perfil</a>
-                            </div>
-                            <div class="mb-4 d-flex flex-column" sec:authorize="!hasAuthority('AUTHOR')">
-                                <a href="#" id="askAuthorModalBtn" class="btn" data-toggle="modal" data-target="#askAuthorModal"
-                                   th:classappend="${isUnderReview}? 'disabled btn-secondary' : (${status == 'RECHAZADO' || status== null}?'follow-btn':'disabled btn-success')">
-                                    <i class="fa-solid fa-handshake"></i>
-                                    <span th:text="${isUnderReview}? ' En revisión...' : (${status == 'RECHAZADO' || status == null}?' Ser Autor':'Ya eres autor!')"></span>
-                                </a>
-                                <div class="text-white d-flex my-1" th:if="${status}">
-                                    Última solicitud:
-                                    <strong class="align-self-center" th:text="${status}"
-                                            th:styleappend="${status == 'RECHAZADO'}? 'color: #ff0303' : (${status == 'PENDIENTE'}? 'color: #0396ff' : 'color: #0ad406')"></strong>
-                                </div>
-                                <div class="alert alert-success my-1" th:if="${status == 'ACEPTADO'}">
-                                    Felicidades! Ya eres <strong>autor</strong>, vuelve a iniciar sesión para reclamar tus poderes!
-                                </div>
-                                <div class="alert alert-warning my-1" th:if="${status == 'RECHAZADO'}">
-                                    Lo sentimos, tu solicitud ha sido rechazada.
-                                    <div class="my-1" th:if="${rejectReason!=''}" th:text="'Detalle: '+${rejectReason}"></div>
-                                    Puedes volver a solicitar una autorización.
-                                </div>
-                            </div>
+                        <table class="pixel-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nombre de usuario</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Mensaje</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Creado el</th>
+                                <th scope="col">Actualizado el</th>
+                                <th scope="col">Actualizado por</th>
+                                <th scope="col">Razón de rechazo</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="request : ${requests}" th:object="${request}">
+                                <th scope="row" th:text="*{id}"></th>
+                                <td th:text="*{username}"></td>
+                                <td th:text="*{email}"></td>
+                                <td th:text="*{message}"></td>
+                                <td th:text="*{status}"></td>
+                                <td th:text="*{createdAt}"></td>
+                                <td th:text="*{updatedAt}"></td>
+                                <td th:text="*{updatedBy}"></td>
+                                <td th:text="*{rejectReason}"></td>
+                                <td>
+                                    <div class="d-flex align-items-center justify-content-between" th:if="${request.status=='PENDIENTE'}">
+                                        <form th:action="@{/make_author}" method="post">
+                                            <input type="hidden" name="requestId" th:value="*{id}">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fa fa-check-circle"></i>
+                                                Aceptar
+                                            </button>
+                                        </form>
+                                        <button type="button" id="rejectRequestBtn" class="btn btn-danger" data-toggle="modal" data-target="#rejectRequestModal" th:data-id="*{id}">
+                                            <i class="fa fa-times-circle"></i>
+                                            Rechazar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="d-flex flex-column align-items-center col-12 mt-4">
+                            <i th:class="${search_message!=null? 'fa fa-times fa-5x text-center' : 'd-none'}" style="color: #bfbfbf;"></i>
+                            <p th:text="${search_message}" style="font-size: 30px"></p>
+                        </div>
+                        <div>
+                            <ul class="pagination product__pagination justify-content-center">
+                                <li th:classappend="${prev == 0? 'disabled' : 'page-item'}" th:style="${prev == 0? 'display: none' : ''}">
+                                    <a th:href="@{'/requests?page='+${prev}}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
+                                </li>
+                                <li class="page-item" th:each="page :${pages}">
+                                    <a th:classappend="${current == page? 'current-page' : ''}" th:href="@{'/requests?page='+${page}+${parameters}}" th:text="${page}"></a>
+                                </li>
+                                <li th:classappend="${current == last || current==null? 'disabled' : 'page-item'}" th:style="${current == last || current==null? 'display: none' : ''}">
+                                    <a th:href="@{'/requests?page='+${next}}"><i th:classappend="${current==last || current==null? '' : 'fa fa-angle-double-right'}"></i></a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </header>
-        <main role="main" class="container-fluid element-body p-0">
-            <div class="container p-0 p-sm-2">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="row">
-                            <div class="col-12 mt-2 d-flex justify-content-between">
-                                <h2 class="list-color">Mis Listas</h2>
-                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createListModal"><i class="fa fa-plus"></i> Crear nueva lista y añadir</button>
-                            </div>
-                            <div th:if="${user_lists.isEmpty()}" class="col-12 text-center my-5">
-                                <h3><i class="fa fa-times fa-5x"></i></h3>
-                                <h5>No hay elementos</h5>
-                            </div>
-                            <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${user_lists}">
-                                <a th:href="'/lists/'+${list.id}">
-                                    <div th:data-id="${list.id}" class="thumbnail list list-bg thumbnail-list">
-                                        <div class="thumbnail-title text-white">
-                                            <h5 class="text-truncate" th:text="${list.name}"></h5>
-                                        </div>
-                                        <div class="thumbnail-description">
-                                            <p class="text-truncate" th:text="${list.description}"></p>
-                                        </div>
-                                        <div class="thumbnail-container">
-                                            <span class="followers_count"><i class="fa fa-users fa-fw"></i> 0</span>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-12 mt-2 anime__details__btn">
-                                <a class="follow-btn" href="/profile/lists"><i class="fa fa-list fa-fw"></i> Ir a Mis Listas</a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 mt-2">
-                                <h2 class="list-color">Listas Seguidas</h2>
-                            </div>
-                            <div class="col-12 text-center my-5">
-                                <h3><i class="fa fa-times fa-5x"></i></h3>
-                                <h5>No hay elementos</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </div>
     </section>
-    <!-- Anime Section End -->
+    <!-- Product Section End -->
 
     <!-- Footer Section Begin -->
     <footer class="footer">
@@ -380,7 +326,7 @@
                         <ul>
                             <li class="active"><a href="/home">Home</a></li>
                             <li><a th:href="@{/library}">Biblioteca</a></li>
-                            <li><a href="/favorite">Siguiendo</a></li>
+                            <li><a href="#">Siguiendo</a></li>
                             <li><a href="#">Listas</a></li>
                         </ul>
                     </div>
@@ -396,7 +342,7 @@
         <div class="h-100 d-flex align-items-center justify-content-center">
             <div class="search-close-switch"><i class="icon_close"></i></div>
             <form class="search-model-form" action="/library">
-                <input type="text" id="search-input" placeholder="Busque aquí.....">
+                <input type="text" name="title" id="search-input" placeholder="Busque aquí.....">
             </form>
         </div>
     </div>
@@ -406,7 +352,15 @@
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/jquery.nice-select.min.js"></script>
+    <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/main.js"></script>
+    <script>
+        $('#rejectRequestBtn').on('click', function () {
+            const requestId = parseInt($(this).data('id'));
+            $(".modal-body #requestId").val( requestId );
+        });
+    </script>
 </body>
+
 </html>

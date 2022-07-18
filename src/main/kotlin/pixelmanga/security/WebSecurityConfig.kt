@@ -40,7 +40,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/make_author").authenticated()
+            .antMatchers("/make_author").hasAuthority("ADMIN")
+            .antMatchers("/reject_request").hasAuthority("ADMIN")
             .antMatchers("/register_sample").hasAnyAuthority("ADMIN","AUTHOR")
             .antMatchers("/perform_sample_register").hasAnyAuthority("ADMIN", "AUTHOR")
             .antMatchers("/upload_chapter/**").hasAnyAuthority("ADMIN", "AUTHOR")

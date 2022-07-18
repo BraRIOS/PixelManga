@@ -7,10 +7,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AnonymousAuthenticationToken
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
@@ -23,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pixelmanga.entities.*
 import pixelmanga.repositories.*
-import pixelmanga.security.CustomUserDetails
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.util.stream.Collectors
+import java.sql.Date
+import java.time.LocalDate
 import java.util.stream.IntStream
 import kotlin.io.path.exists
 import kotlin.streams.toList
@@ -57,6 +54,9 @@ class AppController {
     @Autowired
     private lateinit var listRepo: UserSamplesListRepository
 
+    @Autowired
+    private lateinit var authorRequestRepo: AuthorRequestRepository
+
     @GetMapping("")
     fun root(): String {
         return "redirect:/home"
@@ -66,13 +66,6 @@ class AppController {
     fun showHomePage(model: Model): String {
         val randomSamples = sampleRepo.findAll().sortedBy { it.name }.shuffled().take(12)
         val latestSamples = sampleRepo.findAll().sortedBy { it.publicationDate }.reversed().take(12)
-        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-        if (authentication != null) {
-            val user = userRepo.findByUsername(authentication.name)
-            if (user != null) {
-                model.addAttribute("user", user)
-            }
-        }
         model.addAttribute("random_samples", randomSamples)
         model.addAttribute("latest_samples", latestSamples)
         model.addAttribute("is_home", true)
@@ -128,11 +121,14 @@ class AppController {
     }
 
     @GetMapping("/login")
-    fun showLoginForm(): String {
+    fun showLoginForm(ra: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         return if (authentication == null || authentication is AnonymousAuthenticationToken) {
             "login_form"
-        } else "redirect:/"
+        } else {
+            ra.addFlashAttribute("info", "Ya estas logueado")
+            "redirect:/"
+        }
     }
 
     @GetMapping("/profile")
@@ -151,9 +147,21 @@ class AppController {
                 else -> "Desconocido"
             }
         }
+        if (!user.roles.contains(roleRepo.findByName("ADMIN")) && !user.roles.contains(roleRepo.findByName("AUTHOR"))) {
+            val authorRequests = authorRequestRepo.findByUsernameOrderByIdDesc(user.username as String)
+            if (authorRequests.isNotEmpty()) {
+                val lastAuthorRequest = authorRequests.first()
+                model.addAttribute("isUnderReview", lastAuthorRequest.status == "PENDIENTE")
+                model.addAttribute("status", lastAuthorRequest.status)
+                if (lastAuthorRequest.status == "RECHAZADO") {
+                    model.addAttribute("rejectReason", lastAuthorRequest.rejectReason)
+                }
+            } else model.addAttribute("isUnderReview", false)
+        }
         model.addAttribute("user", user)
         model.addAttribute("user_lists", listRepo.findAllByUser_Username(user.username as String))
         model.addAttribute("roles", roles)
+
         return "profile"
     }
 
@@ -170,27 +178,29 @@ class AppController {
     }
 
     @PostMapping("/profile/edit")
-    fun editProfile(user: User,@RequestParam("fileImage") image: MultipartFile, redirectAttributes: RedirectAttributes): String {
+    fun editProfile(@RequestParam username: String, @RequestParam email:String, @RequestParam password:String,
+                    @RequestParam birthDate: String, @RequestParam("fileImage") image: MultipartFile,
+                    redirectAttributes: RedirectAttributes): String {
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para poder editar tu perfil")
             return "redirect:/login"
         }
         val userDB = userRepo.findByUsername(authentication.name) as User
-        if (!checkEmailAvailable(user.email as String) && user.email != userDB.email) {
-            redirectAttributes.addFlashAttribute("error", "El email: '${user.email}' ya esta en uso")
+        if (!checkEmailAvailable(email) && email != userDB.email) {
+            redirectAttributes.addFlashAttribute("error", "El email: '${email}' ya esta en uso")
             return "redirect:/profile"
         }
-        if (!checkUsernameAvailable(user.username as String) && user.username != userDB.username) {
-            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${user.username}' ya esta en uso")
+        if (!checkUsernameAvailable(username) && username != userDB.username) {
+            redirectAttributes.addFlashAttribute("error", "El nombre de usuario: '${username}' ya esta en uso")
             return "redirect:/profile"
         }
-        userDB.username = user.username
-        userDB.email = user.email
+        userDB.username = username
+        userDB.email = email
         val passwordEncoder = BCryptPasswordEncoder()
-        val encodedPassword = passwordEncoder.encode(user.password)
+        val encodedPassword = passwordEncoder.encode(password)
         userDB.password = encodedPassword
-        userDB.birthDate = user.birthDate
+        if(birthDate=="") userDB.birthDate = null else userDB.birthDate = Date.valueOf(birthDate)
         saveImage(image, userDB)
         userRepo.save(userDB)
         redirectAttributes.addFlashAttribute("message", "Se ha editado correctamente")
@@ -210,20 +220,27 @@ class AppController {
         return "redirect:/login"
     }
 
-    @PostMapping("/make_author")
-    fun makeAuthor(authentication: Authentication): String {
-        val user = userRepo.findByUsername(authentication.name) as User
-        user.roles.add(roleRepo.findByName("AUTHOR"))
+    @PostMapping("/askAuthor")
+    fun askAuthor(@RequestParam("message", required = false) message:String?, redirectAttributes: RedirectAttributes): String {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para poder solicitar una cuenta de autor")
+            return "redirect:/login"
+        }
+        val userDB = userRepo.findByUsername(authentication.name) as User
+        val authorRequest = AuthorRequest()
 
-        val actualAuthorities : MutableSet<GrantedAuthority>? =
-            user.roles.stream().map { role ->  SimpleGrantedAuthority(role.name) }.collect(Collectors.toSet())
-        val newAuth: Authentication = UsernamePasswordAuthenticationToken(CustomUserDetails(user), user.password, actualAuthorities)
-        SecurityContextHolder.getContext().authentication = newAuth
+        authorRequest.username = userDB.username
+        authorRequest.email = userDB.email
+        authorRequest.message = message
+        authorRequest.status = "PENDIENTE"
+        authorRequest.createdAt = Date(System.currentTimeMillis())
+        authorRequestRepo.save(authorRequest)
 
-        userRepo.save(user)
-
-        return "redirect:/register_sample"
+        redirectAttributes.addFlashAttribute("message", "Se ha solicitado correctamente. Esperamos que te acepten")
+        return "redirect:/profile"
     }
+
 
     @GetMapping("/library")
     fun showLibrary(model: Model, @RequestParam("page", required = false) pageNumber: Int?, @RequestParam("title", required = false) title: String?,
@@ -606,6 +623,13 @@ class AppController {
         return ResponseEntity.ok(Files.readAllBytes(imagePath))
     }
 
+    @GetMapping("/images/users/current/avatar")
+    fun getCurrentUserAvatar(authentication: Authentication): ResponseEntity<ByteArray> {
+        val user = userRepo.findByUsername(authentication.name) as User
+        val imagePath = Paths.get(user.imagePath())
+        return ResponseEntity.ok(Files.readAllBytes(imagePath))
+    }
+
 
     @GetMapping("/images/samples/{id}")
     fun getSampleCover(@PathVariable id: Long): ResponseEntity<ByteArray> {
@@ -744,4 +768,65 @@ class AppController {
         ra.addFlashAttribute("error", "Usuario o contraseña incorrectos")
         return "redirect:/login"
     }
+
+    @GetMapping("/requests")
+    fun showRequests(model: Model, @RequestParam("page", required = false) pageNumber: Int?, authentication: Authentication?, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver las solicitudes")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        if (!user.roles.contains(roleRepo.findByName("ADMIN"))) {
+            ra.addFlashAttribute("error", "No tienes permisos para ver esta página")
+            return "redirect:/"
+        }
+        val page: Int = pageNumber?.minus(1) ?:  0
+        val pageable = PageRequest.of(page, 10)
+        val requests = authorRequestRepo.findAll(pageable)
+        if(requests.isEmpty) {
+            model.addAttribute("search_message", "No se encontraron solicitudes")
+        }
+        else {
+            val totalPage = requests.totalPages
+            if (totalPage > 0){
+                val pages = IntStream.rangeClosed(1, totalPage).toList()
+                model.addAttribute("pages", pages)
+            }
+            model.addAttribute("requests", requests.content)
+            model.addAttribute("last", totalPage)
+            model.addAttribute("current", page+1)
+        }
+
+        model.addAttribute("next", page+2)
+        model.addAttribute("prev", page)
+        return "requests"
+    }
+
+    @PostMapping("/make_author")
+    fun makeAuthor(@RequestParam requestId: Long, authentication: Authentication, ra: RedirectAttributes): String {
+        val request = authorRequestRepo.findById(requestId).get()
+        val user = userRepo.findByUsername(request.username as String) as User
+        user.roles.add(roleRepo.findByName("AUTHOR"))
+        userRepo.save(user)
+        request.status = "ACEPTADO"
+        request.updatedAt = Date.valueOf(LocalDate.now())
+        request.updatedBy = authentication.name
+        authorRequestRepo.save(request)
+
+        ra.addFlashAttribute("message", "Se ha aceptado la solicitud de ${request.username}")
+        return "redirect:/requests"
+    }
+
+    @PostMapping("/reject_author")
+    fun rejectAuthor(@RequestParam requestId: Long, @RequestParam rejectReason:String, authentication: Authentication, ra: RedirectAttributes): String {
+        val request = authorRequestRepo.findById(requestId).get()
+        request.status = "RECHAZADO"
+        request.updatedAt = Date.valueOf(LocalDate.now())
+        request.updatedBy = authentication.name
+        request.rejectReason = rejectReason
+        authorRequestRepo.save(request)
+        ra.addFlashAttribute("message", "Se ha rechazado la solicitud de ${request.username}")
+        return "redirect:/requests"
+    }
+
 }

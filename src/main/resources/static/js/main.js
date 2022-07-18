@@ -31,7 +31,7 @@
     });
 
     /*------------------
-        Thumbnails
+        Lists Thumbnails
     ------------------*/
     $('.thumbnail-list').each(function () {
         let id = parseInt($(this).data('id'))
@@ -99,6 +99,22 @@
     $("#scrollToTopButton").click(function() {
         $("html, body").animate({ scrollTop: 0 }, "slow");
         return false;
-     });
+    });
 
+    /*------------------
+        Profile Menu
+    --------------------*/
+    $(".tuquito").on('click', function() {
+        $(".erc-user-menu").toggleClass("state-open");
+        $(".erc-page-overlay").toggleClass("state-open");
+        $("body").toggleClass("state-scroll-blocked");
+    });
+    $(".erc-page-overlay").on('click', function() {
+        $(".erc-user-menu").toggleClass("state-open");
+        $(".erc-page-overlay").toggleClass("state-open");
+        $("body").toggleClass("state-scroll-blocked");
+    });
+    $("#logout").on('click', function() {
+        $("#logout-btn").submit();
+    });
 })(jQuery);

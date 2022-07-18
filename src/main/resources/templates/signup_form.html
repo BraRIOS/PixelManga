@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -28,22 +28,21 @@
 </head>
 
 <body>
-<!-- Page Preloder -->
-<div id="preloder">
-    <div class="loader"></div>
-</div>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
 
-<!-- Header Section Begin -->
-<header class="header">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <a href="/home">
-                    <img src="/static/images/logo.jpg" alt="" >
-                </a>
-            </div>
-            <div class="col-lg-7">
-                <div class="header__nav">
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3" >
+                    <a href="/home">
+                        <img src="/static/images/logo.jpg" alt="" >
+                    </a>
+                </div>
+                <div class="col-lg-7">
                     <nav class="header__menu mobile-menu">
                         <ul>
                             <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
@@ -53,22 +52,16 @@
                         </ul>
                     </nav>
                 </div>
-            </div>
-            <div class="col-lg-2">
-                <div class="header__right">
-                    <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
-                    <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
-                    <a href="#" class="search-switch"><span class="icon_search"></span></a>
-                    <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
-                    <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
-                    <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
+                <div class="col-lg-2 col-md-3 col-sm-3 d-flex align-items-center justify-content-end">
+                    <div class="header__right">
+                        <a href="#" class="search-switch"><span class="icon_search"></span></a>
+                    </div>
                 </div>
             </div>
+            <div id="mobile-menu-wrap"></div>
         </div>
-        <div id="mobile-menu-wrap"></div>
-    </div>
-</header>
-<!-- Header End -->
+    </header>
+    <!-- Header End -->
 
     <!-- Msg notification -->
 

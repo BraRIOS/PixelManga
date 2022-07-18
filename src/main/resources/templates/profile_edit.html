@@ -8,7 +8,7 @@
     <meta name="keywords" content="Anime, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title th:text="'Editar - '+${user.username}+' - Usuarios | PIXELmanga'"></title>
+    <title th:text="'Editar - '+${user.username}+' - Usuarios | Pixelmanga'"></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -120,13 +120,13 @@
                             </div>
                         </div>
 
-                        <form th:action="@{/profile/edit}" autocomplete="off" th:object="${user}" method="post" enctype="multipart/form-data">
+                        <form th:action="@{/profile/edit}" autocomplete="off" method="post" enctype="multipart/form-data">
                             <div class="input__item">
-                                <input type="email" name="email" required placeholder="Correo electrónico" th:value="*{email}" maxlength="255" autocomplete="email">
+                                <input type="email" name="email" required placeholder="Correo electrónico" th:value="${user.email}" maxlength="255" autocomplete="email">
                                 <span class="icon_mail"></span>
                             </div>
                             <div class="input__item">
-                                <input type="text" name="username" required placeholder="Nombre de usuario" th:value="*{username}" minlength="2" maxlength="255" autocomplete="username">
+                                <input type="text" name="username" required placeholder="Nombre de usuario" th:value="${user.username}" minlength="2" maxlength="255" autocomplete="username">
                                 <span class="icon_profile"></span>
                             </div>
                             <div class="input__item">
@@ -135,7 +135,7 @@
                                 <span class="icon_lock"></span>
                             </div>
                             <div class="input__item">
-                                <input type="date" th:field ="*{birthDate}" placeholder="Fecha de nacimiento" th:value="*{birthDate}" min="1940-01-01" max="2010-01-01">
+                                <input type="date" name="birthDate" placeholder="Fecha de nacimiento" th:value="${user.birthDate}" min="1940-01-01">
                                 <span class="icon_calendar"></span>
                             </div>
                             <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" id="fileImage" name="fileImage"

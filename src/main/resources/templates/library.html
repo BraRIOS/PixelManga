@@ -7,7 +7,7 @@
     <meta name="keywords" content="manga, manhwa, manhua, pixelmanga, leer online">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Biblioteca | PIXELmanga</title>
+    <title>Biblioteca | Pixelmanga</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/select2.min.css" type="text/css">
+    <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
 
 </head>
 
@@ -34,29 +35,28 @@
     <header class="header">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3">
+                <div class="col-lg-3 col-md-3 col-sm-3" >
                     <a href="/home">
                         <img src="/static/images/logo.jpg" alt="" >
                     </a>
                 </div>
                 <div class="col-lg-7">
-                    <div class="header__nav">
-                        <nav class="header__menu mobile-menu">
-                            <ul>
-                                <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
-                                <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
-                                <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
-                                <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
-                            </ul>
-                        </nav>
-                    </div>
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                            <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                            <li th:classappend="${is_following != null? 'active':''}"><a th:href="@{/favorite}">Siguiendo</a></li>
+                            <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
+                        </ul>
+                    </nav>
                 </div>
-                <div class="col-lg-2">
+                <div class="col-lg-2 col-md-3 col-sm-3 d-flex align-items-center justify-content-end">
                     <div class="header__right">
                         <a href="/register_sample" sec:authorize="hasAnyAuthority('AUTHOR') and isAuthenticated()"><span class="icon_pencil"></span></a>
-                        <a sec:authorize="!hasAnyAuthority('AUTHOR') and isAuthenticated()" data-toggle="modal" data-target="#askAuthorModal"><span class="icon_pencil"></span></a>
-                        <a href="/profile" sec:authorize="isAuthenticated()"><span class="icon_profile"></span></a>
-                        <a sec:authorize="isAuthenticated()"><form th:action="@{/logout}" method="post" ><input type="submit" value="Salir"></form></a>
+                        <a href="#" sec:authorize="isAuthenticated()" class="tuquito">
+                            <img class="account-item-avatar" th:src="'/images/users/current/avatar'" alt="">
+                            <i class="fa-solid fa-sort-down" style="font-size:12px;padding-left:3px"></i>
+                        </a>
                         <a href="/login" sec:authorize="!isAuthenticated()">Login</a>
                     </div>
                 </div>
@@ -65,6 +65,96 @@
         </div>
     </header>
     <!-- Header End -->
+
+    <!-- profile menu begin -->
+    <div class="erc-user-menu state-sticky" sec:authorize="isAuthenticated()">
+        <div class="user-menu-scrollable">
+            <div class="user-menu-section user-menu-account-section">
+                <div class="erc-user-menu-account-item">
+                    <div class="erc-header-avatar account-item-avatar">
+                        <img class="c-avatar avatar-img" th:src="'/images/users/current/avatar'" alt="">
+                    </div>
+                    <div class="account-item-meta">
+                        <h4 sec:authentication="name" class="c-heading c-heading--xxs c-heading--family-type-one c-heading--fixed-size account-item-title"></h4>
+                        <div class="account-item-premium-user">
+                            <span class="c-premium-filled-svg account-item-premium-icon fa-solid fa-crown"></span>
+                            <p class="c-text c-text--m account-item-premium-label">Miembro premium</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-menu-section">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" href="/profile">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-user"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Mi cuenta</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Gestiona tu perfil y tus opciones.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="user-menu-section" sec:authorize="hasAuthority('ADMIN')">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" href="/requests">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-handshake"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Solicitudes</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Gestiona las solicitudes de los usuarios.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="user-menu-section">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" href="/profile/lists">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-bookmark"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Mis Listas</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Gestiona y accede a tus listas.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="user-menu-section">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-book"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Siguiendo</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Continua tus lecturas.</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" th:href="@{/favorite}">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-star"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Favoritos</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Accede a tus libros favoritos.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="user-menu-section user-menu-sticky">
+                    <a class="erc-user-menu-nav-item" tabindex="0" id="logout" href="#">
+                        <form th:action="@{/logout}" method="post" hidden id="logout-btn"><input type="submit" value="Salir" hidden></form>
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-arrow-right-to-bracket" style="margin-top: 5px"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Desconectar</h5>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="erc-page-overlay"></div>
+    <!-- profile menu end -->
     <!-- Msg notification -->
 
     <div class="row" th:if="${message}">
@@ -237,61 +327,61 @@
     </footer>
   <!-- Footer Section End -->
 
-<!-- Js Plugins -->
-<script src="/static/js/jquery-3.3.1.min.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/mixitup.min.js"></script>
-<script src="/static/js/jquery.slicknav.js"></script>
-<script src="/static/js/main.js"></script>
-<script src="/static/js/select2.min.js"></script>
-<script type="text/javascript" th:inline="javascript">
-    /*<![CDATA[*/
-    $(document).ready(function() {
-        //show rating for each book
-        let samples= [[${list_samples_id}]];
-        if (samples != null) {
-            for (let i = 0; i < samples.length; i++) {
-                $.get("/sample_average_rate", {sampleId: samples[i]}, function (data) {
-                    //console.log(data);
-                    $("#" + samples[i]).append(data);
-                });
+    <!-- Js Plugins -->
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/mixitup.min.js"></script>
+    <script src="/static/js/jquery.slicknav.js"></script>
+    <script src="/static/js/select2.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function() {
+            //show rating for each book
+            let samples= [[${list_samples_id}]];
+            if (samples != null) {
+                for (let i = 0; i < samples.length; i++) {
+                    $.get("/sample_average_rate", {sampleId: samples[i]}, function (data) {
+                        //console.log(data);
+                        $("#" + samples[i]).append(data);
+                    });
+                }
             }
-        }
 
-        $('.type-select').select2({
-            placeholder: "Seleccione el tipo",
-            allowClear: true,
-            width: '100%'
-        }).val([[${type}]]).trigger('change');
+            $('.type-select').select2({
+                placeholder: "Seleccione el tipo",
+                allowClear: true,
+                width: '100%'
+            }).val([[${type}]]).trigger('change');
 
 
-        $('.genres-select').select2({
-            placeholder: "Seleccione los géneros",
-            allowClear: true,
-            width: '100%'
-        }).val([[${genres}]]).trigger('change');
+            $('.genres-select').select2({
+                placeholder: "Seleccione los géneros",
+                allowClear: true,
+                width: '100%'
+            }).val([[${genres}]]).trigger('change');
 
-        $('.demography-select').select2({
-            placeholder: "Seleccione la demografía",
-            allowClear: true,
-            width: '100%'
-        }).val([[${demography}]]).trigger('change');
+            $('.demography-select').select2({
+                placeholder: "Seleccione la demografía",
+                allowClear: true,
+                width: '100%'
+            }).val([[${demography}]]).trigger('change');
 
-        $('.order-select').select2({
-            width: '100%'
-        }).val([[${order}]]).trigger('change');
+            $('.order-select').select2({
+                width: '100%'
+            }).val([[${order}]]).trigger('change');
 
-        $('.order-dir-select').select2({
-            width: '100%'
-        }).val([[${order_dir}]]).trigger('change');
-    })
+            $('.order-dir-select').select2({
+                width: '100%'
+            }).val([[${order_dir}]]).trigger('change');
+        })
 
-    $(document).keydown(function (e) {
-        if (e.keyCode === 13) {
-            $('#search_submit').trigger('click');
-        }
-    });
-    /*]]>*/
-</script>
+        $(document).keydown(function (e) {
+            if (e.keyCode === 13) {
+                $('#search_submit').trigger('click');
+            }
+        });
+        /*]]>*/
+    </script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>
