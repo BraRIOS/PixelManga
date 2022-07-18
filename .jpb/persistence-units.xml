@@ -2,7 +2,7 @@
 <project version="4">
   <component name="PersistenceUnitSettings">
     <persistence-units>
-      <persistence-unit name="Default" persistenceXmlPath=".jpb/persistence-units.xml" defaultSearchScope="Project">
+      <persistence-unit name="Default" persistenceXmlPath=".jpb/persistence-units.xml">
         <packages>
           <package value="pixelmanga" />
         </packages>

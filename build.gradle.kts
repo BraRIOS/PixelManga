@@ -17,6 +17,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.stripe:stripe-java:20.133.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -39,6 +41,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
     }
 
 tasks.withType<KotlinCompile> {

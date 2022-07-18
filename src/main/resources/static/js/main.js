@@ -117,4 +117,19 @@
     $("#logout").on('click', function() {
         $("#logout-btn").submit();
     });
+
+    /*------------------
+        Premium menu
+    --------------------*/
+    $.get('isPremium', function(data) {
+        if (data) {
+            $("#premiumBadge").removeClass("d-none");
+            $("#showSubscription").removeClass("d-none");
+            $("#buySubscription").addClass("d-none");
+        } else {
+            $("#premiumBadge").addClass("d-none");
+            $("#showSubscription").addClass("d-none");
+            $("#buySubscription").removeClass("d-none");
+        }
+    });
 })(jQuery);

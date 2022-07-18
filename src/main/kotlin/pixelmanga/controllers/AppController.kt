@@ -1,5 +1,8 @@
 package pixelmanga.controllers
 
+import com.stripe.Stripe
+import com.stripe.model.checkout.Session
+import com.stripe.param.checkout.SessionCreateParams
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -827,6 +830,74 @@ class AppController {
         authorRequestRepo.save(request)
         ra.addFlashAttribute("message", "Se ha rechazado la solicitud de ${request.username}")
         return "redirect:/requests"
+    }
+
+    @GetMapping("/checkout")
+    fun checkout(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder pagar")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val list = user.favoriteSamples
+        model.addAttribute("list", list)
+        model.addAttribute("list_samples_id", list.map { it.id })
+        model.addAttribute("is_checkout", true)
+        return "checkout"
+    }
+
+    @PostMapping("/create-checkout-session")
+    fun createCheckoutSession(): String {
+        Stripe.apiKey = "sk_test_51LLdV2HCtZNMr4LMvyxwWpjWnUocMZ4UyZof7ojWoJp7EJoDck43VeAfZKKFuqGC3j2Z4tLE8fjG36WbV8oG6mqB00dBdGlQej";
+
+        val YOUR_DOMAIN = "http://localhost:8080"
+        val params: SessionCreateParams = SessionCreateParams.builder()
+            .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+            .setSuccessUrl("$YOUR_DOMAIN/success?session_id={CHECKOUT_SESSION_ID}")
+            .setCancelUrl("$YOUR_DOMAIN/home")
+            .addLineItem(
+                SessionCreateParams.LineItem.builder()
+                    .setQuantity(1L) // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                    .setPrice("price_1LLdcbHCtZNMr4LMYNVriHrn")
+                    .build()
+            )
+            .build()
+        return "redirect:"+ Session.create(params).url
+    }
+
+    @GetMapping("/create-portal-session")
+    fun createPortalSession(authentication: Authentication): String {
+        Stripe.apiKey = "sk_test_51LLdV2HCtZNMr4LMvyxwWpjWnUocMZ4UyZof7ojWoJp7EJoDck43VeAfZKKFuqGC3j2Z4tLE8fjG36WbV8oG6mqB00dBdGlQej";
+
+        val YOUR_DOMAIN = "http://localhost:8080"
+
+        val customer = (userRepo.findByUsername(authentication.name) as User).stripeId
+        // Authenticate your user.
+        val params = com.stripe.param.billingportal.SessionCreateParams.Builder()
+            .setReturnUrl(YOUR_DOMAIN).setCustomer(customer).build()
+
+        val portalSession = com.stripe.model.billingportal.Session.create(params)
+
+
+        return "redirect:"+portalSession.url
+    }
+
+    @GetMapping("/success")
+    fun success(@RequestParam session_id: String, ra: RedirectAttributes ,authentication: Authentication): String {
+        val user = userRepo.findByUsername(authentication.name) as User
+        user.stripeId = Session.retrieve(session_id).customer
+        userRepo.save(user)
+        ra.addFlashAttribute("message", "Te has convertido en usuario premium correctamente")
+        return "redirect:/profile"
+    }
+
+    @GetMapping("/isPremium")
+    fun isPremium(authentication: Authentication?): Boolean {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            return false
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        return user.isPremium()
     }
 
 }

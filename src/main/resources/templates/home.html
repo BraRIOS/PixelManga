@@ -31,6 +31,32 @@
         <div class="loader"></div>
     </div>
 
+    <!-- Modal Subscription-->
+    <div class="modal fade" id="subscriptionModal" tabindex="-1" role="dialog" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white">
+                    <h5 class="modal-title" id="subscriptionModalLabel">Deseas convertirte en usuario premium?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form method="POST" th:action="@{/create-checkout-session}" accept-charset="UTF-8">
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <p class="col-form-label col-12 col-sm-3">Serás redirigido a la pagina de stripe</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-success" id="checkout-button"><i class="fa fa-shopping-cart"></i> Comprar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal create list End-->
+
     <!-- Header Section Begin -->
     <header class="header">
         <div class="container">
@@ -77,7 +103,7 @@
                     </div>
                     <div class="account-item-meta">
                         <h4 sec:authentication="name" class="c-heading c-heading--xxs c-heading--family-type-one c-heading--fixed-size account-item-title"></h4>
-                        <div class="account-item-premium-user">
+                        <div class="account-item-premium-user" id="premiumBadge">
                             <span class="c-premium-filled-svg account-item-premium-icon fa-solid fa-crown"></span>
                             <p class="c-text c-text--m account-item-premium-label">Miembro premium</p>
                         </div>
@@ -91,6 +117,26 @@
                                 Mi cuenta</h5>
                             <div class="nav-item-description">
                                 <p class="c-text c-text--m description-text">Gestiona tu perfil y tus opciones.</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" data-toggle="modal" data-target="#subscriptionModal" id="buySubscription" href="#">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-star"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Convertirse en usuario premium</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Accede a beneficios exclusivos.</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" th:href="@{/create-portal-session}" id="showSubscription">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-edit"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Mi subscripción</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Gestiona tu subscripción y tus opciones.</p>
                             </div>
                         </div>
                     </a>
@@ -120,7 +166,7 @@
                     </a>
                 </div>
                 <div class="user-menu-section">
-                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0">
+                    <a class="erc-user-menu-nav-item d-flex align-items-center" tabindex="0" href="/checkout">
                         <span class="nav-item-icon c-base-svg--flip fa-solid fa-book"></span>
                         <div class="nav-item-info">
                             <h5 class="c-text c-text--l c-text--fixed-size">

@@ -29,6 +29,9 @@ open class User : Pathable {
     @Column(name = "avatar")
     open var avatar: String? = null
 
+    @Column(name = "stripe_id", unique = true)
+    open var stripeId: String? = null
+
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JoinTable(
         name = "users_roles",
@@ -63,5 +66,10 @@ open class User : Pathable {
         } else {
             "./resources/images/defaults/default-user-avatar.png"
         }
+    }
+
+    @Transient
+    fun isPremium(): Boolean {
+        return stripeId != null
     }
 }
