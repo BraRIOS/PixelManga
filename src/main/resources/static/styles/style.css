@@ -3207,12 +3207,13 @@ Thumbnail list
 }
 
 .erc-user-menu-nav-item {
-	align-items: flex-start;
 	color: #dadada;
 	display: flex;
 	padding: .875rem 1.5rem;
 	position: relative;
 	width: 100%;
+	-ms-flex-align: center !important;
+	align-items: center !important;
 }
 
 .erc-user-menu-nav-item .nav-item-info {

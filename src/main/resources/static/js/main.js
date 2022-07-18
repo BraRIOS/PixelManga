@@ -77,21 +77,23 @@
     /*------------------
 		Hero Slider
 	--------------------*/
-    var hero_s = $(".hero__slider");
-    hero_s.owlCarousel({
-        loop: true,
-        margin: 0,
-        items: 1,
-        dots: true,
-        nav: true,
-        navText: ["<span class='arrow_carrot-left'></span>", "<span class='arrow_carrot-right'></span>"],
-        animateOut: 'fadeOut',
-        animateIn: 'fadeIn',
-        smartSpeed: 1200,
-        autoHeight: false,
-        autoplay: true,
-        mouseDrag: false
-    });
+    let hero_s = $(".hero__slider");
+    if(hero_s.length !==0) {
+        hero_s.owlCarousel({
+            loop: true,
+            margin: 0,
+            items: 1,
+            dots: true,
+            nav: true,
+            navText: ["<span class='arrow_carrot-left'></span>", "<span class='arrow_carrot-right'></span>"],
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn',
+            smartSpeed: 1200,
+            autoHeight: false,
+            autoplay: true,
+            mouseDrag: false
+        });
+    }
 
     /*------------------
         Scroll To Top
@@ -104,18 +106,21 @@
     /*------------------
         Profile Menu
     --------------------*/
-    $(".tuquito").on('click', function() {
+
+    $('.open-userMenu').on('click', function (e) {
+        e.preventDefault();
         $(".erc-user-menu").toggleClass("state-open");
         $(".erc-page-overlay").toggleClass("state-open");
         $("body").toggleClass("state-scroll-blocked");
     });
-    $(".erc-page-overlay").on('click', function() {
+    $('.erc-page-overlay').on('click', function (e) {
+        e.preventDefault();
         $(".erc-user-menu").toggleClass("state-open");
         $(".erc-page-overlay").toggleClass("state-open");
         $("body").toggleClass("state-scroll-blocked");
     });
-    $("#logout").on('click', function() {
-        $("#logout-btn").submit();
+    $('#logout').click(function () {
+        $("#logout-form").submit();
     });
 
     /*------------------
@@ -132,4 +137,5 @@
             $("#buySubscription").removeClass("d-none");
         }
     });
+
 })(jQuery);
