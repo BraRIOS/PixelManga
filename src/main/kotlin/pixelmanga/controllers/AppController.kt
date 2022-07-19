@@ -602,8 +602,11 @@ class AppController {
 
     @GetMapping("/view/{type}/{sampleId}/{sampleName}/chapters/{number}")
     fun showChapter(model: Model, @PathVariable type: String, @PathVariable sampleId: Long, @PathVariable number:Long,
-                    @PathVariable sampleName: String
-    ): String {
+                    @PathVariable sampleName: String, ra: RedirectAttributes, authentication: Authentication?): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder leer un capítulo")
+            return "redirect:/login"
+        }
         val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
         val chapters = chapterRepo.findAllBySampleId(sampleId)
         when(type){
