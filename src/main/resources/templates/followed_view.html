@@ -3,26 +3,24 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Anime Template">
-    <meta name="keywords" content="Anime, unica, creative, html">
+    <meta name="description" content="Lector online de cómics orientales">
+    <meta name="keywords" content="manga, manhwa, manhua, pixelmanga, leer online">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title th:text="${sample.name}+' - '+${type.substring(0,1).toUpperCase()+type.substring(1)}+' | Pixelmanga'"></title>
+    <title>Listas seguidas | Pixelmanga</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+          rel="stylesheet">
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/plyr.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/nice-select.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+    <link rel="stylesheet" href="/static/styles/select2.min.css" type="text/css">
     <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
 
 </head>
@@ -215,7 +213,6 @@
     </div>
     <div class="erc-page-overlay"></div>
     <!-- profile menu end -->
-
     <!-- Msg notification -->
 
     <div class="row" th:if="${message}">
@@ -248,263 +245,87 @@
         </div>
     </div>
 
-    <div class="row" th:if="${info}">
-
-        <div class="col-sm-12">
-            <div class="alert fade alert-simple alert-warning alert-dismissible text-left font__family-montserrat font__size-16 font__weight-light brk-library-rendered rendered show" role="alert" data-brk-library="component__alert">
-                <button type="button" class="close font__size-18" data-dismiss="alert">
-									<span aria-hidden="true">
-										<i class="fa fa-times warning"></i>
-									</span>
-                    <span class="sr-only">Close</span>
-                </button>
-                <i class="start-icon fa fa-exclamation-triangle faa-flash animated"></i>
-                <strong class="font__weight-semibold" th:text="${info}"></strong>
-            </div>
-        </div>
-    </div>
-
     <!-- Msg notification End-->
 
-    <!-- Anime Section Begin -->
-    <section class="anime-details spad" th:object="${sample}">
+    <!-- Library Section Begin -->
+    <section class="product-page spad">
         <div class="container">
-            <div class="anime__details__content">
-                <div class="row" style="margin-bottom: 12px">
-                    <div class="col 12 col-md-3 text-center" >
-                        <h1 class="book-type mt-2" th:classappend="'bg-'+${type}" th:text="${type.toUpperCase()}"></h1>
-                        <div class="book__details__thumbnail my-2">
-                            <span class="score" th:id="${sample.id}">
-                                <i class="fa fa-star"></i>
-                                <span th:text="${average}"></span>
-                            </span>
-                            <div class="demography" th:classappend="${demography.name}"
-                                 th:text="${ demography.name.substring(0, 1).toUpperCase() + demography.name.substring(1)}"
-                                 th:title="${demography.description != null? demography.description : '' }"></div>
-                            <img class="book-thumbnail" src="" th:src="'/images/samples/'+${sample.id}">
-                        </div>
-                        <div class="anime__details__rating2">
-                            <form th:action="@{/user_rating_sample}" method="post">
-                                <div class="vote-input" id="votebar">
-                                    <div class="star-bar">
-                                        <input type="radio" name="rating" id="votebar-1" th:value="1">
-                                        <label id="label-1" for="votebar-1">Vote 1</label>
-                                        <input type="radio" name="rating" id="votebar-2" th:value="2">
-                                        <label id="label-2" for="votebar-2">Vote 2</label>
-                                        <input type="radio" name="rating" id="votebar-3" th:value="3">
-                                        <label id="label-3" for="votebar-3">Vote 3</label>
-                                        <input type="radio" name="rating" id="votebar-4" th:value="4">
-                                        <label id="label-4" for="votebar-4">Vote 4</label>
-                                        <input type="radio" name="rating" id="votebar-5" th:value="5">
-                                        <label id="label-5" for="votebar-5">Vote 5</label>
-                                        <input type="radio" name="rating" id="votebar-6" th:value="6">
-                                        <label id="label-6" for="votebar-6">Vote 6</label>
-                                        <input type="radio" name="rating" id="votebar-7" th:value="7">
-                                        <label id="label-7" for="votebar-7">Vote 7</label>
-                                        <input type="radio" name="rating" id="votebar-8" th:value="8">
-                                        <label id="label-8" for="votebar-8">Vote 8</label>
-                                        <input type="radio" name="rating" id="votebar-9" th:value="9">
-                                        <label id="label-9" for="votebar-9">Vote 9</label>
-                                        <input type="radio" name="rating" id="votebar-10" th:value="10">
-                                        <label id="label-10" for="votebar-10">Vote 10</label>
+            <div class="row">
+                <!-- Book List -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${lists}" th:if="${list.isPublic}">
+                            <a th:href="'/lists/'+${list.id}">
+                                <div th:data-id="${list.id}" class="thumbnail list list-bg thumbnail-list">
+                                    <div class="thumbnail-title text-white">
+                                        <h5 class="text-truncate" th:text="${list.name}"></h5>
+                                    </div>
+                                    <div class="thumbnail-description">
+                                        <p class="text-truncate" th:text="${list.description}"></p>
+                                    </div>
+                                    <div class="thumbnail-container">
+                                        <span class="followers_count" th:id="${list.id}"><i class="fa fa-users fa-fw"></i></span>
                                     </div>
                                 </div>
-                                <b id="vote"></b>
-                                <input type="hidden" name="sample_id" th:value="${sample.id}">
-                                <button id="makeVote" hidden type="submit"></button>
-                            </form>
+                            </a>
                         </div>
                     </div>
-                    <div class="col-lg-9">
-                        <div class="anime__details__text">
-                            <div class="anime__details__title">
-                                <h3 th:text="*{name}"></h3>
-                            </div>
-                            <div class="anime__details__rating">
-                                <div class="anime__details__btn" sec:authorize="hasAuthority('AUTHOR')">
-                                <a class="follow-btn" th:href="@{'/library/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/edit'}"><i class="fa fa-edit fa-fw"></i> Editar</a>
-                                </div>
-                            </div>
-                            <p th:text="*{synopsis}"></p>
-                            <div class="anime__details__widget">
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12">
-                                        <ul>
-                                            <li>
-                                                Fecha de publicación:
-                                                <span class="badge badge-pill badge-grey py-2 px-3">
-                                                    <i class="fa fa-calendar fa-fw"></i>
-                                                    <span th:text="*{publicationDate}"></span>
-                                                </span>
-                                            </li>
-                                        </ul>
-                                        <h5 style="color: #FFFFFF">Géneros</h5>
-                                        <h6 style="display: inline-block;" th:each="genre : ${genres}">
-                                            <a class="badge badge-dark py-2 px-4 mx-1 my-2" th:text="${genre.toUpperCase()}" th:href="@{/library(genres[]=${genre})}"></a>
-                                        </h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="anime__details__btn">
-                                <a href="#" id="favoriteBtn" class="follow-btn"><i th:classappend="${is_favorite? 'fa fa-heart' : 'fa fa-heart-o'}"></i> Favorito</a>
-                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')"><i class="fa fa-upload fa-fw"></i> Subir capítulo</a>
-                                <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" >
-                                    <i class="fa fa-pencil"></i>Agregar a lista
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <div class="anime__details__episodes">
-                    <div class="section-title">
-                        <h5>Capítulos</h5>
-                    </div>
-                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}"
-                       th:text="'Ep '+${chapter.number}+': '+${chapter.title}"></a>
-                </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 col-md-8">
-                        <div class="anime__details__review">
-                            <div id="disqus_thread"></div>
-                            <script>
-                                /**
-                                 *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-                                 *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-                                /*
-                                var disqus_config = function () {
-                                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-                                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-                                };
-                                */
-                                (function() { // DON'T EDIT BELOW THIS LINE
-                                    var d = document, s = d.createElement('script');
-                                    s.src = 'https://pixelmanga.disqus.com/embed.js';
-                                    s.setAttribute('data-timestamp', +new Date());
-                                    (d.head || d.body).appendChild(s);
-                                })();
-                            </script>
-                            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                        </div>
-                    </div>
-
-                        </div>
+                    <div>
+                        <ul class="pagination product__pagination justify-content-center">
+                            <li th:classappend="${prev == 0? 'disabled' : 'page-item'}" th:style="${prev == 0? 'display: none' : ''}">
+                                <a th:href="@{'/followed_lists?page='+${prev}}"><i th:classappend="${prev==0? '' : 'fa fa-angle-double-left'}"></i></a>
+                            </li>
+                            <li class="page-item" th:each="page :${pages}">
+                                <a th:classappend="${current == page? 'current-page' : ''}" th:href="@{'/followed_lists?page='+${page}}" th:text="${page}"></a>
+                            </li>
+                            <li th:classappend="${current == last || current==null? 'disabled' : 'page-item'}" th:style="${current == last || current==null? 'display: none' : ''}">
+                                <a th:href="@{'/followed_lists?page='+${next}}"><i th:classappend="${current==last || current==null? '' : 'fa fa-angle-double-right'}"></i></a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+                <!-- End of Book List -->
             </div>
-        </section>
-        <!-- Anime Section End -->
+        </div>
+    </section>
+    <!-- Product Section End -->
 
-        <!-- Footer Section Begin -->
+    <!-- Footer Section Begin -->
     <footer class="footer">
         <div class="page-up">
             <a href="#" id="scrollToTopButton"><span class="arrow_carrot-up"></span></a>
         </div>
     </footer>
-          <!-- Footer Section End -->
-
-          <!-- Search model Begin -->
-        <div class="search-model">
-            <div class="h-100 d-flex align-items-center justify-content-center">
-                <div class="search-close-switch"><i class="icon_close"></i></div>
-                <form class="search-model-form" action="/library">
-                    <input type="text" id="search-input" placeholder="Busque aquí.....">
-                </form>
-            </div>
-        </div>
-        <!-- Search model end -->
-
-    <!-- Modal -->
-    <div id="addList" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agregar el ejemplar a la lista:</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form th:action="@{/add_sample_to_list}" method="post">
-                    <div class="modal-body text-center">
-                        <div class="input__select">
-                            <input hidden th:value="${sample.id}" name="sample_id">
-                            <select class="user-list-select" name="list_id" required>
-                                <option th:each="list : ${user_sample_lists}"
-                                        th:value="${list.id}"
-                                        th:text="${list.name}"></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <a type="button" href="/lists/create" class="btn btn-secondary">Nueva lista</a>
-                        <button type="submit" class="btn btn-primary">Agregar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
-
-    <!-- Favorite -->
-
-    <div class="d-none">
-        <form th:action="@{/add_sample_to_favorite}" method="post" id="addFavorite">
-            <input hidden th:value="${sample.id}" name="sample_id">
-            <button type="submit" class="btn btn-primary"></button>
-        </form>
-        <form  th:action="@{/remove_sample_from_favorite}" method="post" id="removeFavorite">
-            <input hidden th:value="${sample.id}" name="sample_id">
-            <button type="submit" class="btn btn-primary"></button>
-        </form>
-    </div>
-
-    <!-- End Favorite -->
-
+    <!-- Footer Section End -->
 
     <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/jquery.nice-select.min.js"></script>
+    <script src="/static/js/mixitup.min.js"></script>
     <script src="/static/js/jquery.slicknav.js"></script>
-    <script src="/static/js/main.js"></script>
     <script src="/static/js/select2.min.js"></script>
-
-    <script th:inline="javascript">
+    <script src="/static/js/main.js"></script>
+    <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
-        $('#favoriteBtn').on('click', function () {
-            if ([[${is_favorite}]]) {
-                $('#removeFavorite').submit();
-            } else {
-                $('#addFavorite').submit();
+        $(document).ready(function() {
+            //show rating for each book
+            let lists = [[${lists_id}]];
+            if (lists != null) {
+                for (let i = 0; i < lists.length; i++) {
+                    $.get("/list_followers_count", {listId: lists[i]}, function (data) {
+                        //console.log(data);
+                        $("#" + lists[i]).append(data);
+                    });
+                }
+            }
+        })
+
+        $(document).keydown(function (e) {
+            if (e.keyCode === 13) {
+                $('#search_submit').trigger('click');
             }
         });
         /*]]>*/
-    </script>
-    <script>
-        let votes = [1,2,3,4,5,6,7,8,9,10];
-        let voteText = document.getElementById("vote")
-        votes.forEach(vote => {
-            $("#votebar-"+vote).click(
-                function () {
-                    document.getElementById("makeVote").click()
-                })
-            $("#label-"+vote).hover(
-                function() {
-                    //console.log(vote)
-                    voteText.innerHTML = vote.toString();
-                    voteText.style.color = "#FF7D3A";
-                    voteText.style.fontSize = "1.2rem";
-                },
-                function() {
-                    document.getElementById("vote").innerHTML = "";
-                })
-        })
-        /*$(document).ready(function(){
-            $('.user-list-select').select2({
-                placeholder: "Seleccione la lista",
-                allowClear: true,
-                width:'style'
-            })
-        })*/
     </script>
 </body>
 </html>

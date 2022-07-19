@@ -166,6 +166,16 @@
                             </div>
                         </div>
                     </a>
+                    <a class="erc-user-menu-nav-item " tabindex="0" href="/followed_lists">
+                        <span class="nav-item-icon c-base-svg--flip fa-solid fa-list-check"></span>
+                        <div class="nav-item-info">
+                            <h5 class="c-text c-text--l c-text--fixed-size">
+                                Listas seguidas</h5>
+                            <div class="nav-item-description">
+                                <p class="c-text c-text--m description-text">Accede a tus listas seguidas.</p>
+                            </div>
+                        </div>
+                    </a>
                 </div>
                 <div class="user-menu-section">
                     <a class="erc-user-menu-nav-item " tabindex="0" href="#">
@@ -255,8 +265,42 @@
 
     <!-- Msg notification End-->
 
+    <!-- Anime Section Begin -->
+    <section class="anime-details">
+        <header class="container">
+            <div class="row anime__details__content mb-2">
+                <div class="col 12 col-md-3 text-center" >
+                    <h1 class="book-type bg-manga mt-2 bg-user">LISTA</h1>
+                    <div class="book__details__thumbnail">
+                        <span class="score" th:id="${list.id}">
+                                <i class="fa fa-users fa-fw" style="color: white"></i>
+                                <span th:text="${followers}"></span>
+                            </span>
+                        <img class="book-thumbnail" src="" th:src="'/images/lists/'+${list.id}">
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="anime__details__title">
+                                <h3 th:text="${list.name}"></h3>
+                            </div>
+                            <p th:text="${list.description}"></p>
+                        </div>
+                        <div class="anime__details__btn" th:classappend="${is_user? 'd-none' : ''}">
+                            <a href="#" id="followBtn" class="follow-btn"><i th:classappend="${is_followed? 'fa fa-heart' : 'fa fa-heart-o'}"></i>Seguir</a>
+                        </div>
+                        <div class="anime__details__btn" th:classappend="${is_user? '' : 'd-none'}">
+                            <a href="#" id="privacyBtn" class="follow-btn"><i th:classappend="${list.isPublic? 'fa fa-lock-open' : 'fa fa-lock'}"></i>Privacidad</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </section>
+
     <!-- Product Section Begin -->
-    <section class="product spad">
+    <section class="product">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -313,6 +357,36 @@
     </div>
     <!-- Search model end -->
 
+    <!-- FollowedList -->
+
+    <div class="d-none">
+        <form th:action="@{/add_user_to_followed_list}" method="post" id="addFavorite">
+            <input hidden th:value="${list.id}" name="list_id">
+            <button type="submit" class="btn btn-primary"></button>
+        </form>
+        <form  th:action="@{/remove_user_from_followed_list}" method="post" id="removeFavorite">
+            <input hidden th:value="${list.id}" name="list_id">
+            <button type="submit" class="btn btn-primary"></button>
+        </form>
+    </div>
+
+    <!-- End FollowedList -->
+
+    <!-- PrivacyList -->
+
+    <div class="d-none">
+        <form th:action="@{/public_list}" method="post" id="makePublic">
+            <input hidden th:value="${list.id}" name="list_id">
+            <button type="submit" class="btn btn-primary"></button>
+        </form>
+        <form  th:action="@{/private_list}" method="post" id="makePrivate">
+            <input hidden th:value="${list.id}" name="list_id">
+            <button type="submit" class="btn btn-primary"></button>
+        </form>
+    </div>
+
+    <!-- End PrivacyList -->
+
     <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
@@ -332,6 +406,30 @@
                     //console.log(data);
                     $("#" + samples[i]).append(data);
                 });
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#followBtn').on('click', function () {
+            if ([[${is_followed}]]) {
+                $('#removeFavorite').submit();
+            } else {
+                $('#addFavorite').submit();
+            }
+        });
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $('#privacyBtn').on('click', function () {
+            if ([[${list.isPublic}]]) {
+                $('#makePrivate').submit();
+            } else {
+                $('#makePublic').submit();
             }
         });
         /*]]>*/

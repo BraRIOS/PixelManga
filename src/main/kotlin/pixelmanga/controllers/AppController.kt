@@ -653,7 +653,7 @@ class AppController {
     @GetMapping("/images/lists/{id}")
     fun getListCover(@PathVariable id: Long): ResponseEntity<ByteArray> {
         val list = listRepo.findById(id).get()
-        val imagePath = Paths.get(list.coverPath())
+        val imagePath = Paths.get(list.imagePath())
         return ResponseEntity.ok().body(Files.readAllBytes(imagePath))
     }
 
@@ -688,19 +688,21 @@ class AppController {
     fun createUserSampleList(authentication: Authentication,
                              @RequestParam("listName") listName: String,
                              @RequestParam("listDescription", required = false) listDescription: String?,
-                             ra: RedirectAttributes): String {
+                             ra: RedirectAttributes,@RequestParam fileImage:MultipartFile): String {
         val user = userRepo.findByUsername(authentication.name)
         val list = UserSamplesList()
+        list.isPublic = false
         list.name= listName
         list.description= listDescription
         list.user= user
+        listRepo.save(list)
+        saveImage(fileImage, list)
         listRepo.save(list)
         ra.addFlashAttribute("message", "Se ha creado la lista ${list.name} correctamente")
         return "redirect:/lists/{id}".replace("{id}", list.id.toString())
     }
 
-    // TODO: Separar vista de listas del usuario (/profile/lists) de listas de todos los usuarios (/lists)
-    @GetMapping("/lists", "/profile/lists")
+    @GetMapping("/profile/lists")
     fun showListPage(model: Model, authentication: Authentication?, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus listas")
@@ -712,12 +714,160 @@ class AppController {
         return "user_lists"
     }
 
+    @GetMapping("/lists")
+    fun showListsPage(@RequestParam("page", required = false) pageNumber: Int?,model: Model,
+                      authentication: Authentication?, ra: RedirectAttributes,@RequestParam title: String?): String {
+        val page:Int = pageNumber?.minus(1) ?:0
+        val pageable= PageRequest.of(page, 10)
+        val listsPage: Page<UserSamplesList>
+        var lists = listRepo.findAllByIsPublicTrue()
+        if (title != null && title != ""){
+            lists = lists.filter { (it.name as String).contains(title) }}
+        if (lists.isEmpty()){
+            model.addAttribute("search_message", "No se han encontrado listas")
+        }else{
+            val start = pageable.offset.toInt()
+            val end = (start + pageable.pageSize).coerceAtMost(lists.size)
+            listsPage = PageImpl(lists.subList(start, end), pageable, lists.size.toLong())
+            val totalPage = listsPage.totalPages
+            if (totalPage > 0) {
+                val pages = IntStream.rangeClosed(1, totalPage).toList()
+                model.addAttribute("pages", pages)
+            }
+            model.addAttribute("lists", listsPage.content)
+            model.addAttribute("lists_id", listsPage.content.map { it.id })
+            model.addAttribute("last", totalPage)
+            model.addAttribute("current", page + 1)
+        }
+        model.addAttribute("next", page + 2)
+        model.addAttribute("prev", page)
+        model.addAttribute("title", title?:"")
+        return "lists"
+    }
+
+    @GetMapping("/list_followers_count")
+    fun getListFollowersCount(@RequestParam("listId") listId: Long): ResponseEntity<Int> {
+        val list = listRepo.findById(listId).get()
+        return ResponseEntity.ok(list.followers.size)
+    }
+
     @GetMapping("/lists/{id}")
-    fun showList(@PathVariable id: Long, model: Model) :String{
+    fun showList(@PathVariable id: Long, model: Model,ra: RedirectAttributes, authentication: Authentication?) :String{
         val list = listRepo.findById(id).get()
-        model.addAttribute("list",list)
-        model.addAttribute("list_samples_id", list.samples.map { it.id })
-        return "list_view"
+        val followers = getListFollowersCount(list.id as Long)
+        model.addAttribute("followers", followers.body)
+        return if (list.isPublic as Boolean || list.user?.username == authentication?.name) {
+            model.addAttribute("list",list)
+            model.addAttribute("list_samples_id", list.samples.map { it.id })
+            if (list.user?.username == authentication?.name) {
+                model.addAttribute("is_user", true)
+            }else{
+                model.addAttribute("is_user", false)
+            }
+            val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+            if (authentication != null || authentication !is AnonymousAuthenticationToken) {
+                model.addAttribute("is_followed", list.followers.contains(userRepo.findByUsername((authentication as Authentication).name)))
+
+            }
+            "list_view"
+        } else {
+            ra.addFlashAttribute("error", "Esta lista no es pública")
+            "redirect:/home"
+        }
+    }
+
+    @PostMapping("/public_list")
+    fun makeListPublic(@RequestParam("list_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para hacer la lista pública")
+            return "redirect:/login"
+        }
+        if (listRepo.findById(sample_id).get().user?.username != authentication.name) {
+            ra.addFlashAttribute("error", "Debes ser el creador de la lista para hacerla pública")
+            return "redirect:/lists/${sample_id}"
+        }
+        val list = listRepo.findById(sample_id).get()
+        list.isPublic = true
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "${list.name} ahora es pública")
+        return "redirect:/lists/${list.id}"
+    }
+
+    @PostMapping("/private_list")
+    fun makeListPrivate(@RequestParam("list_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para hacer la lista privada")
+            return "redirect:/login"
+        }
+        if (listRepo.findById(sample_id).get().user?.username != authentication.name) {
+            ra.addFlashAttribute("error", "Debes ser el creador de la lista para hacerla privada")
+            return "redirect:/lists/${sample_id}"
+        }
+        val list = listRepo.findById(sample_id).get()
+        list.isPublic = false
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "${list.name} ahora es privada")
+        return "redirect:/lists/${list.id}"
+    }
+
+    @PostMapping("/add_user_to_followed_list")
+    fun addUserToFollowedList(@RequestParam("list_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder agregar a listas seguidas")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val list = listRepo.findById(sample_id).get()
+        list.followers.add(user)
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "Se ha agregado ${list.name} a listas seguidas")
+        return "redirect:/lists/${list.id}"
+    }
+
+    @PostMapping("/remove_user_from_followed_list")
+    fun removeUserFromFollowedList(@RequestParam("list_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder remover a listas seguidas")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val list = listRepo.findById(sample_id).get()
+        list.followers.remove(user)
+        listRepo.save(list)
+        ra.addFlashAttribute("message", "Se ha eliminado ${list.name} de listas seguidas")
+        return "redirect:/lists/${list.id}"
+    }
+
+    @GetMapping("/followed_lists")
+    fun showFollowedListsPage(@RequestParam("page", required = false) pageNumber: Int?,model: Model,
+                      authentication: Authentication?, ra: RedirectAttributes,@RequestParam title: String?): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus listas seguidas")
+            return "redirect:/login"
+        }
+        val page:Int = pageNumber?.minus(1) ?:0
+        val pageable= PageRequest.of(page, 10)
+        val listsPage: Page<UserSamplesList>
+        var lists = listRepo.findAllByFollowersContaining(authentication.name)
+        if (lists.isEmpty()){
+            model.addAttribute("search_message", "No se han encontrado listas")
+        }else{
+            val start = pageable.offset.toInt()
+            val end = (start + pageable.pageSize).coerceAtMost(lists.size)
+            listsPage = PageImpl(lists.subList(start, end), pageable, lists.size.toLong())
+            val totalPage = listsPage.totalPages
+            if (totalPage > 0) {
+                val pages = IntStream.rangeClosed(1, totalPage).toList()
+                model.addAttribute("pages", pages)
+            }
+            model.addAttribute("lists", listsPage.content)
+            model.addAttribute("lists_id", listsPage.content.map { it.id })
+            model.addAttribute("last", totalPage)
+            model.addAttribute("current", page + 1)
+        }
+        model.addAttribute("next", page + 2)
+        model.addAttribute("prev", page)
+        return "followed_view"
     }
 
     @PostMapping("/add_sample_to_list")
