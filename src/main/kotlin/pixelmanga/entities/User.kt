@@ -1,5 +1,8 @@
 package pixelmanga.entities
 
+import com.stripe.Stripe
+import com.stripe.model.Subscription
+import com.stripe.model.checkout.Session
 import org.springframework.web.multipart.MultipartFile
 import java.sql.Date
 import javax.persistence.*
@@ -70,6 +73,10 @@ open class User : Pathable {
 
     @Transient
     fun isPremium(): Boolean {
-        return stripeId != null
+        Stripe.apiKey = "sk_test_51LLdV2HCtZNMr4LMvyxwWpjWnUocMZ4UyZof7ojWoJp7EJoDck43VeAfZKKFuqGC3j2Z4tLE8fjG36WbV8oG6mqB00dBdGlQej";
+        if (stripeId == null) return false
+        if (Subscription.retrieve(Session.retrieve(stripeId).subscription).status == "active") return true
+        return false
+
     }
 }

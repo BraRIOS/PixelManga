@@ -1,7 +1,16 @@
 package pixelmanga.controllers
 
+
 import com.stripe.Stripe
+import com.stripe.exception.SignatureVerificationException
+import com.stripe.model.Customer
+import com.stripe.model.Event
+import com.stripe.model.StripeObject
+import com.stripe.model.StripeSearchResult
+import com.stripe.model.Subscription
 import com.stripe.model.checkout.Session
+import com.stripe.net.StripeRequest
+import com.stripe.net.Webhook
 import com.stripe.param.checkout.SessionCreateParams
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -15,10 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pixelmanga.entities.*
@@ -871,7 +877,8 @@ class AppController {
 
         val YOUR_DOMAIN = "http://localhost:8080"
 
-        val customer = (userRepo.findByUsername(authentication.name) as User).stripeId
+        val session = (userRepo.findByUsername(authentication.name) as User).stripeId
+        val customer = Session.retrieve(session).customer
         // Authenticate your user.
         val params = com.stripe.param.billingportal.SessionCreateParams.Builder()
             .setReturnUrl(YOUR_DOMAIN).setCustomer(customer).build()
@@ -885,19 +892,68 @@ class AppController {
     @GetMapping("/success")
     fun success(@RequestParam session_id: String, ra: RedirectAttributes ,authentication: Authentication): String {
         val user = userRepo.findByUsername(authentication.name) as User
-        user.stripeId = Session.retrieve(session_id).customer
+        user.stripeId = session_id
         userRepo.save(user)
         ra.addFlashAttribute("message", "Te has convertido en usuario premium correctamente")
         return "redirect:/profile"
     }
 
     @GetMapping("/isPremium")
-    fun isPremium(authentication: Authentication?): Boolean {
+    fun isPremium(authentication: Authentication?): ResponseEntity<Boolean> {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            return false
+            return ResponseEntity.ok(false)
         }
         val user = userRepo.findByUsername(authentication.name) as User
-        return user.isPremium()
+        return ResponseEntity.ok(user.isPremium())
     }
 
+    @PostMapping("/webhooks")
+    fun handleStripeEvent(@RequestHeader("Stripe-Signature") sigHeader: String,@RequestBody payload:String, authentication: Authentication): String {
+        val endpointSecret = "whsec_8a8bd3d32a03e57eb56ecba89571ff15cd13833dbf1012992bfd847d78859f05"
+
+        if (sigHeader == null) {return ""}
+
+        var event: Event
+
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret)
+        } catch (e: SignatureVerificationException) {
+            // Invalid signature
+            println("⚠️  Webhook error while validating signature.")
+            return ""
+        }
+        // Deserialize the nested object inside the event
+        val dataObjectDeserializer = event.dataObjectDeserializer
+        var stripeObject: StripeObject? = null
+        if (dataObjectDeserializer.getObject().isPresent) {
+            stripeObject = dataObjectDeserializer.getObject().get()
+        } else {
+            // Deserialization failed, probably due to an API version mismatch.
+            // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
+            // instructions on how to handle this case, or return an error here.
+        }
+        // Handle the event
+        var subscription: Subscription
+        when (event.type as String) {
+            "customer.subscription.deleted" -> {
+                println("Unhandled event type: ")
+            }
+            "customer.subscription.trial_will_end" -> {
+                println("Unhandled event type: ")
+            }
+            "customer.subscription.created" -> {
+                val user = userRepo.findByUsername(authentication.name) as User
+                user.stripeId = "puton"
+                userRepo.save(user)
+            }
+            "customer.subscription.updated" -> {
+                println("Unhandled event type: ")
+            }
+            "payment_intent.succeeded" -> {
+                println("Unhandled event type: ")
+            }
+            else -> println("Unhandled event type: ")
+        }
+        return ""
+        }
 }
