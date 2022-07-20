@@ -167,9 +167,18 @@ class AppController {
                 }
             } else model.addAttribute("isUnderReview", false)
         }
+        var userLists = listRepo.findAllByUser_Username(user.username as String)
+        var followedLists = listRepo.findAllByFollowersContaining(user.username as String)
+        if (userLists.size > 6){
+            userLists = userLists.subList(0, 6)
+        }
+        if (followedLists.size > 6){
+            followedLists = followedLists.subList(0, 6)
+        }
         model.addAttribute("user", user)
-        model.addAttribute("user_lists", listRepo.findAllByUser_Username(user.username as String))
+        model.addAttribute("user_lists", userLists)
         model.addAttribute("roles", roles)
+        model.addAttribute("followed_lists",followedLists)
 
         return "profile"
     }

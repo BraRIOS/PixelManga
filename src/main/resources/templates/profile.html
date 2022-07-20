@@ -399,9 +399,6 @@
                                         <div class="thumbnail-description">
                                             <p class="text-truncate" th:text="${list.description}"></p>
                                         </div>
-                                        <div class="thumbnail-container">
-                                            <span class="followers_count"><i class="fa fa-users fa-fw"></i> 0</span>
-                                        </div>
                                     </div>
                                 </a>
                             </div>
@@ -413,9 +410,24 @@
                             <div class="col-12 mt-2">
                                 <h2 class="list-color">Listas Seguidas</h2>
                             </div>
-                            <div class="col-12 text-center my-5">
+                            <div th:if="${followed_lists.isEmpty()}" class="col-12 text-center my-5">
                                 <h3><i class="fa fa-times fa-5x"></i></h3>
                                 <h5>No hay elementos</h5>
+                            </div>
+                            <div class=" col-12 col-sm-12 col-md-6 col-xl-4 mt-2" th:each="list : ${followed_lists}">
+                                <a th:href="'/lists/'+${list.id}">
+                                    <div th:data-id="${list.id}" class="thumbnail list list-bg thumbnail-list">
+                                        <div class="thumbnail-title text-white">
+                                            <h5 class="text-truncate" th:text="${list.name}"></h5>
+                                        </div>
+                                        <div class="thumbnail-description">
+                                            <p class="text-truncate" th:text="${list.description}"></p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-12 mt-2 anime__details__btn">
+                                <a class="follow-btn" href="/followed_lists"><i class="fa fa-list fa-fw"></i> Ir a Mis listas seguidas</a>
                             </div>
                         </div>
                     </div>
