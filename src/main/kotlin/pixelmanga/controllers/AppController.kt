@@ -422,6 +422,8 @@ class AppController {
             model.addAttribute("viewedChapters", user.viewedChapters)
             model.addAttribute("is_favorite", user.favoriteSamples.contains(sample))
             model.addAttribute("is_followed", user.followedSamples.contains(sample))
+            model.addAttribute("userRate", rateRepo.findByUser_IdAndSample_Id(user.id as Long, sample.id as Long)?.rating?:0)
+
         }
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
