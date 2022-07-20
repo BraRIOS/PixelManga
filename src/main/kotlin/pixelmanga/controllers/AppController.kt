@@ -885,7 +885,7 @@ class AppController {
         }
         model.addAttribute("next", page + 2)
         model.addAttribute("prev", page)
-        return "followed_view"
+        return "followed_list_view"
     }
 
     @PostMapping("/add_sample_to_list")
@@ -994,8 +994,20 @@ class AppController {
         val list = user.favoriteSamples
         model.addAttribute("list", list)
         model.addAttribute("list_samples_id", list.map { it.id })
-        model.addAttribute("is_following", true)
         return "favorites_view"
+    }
+
+    @GetMapping("/followeds")
+    fun showFolloweds(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus obras seguidas")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val list = user.followedSamples
+        model.addAttribute("list", list)
+        model.addAttribute("list_samples_id", list.map { it.id })
+        return "followeds_view"
     }
 
     @PostMapping("/failed_login")
