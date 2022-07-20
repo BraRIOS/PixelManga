@@ -43,13 +43,30 @@ open class User : Pathable {
     )
     open var roles: MutableSet<Role> = mutableSetOf()
 
-    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "users_favorite_samples",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "samples_id")]
     )
     open var favoriteSamples: MutableSet<Sample> = mutableSetOf()
+
+    @ManyToMany(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "users_followed_samples",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "samples_id")]
+    )
+    open var followedSamples: MutableSet<Sample> = mutableSetOf()
+
+    @ManyToMany
+    @JoinTable(
+        name = "users_viewed_chapters",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "chapters_id")]
+    )
+    open var viewedChapters: MutableCollection<Chapter> = mutableListOf()
+
     override fun setPersonalizedImageName(image: MultipartFile) {
         val regex = """\s|\*|"|\?|\\|>|/|<|:|\|""".toRegex()
         avatar = "${regex.replace(username as String, "_")}-avatar.${image.contentType?.split("/")?.last()}"

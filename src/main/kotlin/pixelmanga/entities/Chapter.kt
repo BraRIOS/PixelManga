@@ -1,5 +1,6 @@
 package pixelmanga.entities
 
+import org.hibernate.Hibernate
 import javax.persistence.*
 
 @Entity
@@ -39,4 +40,14 @@ open class Chapter {
     open fun imagesPathList(): List<String> {
         return images.map { "${path()}/$it" }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Chapter
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
 }

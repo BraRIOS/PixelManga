@@ -350,7 +350,7 @@
                         </div>
                         <div class="col-md-3 d-flex flex-column align-items-center">
                             <div class="mb-4">
-                                <a class="btn follow-btn" th:href="@{'/profile/edit'}"><i class="fa fa-edit"></i> Editar Perfil</a>
+                                <a class="follow-btn" th:href="@{'/profile/edit'}"><i class="fa fa-edit"></i> Editar Perfil</a>
                             </div>
                             <div class="mb-4 d-flex flex-column" sec:authorize="!hasAuthority('AUTHOR')">
                                 <a href="#" id="askAuthorModalBtn" class="btn" data-toggle="modal" data-target="#askAuthorModal"

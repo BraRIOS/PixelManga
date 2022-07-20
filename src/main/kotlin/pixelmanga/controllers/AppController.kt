@@ -1,16 +1,7 @@
 package pixelmanga.controllers
 
-
 import com.stripe.Stripe
-import com.stripe.exception.SignatureVerificationException
-import com.stripe.model.Customer
-import com.stripe.model.Event
-import com.stripe.model.StripeObject
-import com.stripe.model.StripeSearchResult
-import com.stripe.model.Subscription
 import com.stripe.model.checkout.Session
-import com.stripe.net.StripeRequest
-import com.stripe.net.Webhook
 import com.stripe.param.checkout.SessionCreateParams
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -265,9 +256,9 @@ class AppController {
                     @RequestParam("type", required = false) type: String?, @RequestParam("demography", required = false) demography: String?,
                     @RequestParam("genres[]", required = false) genres: Array<String>?, @RequestParam("order") orderBy: String?,
                     @RequestParam("order_dir") orderDir: String?): String {
-        val page: Int = pageNumber?.minus(1) ?:  0
+        val page: Int = pageNumber?.minus(1) ?: 0
         val pageable = PageRequest.of(page, 10)
-        val samplePages: Page<Sample>
+        val samplesPage: Page<Sample>
         var samples: List<Sample>
         var parameters=""
 
@@ -356,14 +347,14 @@ class AppController {
         else {
             val start = pageable.offset.toInt()
             val end = (start + pageable.pageSize).coerceAtMost(samples.size)
-            samplePages = PageImpl(samples.subList(start, end), pageable, samples.size.toLong())
-            val totalPage = samplePages.totalPages
+            samplesPage = PageImpl(samples.subList(start, end), pageable, samples.size.toLong())
+            val totalPage = samplesPage.totalPages
             if (totalPage > 0){
                 val pages = IntStream.rangeClosed(1, totalPage).toList()
                 model.addAttribute("pages", pages)
             }
-            model.addAttribute("list_samples", samplePages.content)
-            model.addAttribute("list_samples_id", samplePages.content.map { it.id as Long })
+            model.addAttribute("list_samples", samplesPage.content)
+            model.addAttribute("list_samples_id", samplesPage.content.map { it.id as Long })
             model.addAttribute("last", totalPage)
             model.addAttribute("current", page+1)
         }
@@ -414,19 +405,23 @@ class AppController {
     }
 
     @GetMapping("/library/{type}/{id}/{name}")
-    fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String): String {
+    fun showSample(model: Model, @PathVariable type: String, @PathVariable id: Long, @PathVariable name: String,
+                   authentication: Authentication?): String {
         val sample = sampleRepo.findById(id).get()
-        val chapters = chapterRepo.findAllBySampleId(id)
+        val chapters = chapterRepo.findAllBySampleId(id).reversed()
         val average = getSampleAverageRate(sample.id as Long)
         val urlSampleName = URLSampleName(sample)
 
-        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-        if (authentication != null || authentication !is AnonymousAuthenticationToken) {
-            model.addAttribute("user_sample_lists", listRepo.findAllByUser_Username((authentication as Authentication).name))
-            model.addAttribute("is_favorite", userRepo.existsByFavoriteSamples_IdAndUsername(id, authentication.name))
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            model.addAttribute("is_favorite", false)
+            model.addAttribute("is_followed", false)
         }
         else {
-            model.addAttribute("is_favorite", false)
+            val user = userRepo.findByUsername(authentication.name) as User
+            model.addAttribute("user_sample_lists", listRepo.findAllByUser_Username(authentication.name))
+            model.addAttribute("viewedChapters", user.viewedChapters)
+            model.addAttribute("is_favorite", user.favoriteSamples.contains(sample))
+            model.addAttribute("is_followed", user.followedSamples.contains(sample))
         }
         model.addAttribute("average", average.body)
         model.addAttribute("sample", sample)
@@ -616,8 +611,21 @@ class AppController {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder leer un capítulo")
             return "redirect:/login"
         }
+        val user = userRepo.findByUsername(authentication.name) as User
         val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
+        if (chapter == null) {
+            ra.addFlashAttribute("error", "El capítulo no existe")
+            return "redirect:/home"
+        }
+        if (user.favoriteSamples.contains(chapter.sample) || user.favoriteSamples.contains(chapter.sample)) {
+            user.viewedChapters.add(chapter)
+            userRepo.save(user)
+        }
         val chapters = chapterRepo.findAllBySampleId(sampleId)
+        if (!user.isPremium() && number > chapters.size - 3) {
+            ra.addFlashAttribute("error", "Debes ser usuario premium para leer este capítulo")
+            return "redirect:/home"
+        }
         when(type){
             "manga" -> model.addAttribute("reading_direction", "rtl")
             else -> model.addAttribute("reading_direction", "ltr")
@@ -669,7 +677,7 @@ class AppController {
     @GetMapping("/images/samples/{sampleId}/chapters/{number}/{imageNumber}")
     fun getChapterImages(@PathVariable sampleId: Long, @PathVariable number: Long,
                          @PathVariable imageNumber: Number): ResponseEntity<ByteArray> {
-        val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number)
+        val chapter = chapterRepo.findBySampleIdAndNumber(sampleId, number) as Chapter
         return if (chapter.imagesPathList().isNotEmpty()) {
             val images = chapter.imagesPathList().map { imagePath ->
                 val image = Files.readAllBytes(Paths.get(imagePath))
@@ -773,7 +781,6 @@ class AppController {
             }else{
                 model.addAttribute("is_user", false)
             }
-            val authentication: Authentication? = SecurityContextHolder.getContext().authentication
             if (authentication != null || authentication !is AnonymousAuthenticationToken) {
                 model.addAttribute("is_followed", list.followers.contains(userRepo.findByUsername((authentication as Authentication).name)))
 
@@ -857,7 +864,7 @@ class AppController {
         val page:Int = pageNumber?.minus(1) ?:0
         val pageable= PageRequest.of(page, 10)
         val listsPage: Page<UserSamplesList>
-        var lists = listRepo.findAllByFollowersContaining(authentication.name)
+        val lists = listRepo.findAllByFollowersContaining(authentication.name)
         if (lists.isEmpty()){
             model.addAttribute("search_message", "No se han encontrado listas")
         }else{
@@ -893,34 +900,89 @@ class AppController {
         return "redirect:/lists/${list.id}"
     }
 
-    @PostMapping("/add_sample_to_favorite")
-    fun addSampleToUserFavorite(@RequestParam("sample_id") sample_id: Long, authentication: Authentication?,ra: RedirectAttributes):String{
-        if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            ra.addFlashAttribute("error", "Debes iniciar sesión para poder agregar a favoritos")
-            return "redirect:/login"
+    @ResponseBody
+    @PostMapping("/set_status/{sampleId}/{status}")
+    fun setStatus(@PathVariable sampleId: Long, @PathVariable status: String,
+                  authentication: Authentication) :Map<String, String>{
+        var message = ""
+        val user = userRepo.findByUsername(authentication.name) as User
+        val sample = sampleRepo.findById(sampleId).get()
+        val type = "success"
+        when (status) {
+            "follow" -> {
+                user.followedSamples.add(sample)
+                userRepo.save(user)
+                message = "Has seguido a ${sample.name}"
+            }
+            "favorite" -> {
+                user.favoriteSamples.add(sample)
+                userRepo.save(user)
+                message = "Has marcado ${sample.name} como favorito"
+            }
+            "uncheck_follow" -> {
+                user.followedSamples.remove(sample)
+                userRepo.save(user)
+                message = "Has dejado de seguir a ${sample.name}"
+            }
+            "uncheck_favorite" -> {
+                user.favoriteSamples.remove(sample)
+                userRepo.save(user)
+                message = "Has dejado de marcar ${sample.name} como favorito"
+            }
         }
-        val user = userRepo.findByUsername(authentication.name) as User
-        val sample = sampleRepo.findById(sample_id).get()
-        val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
-        user.favoriteSamples.add(sample)
-        userRepo.save(user)
-        ra.addFlashAttribute("message", "Se ha agregado ${sample.name} a favoritos")
-        return "redirect:/library/${type}/${sample.id}/${URLSampleName(sample)}"
+        if (!user.favoriteSamples.contains(sample) && !user.followedSamples.contains(sample)) {
+            user.viewedChapters.removeAll(chapterRepo.findAllBySampleId(sampleId).toSet())
+            userRepo.save(user)
+        }
+
+        return mapOf("message" to message, "type" to type)
     }
 
-    @PostMapping("/remove_sample_from_favorite")
-    fun removeSampleFromUserFavorite(@RequestParam("sample_id") sample_id: Long, authentication: Authentication,ra: RedirectAttributes):String{
+    @ResponseBody
+    @PostMapping("/set_viewed/{chapterId}")
+    fun setViewed(@PathVariable chapterId: Long, authentication: Authentication):Map<String, String>{
         val user = userRepo.findByUsername(authentication.name) as User
-        val sample = sampleRepo.findById(sample_id).get()
-        val type = sample.attributes.find { it.type?.name == "tipo de libro" }?.name
-        user.favoriteSamples.remove(sample)
-        userRepo.save(user)
-        ra.addFlashAttribute("message", "Se ha eliminado ${sample.name} de favoritos")
-        return "redirect:/library/${type}/${sample.id}/${URLSampleName(sample)}"
+        val chapter = chapterRepo.findById(chapterId).get()
+        val type:String
+        val message:String
+        if (!user.favoriteSamples.contains(chapter.sample) && !user.followedSamples.contains(chapter.sample)) {
+            type = "info"
+            message = "Debes seguir o guardar en favoritos esta obra para marcar los capítulos vistos"
+        } else {
+            if (user.viewedChapters.contains(chapter)) {
+                user.viewedChapters.remove(chapter)
+                userRepo.save(user)
+                type = "success"
+                message = "Has desmarcado el capítulo ${chapter.number}"
+            }else {
+                user.viewedChapters.add(chapter)
+                userRepo.save(user)
+                type = "success"
+                message = "Has marcado el capítulo ${chapter.number} como visto"
+            }
+        }
+        return mapOf("message" to message, "type" to type)
     }
 
+    @ResponseBody
+    @PostMapping("/{sampleId}/set_all_chapters_not_viewed")
+    fun setAllNotViewed(@PathVariable sampleId: Long, authentication: Authentication):Map<String, String>{
+        val user = userRepo.findByUsername(authentication.name) as User
+        val type:String
+        val message:String
+        if (user.viewedChapters.isEmpty()) {
+            type = "error"
+            message = "No has marcado ningún capítulo"
+        } else {
+            user.viewedChapters.removeAll(chapterRepo.findAllBySampleId(sampleId).toSet())
+            userRepo.save(user)
+            type = "success"
+            message = "Se han desmarcado todos los capítulos"
+        }
+        return mapOf("type" to type, "message" to message)
+    }
 
-    @GetMapping("/favorite")
+    @GetMapping("/favorites")
     fun showFavorite(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {
         if (authentication == null || authentication is AnonymousAuthenticationToken) {
             ra.addFlashAttribute("error", "Debes iniciar sesión para poder ver tus favoritos")
@@ -1000,20 +1062,6 @@ class AppController {
         return "redirect:/requests"
     }
 
-    @GetMapping("/checkout")
-    fun checkout(authentication: Authentication?, model: Model, ra: RedirectAttributes): String {
-        if (authentication == null || authentication is AnonymousAuthenticationToken) {
-            ra.addFlashAttribute("error", "Debes iniciar sesión para poder pagar")
-            return "redirect:/login"
-        }
-        val user = userRepo.findByUsername(authentication.name) as User
-        val list = user.favoriteSamples
-        model.addAttribute("list", list)
-        model.addAttribute("list_samples_id", list.map { it.id })
-        model.addAttribute("is_checkout", true)
-        return "checkout"
-    }
-
     @PostMapping("/create-checkout-session")
     fun createCheckoutSession(): String {
         Stripe.apiKey = "sk_test_51LLdV2HCtZNMr4LMvyxwWpjWnUocMZ4UyZof7ojWoJp7EJoDck43VeAfZKKFuqGC3j2Z4tLE8fjG36WbV8oG6mqB00dBdGlQej";
@@ -1069,7 +1117,7 @@ class AppController {
         return ResponseEntity.ok(user.isPremium())
     }
 
-    @PostMapping("/webhooks")
+    /*@PostMapping("/webhooks")
     fun handleStripeEvent(@RequestHeader("Stripe-Signature") sigHeader: String,@RequestBody payload:String, authentication: Authentication): String {
         val endpointSecret = "whsec_8a8bd3d32a03e57eb56ecba89571ff15cd13833dbf1012992bfd847d78859f05"
 
@@ -1117,5 +1165,5 @@ class AppController {
             else -> println("Unhandled event type: ")
         }
         return ""
-        }
+        }*/
 }

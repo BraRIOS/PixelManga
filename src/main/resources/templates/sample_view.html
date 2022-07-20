@@ -18,13 +18,11 @@
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/plyr.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/nice-select.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/static/styles/style.css" type="text/css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" type="text/css">
     <script src="https://kit.fontawesome.com/d31cd00fe4.js" crossorigin="anonymous"></script>
-
 </head>
 
 <body>
@@ -71,13 +69,16 @@
                     </a>
                 </div>
                 <div class="col-lg-7">
-                    <nav class="header__menu mobile-menu">
-                        <ul>
-                            <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
-                            <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
-                            <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
-                        </ul>
-                    </nav>
+                    <div class="header__nav">
+                        <nav class="header__menu mobile-menu">
+                            <ul>
+                                <li th:classappend="${is_home !=null? 'active':''}"><a th:href="@{/home}">Home</a></li>
+                                <li th:classappend="${is_library !=null? 'active':''}"><a th:href="@{/library}">Biblioteca</a></li>
+                                <li th:classappend="${is_pendings!= null? 'active':''}"><a th:href="@{/pendings}">Pendientes</a></li>
+                                <li th:classappend="${is_lists !=null? 'active':''}"><a th:href="@{/lists}">Listas</a></li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
                 <div class="col-lg-2 col-md-3 col-sm-3 d-flex align-items-center justify-content-end">
                     <div class="header__right">
@@ -179,17 +180,17 @@
                     </a>
                 </div>
                 <div class="user-menu-section">
-                    <a class="erc-user-menu-nav-item " tabindex="0" href="#">
+                    <a class="erc-user-menu-nav-item " tabindex="0" th:href="@{/following}">
                         <span class="nav-item-icon c-base-svg--flip fa-solid fa-book"></span>
                         <div class="nav-item-info">
                             <h5 class="c-text c-text--l c-text--fixed-size">
                                 Siguiendo</h5>
                             <div class="nav-item-description">
-                                <p class="c-text c-text--m description-text">Continua tus lecturas.</p>
+                                <p class="c-text c-text--m description-text">Revisa los libros que sigues.</p>
                             </div>
                         </div>
                     </a>
-                    <a class="erc-user-menu-nav-item" tabindex="0" th:href="@{/favorite}">
+                    <a class="erc-user-menu-nav-item" tabindex="0" th:href="@{/favorites}">
                         <span class="nav-item-icon c-base-svg--flip fa-solid fa-star"></span>
                         <div class="nav-item-info">
                             <h5 class="c-text c-text--l c-text--fixed-size">
@@ -271,7 +272,7 @@
         <div class="container">
             <div class="anime__details__content">
                 <div class="row" style="margin-bottom: 12px">
-                    <div class="col 12 col-md-3 text-center" >
+                    <div class="col-12 col-md-3 text-center" >
                         <h1 class="book-type mt-2" th:classappend="'bg-'+${type}" th:text="${type.toUpperCase()}"></h1>
                         <div class="book__details__thumbnail my-2">
                             <span class="score" th:id="${sample.id}">
@@ -315,7 +316,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-lg-9">
+                    <div class="col-12 col-md-9">
                         <div class="anime__details__text">
                             <div class="anime__details__title">
                                 <h3 th:text="*{name}"></h3>
@@ -340,30 +341,57 @@
                                         </ul>
                                         <h5 style="color: #FFFFFF">Géneros</h5>
                                         <h6 style="display: inline-block;" th:each="genre : ${genres}">
-                                            <a class="badge badge-dark py-2 px-4 mx-1 my-2" th:text="${genre.toUpperCase()}" th:href="@{/library(genres[]=${genre})}"></a>
+                                            <a class="badge badge-dark py-2 px-4 mx-1 my-2" th:text="${genre.toUpperCase()}" th:href="'/library?genres[]='+${genre}"></a>
                                         </h6>
                                     </div>
                                 </div>
                             </div>
                             <div class="anime__details__btn">
-                                <a href="#" id="favoriteBtn" class="follow-btn"><i th:classappend="${is_favorite? 'fa fa-heart' : 'fa fa-heart-o'}"></i> Favorito</a>
-                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn" sec:authorize="hasAuthority('AUTHOR')"><i class="fa fa-upload fa-fw"></i> Subir capítulo</a>
+                                <a href="#" class="category-button follow-btn" data-status="favorite" title="Para marcar el libro que te gusta mucho" th:classappend="${is_favorite? 'active' : 'uncheked'}">
+                                    <i class="element-icon fa-heart fa-lg fa-fw" th:classappend="${is_favorite? 'fa-solid' : 'fa-regular'}"></i>
+                                    Favorito</a>
+                                <a href="#" class="category-button follow-btn" data-status="follow" title="Para marcar el libro que quieras seguir" th:classappend="${is_followed? 'active' : 'uncheked'}">
+                                    <i class="element-icon fa-circle-play fa-lg fa-fw" th:classappend="${is_followed? 'fa-solid' : 'fa-regular'}"></i>
+                                    <span th:text="${is_followed}? ' Seguido' : ' Seguir'"></span></a>
                                 <a sec:authorize="isAuthenticated()" class="follow-btn" href="#" data-toggle="modal" data-target="#addList" style="float: right; position: relative" >
                                     <i class="fa fa-pencil"></i>Agregar a lista
                                 </a>
                             </div>
                         </div>
                     </div>
-                <div class="anime__details__episodes">
-                    <div class="section-title">
-                        <h5>Capítulos</h5>
+                </div>
+                <div class="row mt-4 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12 section-title d-flex justify-content-between align-items-center">
+                                <h5 class="mr-auto">Capítulos</h5>
+                                <button type="button" class="btn btn-danger btn-check-all" id="btn-uncheck-all"><i class="fas fa-eye-slash fa-fw"></i> Desmarcar todos</button>
+                                <a th:href="@{'/upload_chapter/'+*{id}}" class="follow-btn upload-chapter" sec:authorize="hasAuthority('AUTHOR')"><i class="fa fa-upload fa-fw"></i> Subir capítulo</a>
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-lg-8 col-12 chapters" id="chapters">
+                                <ul class="list-group chapters-list">
+                                    <li class="p-0 upload-link" th:data-index="${chapter.number}" th:each="chapter:${chapters}">
+                                        <h4 class="px-2 py-3 m-0">
+                                            <div class="row d-flex justify-content-between align-items-center">
+                                                <div class="col-10 text-white text-truncate">
+                                                    <a th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}"
+                                                   th:text="'Capítulo '+${chapter.number}+(${chapter.title!=null && chapter.title!=''}?': '+${chapter.title}:'')"></a>
+                                                </div>
+                                                <div class="col-2 text-right">
+                                                    <span class="chapter-viewed-icon" th:data-chapter="${chapter.id}" th:classappend="${viewedChapters !=null && viewedChapters.contains(chapter)}? 'viewed':''" ></span>
+                                                </div>
+                                            </div>
+                                        </h4>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <a th:each="chapter : ${chapters}" th:href="@{'/view/'+${type}+'/'+${sample.id}+'/'+${urlSampleName}+'/chapters/'+${chapter.number}}"
-                       th:text="'Ep '+${chapter.number}+': '+${chapter.title}"></a>
                 </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 col-md-8">
+                <div class="row mt-5">
+                    <div class="col-lg-12 col-md-12">
                         <div class="anime__details__review">
                             <div id="disqus_thread"></div>
                             <script>
@@ -386,12 +414,10 @@
                             <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
                         </div>
                     </div>
-
-                        </div>
-                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
         <!-- Anime Section End -->
 
         <!-- Footer Section Begin -->
@@ -417,7 +443,7 @@
     <div id="addList" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header text-white">
                     <h5 class="modal-title">Agregar el ejemplar a la lista:</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -444,22 +470,6 @@
     </div>
     <!-- End Modal -->
 
-    <!-- Favorite -->
-
-    <div class="d-none">
-        <form th:action="@{/add_sample_to_favorite}" method="post" id="addFavorite">
-            <input hidden th:value="${sample.id}" name="sample_id">
-            <button type="submit" class="btn btn-primary"></button>
-        </form>
-        <form  th:action="@{/remove_sample_from_favorite}" method="post" id="removeFavorite">
-            <input hidden th:value="${sample.id}" name="sample_id">
-            <button type="submit" class="btn btn-primary"></button>
-        </form>
-    </div>
-
-    <!-- End Favorite -->
-
-
     <!-- Js Plugins -->
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
@@ -467,18 +477,8 @@
     <script src="/static/js/jquery.slicknav.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/select2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        $('#favoriteBtn').on('click', function () {
-            if ([[${is_favorite}]]) {
-                $('#removeFavorite').submit();
-            } else {
-                $('#addFavorite').submit();
-            }
-        });
-        /*]]>*/
-    </script>
     <script>
         let votes = [1,2,3,4,5,6,7,8,9,10];
         let voteText = document.getElementById("vote")
@@ -505,6 +505,156 @@
                 width:'style'
             })
         })*/
+    </script>
+    <script type="text/javascript" sec:authorize="isAuthenticated()" th:inline="javascript">
+        /*<![CDATA[*/
+        let sampleId = [[${sample.id}]];
+        var url = "/set_status/"+sampleId+"/:STATUS";
+        var url_check = '/set_viewed/:CHAPTER_ID';
+        var url_uncheck_all = '/'+sampleId+'/set_all_chapters_not_viewed';
+
+        function changeStatus(event){
+            let category_buttons = $('.category-button')
+            let all_inactive= true;
+            event.preventDefault();
+            const element = $(event.currentTarget);
+            if(element.hasClass('active')){
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': [[${_csrf.token}]]
+                    },
+                    url: url.replace(':STATUS',"uncheck_"+element.data('status')),
+                    type: 'POST',
+                    beforeSend :function(){
+                        $('.category-button').unbind('click');
+                    },
+                    success: function(response){
+                        element.toggleClass('unchecked active');
+                        element.find('.element-icon').toggleClass('fa-solid fa-regular');
+                        toastr.success(response.message);
+                        $('.category-button').bind('click', changeStatus);
+                        category_buttons.each(function(){
+                            if($(this).hasClass('active')){
+                                all_inactive = false;
+                            }
+                        })
+                        if(all_inactive){
+                            $('.chapter-viewed-icon.viewed').removeClass('viewed');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Ha ocurrido un error, vuelve a intentarlo pasados unos minutos');
+                        $('.category-button').bind('click',changeStatus);
+                    }
+                });
+            }else{
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': [[${_csrf.token}]]
+                    },
+                    url: url.replace(':STATUS',element.data('status')),
+                    type: 'POST',
+                    beforeSend :function(){
+                        $('.category-button').unbind('click');
+                    },
+                    success: function(response){
+                        element.toggleClass('unchecked active');
+                        element.find('.element-icon').toggleClass('fa-regular fa-solid');
+                        toastr.success(response.message);
+                        $('.category-button').bind('click',changeStatus);
+                    },
+                    error: function () {
+                        toastr.error('Ha ocurrido un error, vuelve a intentarlo pasados unos minutos');
+                        $('.category-button').bind('click',changeStatus);
+                    }
+                });
+            }
+        }
+        function uncheckAll(event){
+            event.preventDefault();
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': [[${_csrf.token}]]
+                },
+                url: url_uncheck_all,
+                type: 'POST',
+                beforeSend :function(){
+                    $('#btn-uncheck-all').unbind('click').attr('disabled','disabled');
+                },
+                success: function(response){
+                    if(response.type==="success") {
+                        toastr.success(response.message);
+                        $('.chapter-viewed-icon').removeClass('viewed');
+                    }else if(response.type==="error"){
+                        toastr.error(response.message);
+                    }else{
+                        toastr.info(response.message);
+                    }
+                    $('#btn-uncheck-all').bind('click',uncheckAll).attr('disabled',false);
+                },
+                error: function () {
+                    toastr.error('Ha ocurrido un error, vuelve a intentarlo pasados unos minutos');
+                    $('#btn-uncheck-all').bind('click',uncheckAll).attr('disabled',false);
+                }
+            });
+        }
+
+        function checkViewed(event){
+            event.preventDefault();
+            const element = $(event.currentTarget);
+            element.toggleClass('loading');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': [[${_csrf.token}]]
+                },
+                url: url_check.replace(':CHAPTER_ID',element.data('chapter')),
+                type: 'POST',
+                beforeSend :function(){
+                    $('.chapter-viewed-icon').unbind('click');
+                },
+                success: function(response){
+                    if(response.type==="success") {
+                        toastr.success(response.message);
+                        element.toggleClass('viewed');
+                    }else{
+                        toastr.info(response.message);
+                    }
+                    $('.chapter-viewed-icon').bind('click',checkViewed);
+                    element.toggleClass('loading');
+                },
+                error: function () {
+                    toastr.error('Ha ocurrido un error, vuelve a intentarlo pasados unos minutos');
+                    $('.chapter-viewed-icon').bind('click',checkViewed);
+                    element.toggleClass('loading');
+                }
+            });
+        }
+
+        $('.category-button').bind('click',changeStatus);
+        $('.chapter-viewed-icon').bind('click',checkViewed);
+        $('#btn-uncheck-all').bind('click',uncheckAll);
+        /*]]>*/
+    </script>
+    <script sec:authorize="!isAuthenticated()">
+        function changeStatus(event){
+            event.preventDefault();
+            toastr.warning('Necesitas iniciar sesión para usar esta funcionalidad');
+        }
+
+        function uncheckAll(event){
+            event.preventDefault();
+            toastr.warning('Necesitas iniciar sesión para usar esta funcionalidad');
+        }
+
+        function checkViewed(event){
+            event.preventDefault();
+            toastr.warning('Necesitas iniciar sesión para usar esta funcionalidad');
+        }
+
+        $('.category-button').bind('click',changeStatus);
+        $('.chapter-viewed-icon').bind('click',checkViewed);
+        $('#btn-uncheck-all').bind('click',uncheckAll);
+
     </script>
 </body>
 </html>
