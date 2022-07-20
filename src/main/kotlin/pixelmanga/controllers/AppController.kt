@@ -995,7 +995,7 @@ class AppController {
         model.addAttribute("list", list)
         model.addAttribute("list_samples_id", list.map { it.id })
         model.addAttribute("is_following", true)
-        return "favorite_view"
+        return "favorites_view"
     }
 
     @PostMapping("/failed_login")
@@ -1117,6 +1117,35 @@ class AppController {
         }
         val user = userRepo.findByUsername(authentication.name) as User
         return ResponseEntity.ok(user.isPremium())
+    }
+
+    @GetMapping("/pendings")
+    fun showChaptersPendings(model: Model, authentication: Authentication?, ra: RedirectAttributes):String{
+        if (authentication == null || authentication is AnonymousAuthenticationToken) {
+            ra.addFlashAttribute("error", "Debes iniciar sesión para ver tus capítulos pendientes")
+            return "redirect:/login"
+        }
+        val user = userRepo.findByUsername(authentication.name) as User
+        val savedSamples: MutableSet<Sample> = mutableSetOf()
+        savedSamples.addAll(user.followedSamples)
+        savedSamples.addAll(user.favoriteSamples)
+
+        val savedSamplesWithChaptersPending = savedSamples.filter { sample -> chapterRepo.findAllBySampleId(sample.id as Long).isNotEmpty() &&
+                !chapterRepo.findAllBySampleId(sample.id as Long).containsAll(user.viewedChapters.filter { (it.sample as Sample) == sample})}.toMutableSet()
+        val totalChapterForEachSavedSample = mutableListOf<Int>()
+        totalChapterForEachSavedSample.addAll(savedSamplesWithChaptersPending.map { sample -> chapterRepo.findAllBySampleId(sample.id as Long).size })
+        val lastViewedChapterNumberForEachSavedSample = mutableListOf<Long>()
+        lastViewedChapterNumberForEachSavedSample.addAll(savedSamplesWithChaptersPending.map { sample -> user.viewedChapters.filter { (it.sample as Sample) == sample }.map { it.number }.maxOf { it as Long }})
+
+        val followedSamplesWithChaptersPending = savedSamplesWithChaptersPending.filter { sample -> user.followedSamples.contains(sample) }.toMutableSet()
+
+        model.addAttribute("followedSamples", followedSamplesWithChaptersPending)
+        model.addAttribute("savedSamples", savedSamplesWithChaptersPending)
+        model.addAttribute("savedSamplesId", savedSamplesWithChaptersPending.map { it.id })
+        model.addAttribute("totalChapterSamples", totalChapterForEachSavedSample)
+        model.addAttribute("lastViewedChapterSamples", lastViewedChapterNumberForEachSavedSample)
+
+        return "pendings"
     }
 
     /*@PostMapping("/webhooks")
