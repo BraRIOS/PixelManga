@@ -1,2 +1,3 @@
-INSERT INTO pixelmanga.users (id, email, user_name, password, avatar, birth_date) VALUES (1, 'admin@admin', 'admin', '$2a$12$O32kJafSfDDPYReIVPp9NOhmfDz.zmWrpY419jFqnoN1jg9pOUxze', null, '2022-01-01');
-INSERT INTO pixelmanga.users (id, email, user_name, password, avatar, birth_date) VALUES (2, 'braian.rios@hotmail.com', 'braian', '$2a$10$K4VhlTO45wZVupoHq6K2p.NbR8Voiw8090tJ/wdcPTSYOxVQg6o6K', null, '1999-11-23');
+INSERT INTO pixelmanga.users (id, email, user_name, password, birth_date, avatar, stripe_id) VALUES (1, 'admin@admin', 'admin', '$2a$12$O32kJafSfDDPYReIVPp9NOhmfDz.zmWrpY419jFqnoN1jg9pOUxze', '2022-01-01', null, 'cs_test_a1zvyzwUG159CRjLRxFVg5AiD4IDWOTwFo4l0CaQCT3CcYnH8wAqKVFZ7L');
+INSERT INTO pixelmanga.users (id, email, user_name, password, birth_date, avatar, stripe_id) VALUES (2, 'braian.rios@hotmail.com', 'braian', '$2a$10$K4VhlTO45wZVupoHq6K2p.NbR8Voiw8090tJ/wdcPTSYOxVQg6o6K', '1999-11-23', null, null);
+INSERT INTO pixelmanga.users (id, email, user_name, password, birth_date, avatar, stripe_id) VALUES (3, 'noesautor@no', 'NoAutor?', '$2a$10$gJ5R6RENPxDMAHi6crSzgOoAjsP2f/vWDhDJtOPViEdYEOxl0phDK', null, null, null);

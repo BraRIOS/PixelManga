@@ -1,0 +1,3 @@
+INSERT INTO pixelmanga.author_request (id, username, email, message, status, created_at, updated_at, reject_reason, updated_by) VALUES (7, 'NoAutor?', 'noesautor@no', null, 'RECHAZADO', '2022-07-18', '2022-07-18', '', 'admin');
+INSERT INTO pixelmanga.author_request (id, username, email, message, status, created_at, updated_at, reject_reason, updated_by) VALUES (8, 'braian', 'braian.rios@hotmail.com', null, 'ACEPTADO', '2022-07-18', '2022-07-18', null, 'admin');
+INSERT INTO pixelmanga.author_request (id, username, email, message, status, created_at, updated_at, reject_reason, updated_by) VALUES (9, 'NoAutor?', 'noesautor@no', null, 'RECHAZADO', '2022-07-18', '2022-07-18', 'Nombre impropio', 'admin');
